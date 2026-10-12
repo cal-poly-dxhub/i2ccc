@@ -5,15 +5,17 @@ import subprocess
 import boto3
 from botocore.exceptions import ClientError
 
+from processing_config import (
+    PROCESS_VIDEO,
+    VIDEO_CHUNK_DURATION_SECONDS,
+    VIDEO_MAX_SIZE_GB,
+    video_chunk_key,
+)
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 s3_client = boto3.client("s3")
-
-# Chunk size: 20 minutes per chunk (in seconds)
-CHUNK_DURATION_SECONDS = 20 * 60
-# Max chunk size target: 1.8 GB
-MAX_CHUNK_SIZE_GB = 1.8
 
 
 def parse_s3_uri(s3_uri):
@@ -50,13 +52,13 @@ def calculate_chunks(duration_seconds, file_size_bytes):
     file_size_gb = file_size_bytes / (1024 ** 3)
 
     # Determine chunk duration based on file size
-    if file_size_gb > MAX_CHUNK_SIZE_GB:
-        # Size-based splitting: ensure each chunk is under 1.8GB
-        num_chunks_for_size = max(2, int(file_size_gb / MAX_CHUNK_SIZE_GB) + 1)
+    if file_size_gb > VIDEO_MAX_SIZE_GB:
+        # Size-based splitting: ensure each chunk is under the size limit
+        num_chunks_for_size = max(2, int(file_size_gb / VIDEO_MAX_SIZE_GB) + 1)
         chunk_duration = duration_seconds / num_chunks_for_size
     else:
-        # Use default 20-minute chunks
-        chunk_duration = CHUNK_DURATION_SECONDS
+        # Use default-length chunks
+        chunk_duration = VIDEO_CHUNK_DURATION_SECONDS
 
     chunks = []
     num_chunks = int(duration_seconds / chunk_duration) + 1
@@ -88,8 +90,10 @@ def create_video_chunk(input_file, output_file, start_time, duration):
     try:
         cmd = [
             "ffmpeg",
-            "-i", input_file,
+            # -ss before -i seeks the input directly instead of reading from
+            # the start of the file for every chunk
             "-ss", str(start_time),
+            "-i", input_file,
             "-t", str(duration),
             "-c", "copy",  # Copy codec (fast, no re-encoding)
             "-avoid_negative_ts", "make_zero",
@@ -153,8 +157,13 @@ def lambda_handler(event, context):
         # Parse S3 URI
         bucket, key = parse_s3_uri(s3_uri)
         filename = os.path.basename(key)
-        name_without_ext = os.path.splitext(filename)[0]
-        ext = os.path.splitext(filename)[1]
+
+        # Chunks are new objects, so copy the original's metadata (access
+        # badge, source links) onto them explicitly
+        original_metadata = s3_client.head_object(Bucket=bucket, Key=key).get(
+            "Metadata", {}
+        )
+        base_offset = int(original_metadata.get("relative-start-time", 0) or 0)
 
         # Download video from S3
         local_video_path = os.path.join(temp_dir, filename)
@@ -172,8 +181,8 @@ def lambda_handler(event, context):
         chunk_results = []
         for chunk in chunks_info:
             chunk_num = chunk["chunk_num"]
-            chunk_filename = f"{name_without_ext}_chunk_{chunk_num:03d}{ext}"
-            chunk_local_path = os.path.join(temp_dir, chunk_filename)
+            chunk_key = video_chunk_key(key, chunk_num)
+            chunk_local_path = os.path.join(temp_dir, os.path.basename(chunk_key))
 
             # Create chunk
             logger.info(f"Creating chunk {chunk_num}/{len(chunks_info)}")
@@ -184,10 +193,19 @@ def lambda_handler(event, context):
                 chunk["duration"]
             )
 
-            # Upload chunk to S3
-            chunk_key = os.path.join(os.path.dirname(key), chunk_filename)
+            # Upload chunk to S3; relative-start-time lets the video processor
+            # report timestamps against the original video
+            chunk_metadata = {
+                **original_metadata,
+                "relative-start-time": str(base_offset + int(chunk["start_time"])),
+            }
             logger.info(f"Uploading chunk to S3: {bucket}/{chunk_key}")
-            s3_client.upload_file(chunk_local_path, bucket, chunk_key)
+            s3_client.upload_file(
+                chunk_local_path,
+                bucket,
+                chunk_key,
+                ExtraArgs={"Metadata": chunk_metadata},
+            )
 
             chunk_s3_uri = f"s3://{bucket}/{chunk_key}"
             chunk_results.append({
@@ -197,7 +215,7 @@ def lambda_handler(event, context):
                 "key": chunk_key,
                 "start_time": chunk["start_time"],
                 "duration": chunk["duration"],
-                "lambda_name": event.get("lambda_name", "process-video"),
+                "lambda_name": event.get("lambda_name", PROCESS_VIDEO),
                 "data_type": event.get("data_type", "mp4"),
                 "timestamp": event.get("timestamp")
             })

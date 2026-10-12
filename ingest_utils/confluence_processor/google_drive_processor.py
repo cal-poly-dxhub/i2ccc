@@ -11,21 +11,13 @@ import re  # Added for regular expressions
 from googleapiclient.errors import HttpError# type: ignore
 import subprocess
 import logging
-import pymediainfo # type: ignore
+from pipeline_config import SUPPORTED_EXTENSIONS, extension_of, pipeline_output_keys
 
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
-# Constants for video processing
-DURATION_THRESHOLD_HOURS = 3  # Videos longer than 3 hours will be split
-CHUNK_AMOUNT = 14  # 14 minutes
-CHUNK_DURATION_HOURS = 1.5  # Each chunk will be 1.5 hours long
-SIZE_THRESHOLD_GB = 2  # Videos bigger than 2GB will be split
-MAX_CHUNK_SIZE_GB = 2  # Maximum size per chunk for Lambda processing
-CHUNK_DURATION_MINUTES = 20  # Each chunk will be 20 minutes long
 CONFLUENCE_ASSETS_LINKS = "confluence_asset_links.csv"
-NAMES_ENV = "names.env"
 
 # just incase
 native_types = {
@@ -57,13 +49,6 @@ direct_export_urls = {
     "application/vnd.google-apps.document": "https://docs.google.com/document/d/{id}/export?format=docx",
     "application/vnd.google-apps.presentation": "https://docs.google.com/presentation/d/{id}/export/pptx",
     "application/vnd.google-apps.spreadsheet": "https://docs.google.com/spreadsheets/d/{id}/export?format=xlsx",
-}
-
-# Must match the lambda_mappings keys in src/ingest/routing/routing_lambda.py -
-# files whose final upload name isn't one of these are skipped by the ingest
-# pipeline, so downloading them is wasted work
-PIPELINE_SUPPORTED_EXTENSIONS = {
-    "mp4", "webm", "pdf", "mp3", "wav", "flac", "m4a", "txt", "vtt",
 }
 
 
@@ -102,9 +87,6 @@ class GoogleDriveProcessor:
         os.makedirs(self.output_dir, exist_ok=True)
         self.s3_uploader = s3_uploader
         self.skip_existing = skip_existing
-
-        # Global timestamp tracking across all videos
-        self.global_timestamp_seconds = 0
 
         # Run summary counts, reported by the collector job
         self.stats = {
@@ -304,8 +286,8 @@ class GoogleDriveProcessor:
     def _predicted_s3_keys(self, name: str, mime_type: str) -> List[str]:
         """
         Predicts the S3 key(s) a Drive file would end up under after export,
-        PDF conversion, or video chunking, so existence can be checked before
-        the file is downloaded.
+        PDF conversion, or pipeline video chunking, so existence can be
+        checked before the file is downloaded.
         """
         if mime_type in native_types:
             export_mime_type = native_types[mime_type]
@@ -317,9 +299,9 @@ class GoogleDriveProcessor:
             if "spreadsheetml" in export_mime_type:
                 return [f"{name}.xlsx"]
             return [name]
-        # Blob files upload under their own name; large videos upload as chunks
-        base_name = os.path.splitext(name)[0]
-        return [name, f"{base_name}_chunk_001.mp4"]
+        # Blob files upload under their own name; large videos are replaced
+        # by chunks once the pipeline splits them
+        return pipeline_output_keys(name)
 
     def _download_and_upload_file(
         self,
@@ -344,8 +326,8 @@ class GoogleDriveProcessor:
 
         # Skip files the ingest pipeline can't process (routing lambda would
         # ignore them anyway), so we never download them
-        final_ext = os.path.splitext(predicted_keys[0])[1].lstrip(".").lower()
-        if final_ext not in PIPELINE_SUPPORTED_EXTENSIONS:
+        final_ext = extension_of(predicted_keys[0])
+        if final_ext not in SUPPORTED_EXTENSIONS:
             logger.info(
                 f"Skipping {name} - final type '{final_ext or mime_type}' is unsupported by the ingest pipeline"
             )
@@ -469,30 +451,10 @@ class GoogleDriveProcessor:
                     )
                     # Fallback to uploading the original file
 
-            # Upload all other files to the configured s3_subfolder (no separate type-based folders)
+            # Upload all other files to the configured s3_subfolder (no separate
+            # type-based folders). Large videos are uploaded whole - the
+            # ingest state machine chunks them.
             s3_object_name = f"{name}"
-
-            # Check if this is a video file and process it before uploading
-            file_ext = os.path.splitext(output_path)[1].lower()
-            if file_ext in [".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv", ".webm"]:
-                # Process video file with splitting if needed
-                logger.info(f"Video file detected, checking for processing: {name}")
-                sanitized_source_url = self._sanitize_drive_file_url(source_url) if source_url else None
-                chunked = self.process_video_file(
-                    output_path,
-                    s3_object_name,
-                    is_subscriber_content,
-                    source_url=sanitized_source_url,
-                    parent_folder_name=parent_folder_name,
-                    parent_folder_url=parent_folder_url,
-                )
-                if chunked:
-                    logger.info(
-                        f"INFO: {name} was chunked. Skipping upload of the original file to S3."
-                    )
-
-                    os.remove(output_path)  # Clean up local file after chunking
-                    return output_path
 
             sanitized_source_url = self._sanitize_drive_file_url(source_url) if source_url else None
             upload_success = self.s3_uploader.upload_file(
@@ -521,228 +483,6 @@ class GoogleDriveProcessor:
             self.stats["failed"] += 1
             if os.path.exists(output_path):
                 os.remove(output_path)
-            return None
-
-    def get_video_duration_seconds(self, file_path: str) -> Optional[float]:
-        try:
-            media_info = pymediainfo.MediaInfo.parse(file_path)
-
-            # Get duration from video track
-            for track in media_info.tracks:
-                if track.track_type == "Video":
-                    if hasattr(track, "duration") and track.duration:
-                        # Duration is in milliseconds, convert to seconds
-                        duration_seconds = float(track.duration) / 1000.0
-                        return duration_seconds
-
-            logger.warning(f"No video duration found for {file_path}")
-            return None
-
-        except Exception as e:
-            logger.error(f"Error getting video duration for {file_path}: {e}")
-            return None
-
-    def get_video_size_gb(self, file_path: str) -> Optional[float]:
-        try:
-            size_bytes = os.path.getsize(file_path)
-            size_gb = size_bytes / (1024 * 1024 * 1024)  # Convert to GB
-            return size_gb
-        except Exception as e:
-            logger.error(f"Error getting video size for {file_path}: {e}")
-            return None
-
-    def should_split_video(self, duration_seconds: float, file_size_bytes: int) -> bool:
-        duration_hours = duration_seconds / 3600.0
-        file_size_gb = file_size_bytes / (1024**3)
-        # Split if duration > 3 hours OR size > 2GB
-        return (
-            duration_hours > DURATION_THRESHOLD_HOURS
-            or file_size_gb > SIZE_THRESHOLD_GB
-        )
-
-    def calculate_chunks(
-        self, duration_seconds: float, file_size_bytes: int
-    ) -> List[Dict]:
-        duration_hours = duration_seconds / 3600.0
-        file_size_gb = file_size_bytes / (1024**3)
-
-        chunks = []
-        MIN_CHUNK_DURATION = 2  # seconds, skip chunks smaller than this
-
-        # --- Adaptive Chunker  ---
-        # Determine chunk duration based on what creates smaller chunks
-        if file_size_gb > SIZE_THRESHOLD_GB:
-            # Size-based splitting: ensure each chunk is under 2GB
-            num_chunks_for_size = max(2, int(file_size_gb / MAX_CHUNK_SIZE_GB) + 1)
-            chunk_duration_seconds = duration_seconds / num_chunks_for_size
-        elif duration_hours > DURATION_THRESHOLD_HOURS:
-            # Duration-based splitting: 1.5-hour chunks
-            chunk_duration_seconds = CHUNK_DURATION_HOURS * 3600
-        else:
-            return [
-                {
-                    "start_time": 0,
-                    "duration": duration_seconds,
-                    "chunk_num": 1,
-                    "relative_time": 0.0,
-                }
-            ]
-
-        num_chunks = int(duration_seconds / chunk_duration_seconds) + 1
-
-        cumulative_time = 0.0
-        for part in range(1, num_chunks + 1):
-            start_time = (part - 1) * chunk_duration_seconds
-            if start_time >= duration_seconds:
-                continue
-            chunk_duration = min(chunk_duration_seconds, duration_seconds - start_time)
-            if chunk_duration < MIN_CHUNK_DURATION:
-                # Skip tiny last chunk
-                continue
-            relative_time = cumulative_time
-            chunks.append(
-                {
-                    "start_time": start_time,
-                    "duration": chunk_duration,
-                    "chunk_num": part,
-                    "relative_time": relative_time,
-                }
-            )
-            cumulative_time += chunk_duration
-
-        return chunks
-
-    def process_video_file(
-        self,
-        file_path: str,
-        s3_key: str,
-        is_subscriber_content: bool,
-        source_url: Optional[str] = None,
-        parent_folder_name: Optional[str] = None,
-        parent_folder_url: Optional[str] = None,
-    ) -> bool:
-        try:
-            # Get video duration and file size
-            duration_seconds = self.get_video_duration_seconds(file_path)
-            file_size_bytes = os.path.getsize(file_path)
-
-            if duration_seconds is None:
-                logger.error(f"Could not get duration for {file_path}")
-                return False
-
-            # Check if splitting is needed
-            if not self.should_split_video(duration_seconds, file_size_bytes):
-                logger.info(f"Video {file_path} does not need splitting")
-                # Upload as single file with global timestamp
-                sanitized_source_url = self._sanitize_drive_file_url(source_url) if source_url else None
-                success = self.s3_uploader.upload_file(
-                    file_path,
-                    s3_key,
-                    is_subscriber_content,
-                    source_url=sanitized_source_url,
-                    parent_folder_name=parent_folder_name,
-                    parent_folder_url=parent_folder_url,
-                    relative_start_time=0,  # Always include, even if zero
-                    skip_if_exists=self.skip_existing,
-                )
-
-                if success:
-                    self.global_timestamp_seconds += int(duration_seconds)
-
-                self._record_upload(success, s3_key)
-                return success
-            else:
-                logger.info(
-                    f"Video {file_path} is being chunked. The original large file will NOT be uploaded to S3."
-                )
-
-            # Calculate chunks
-            chunks = self.calculate_chunks(duration_seconds, file_size_bytes)
-            logger.info(f"Splitting {file_path} into {len(chunks)} chunks")
-
-            success = True
-            for chunk in chunks:
-                # Create chunk file using ffmpeg
-                chunk_file_path = self._create_video_chunk(
-                    file_path,
-                    chunk["start_time"],
-                    chunk["duration"],
-                    chunk["chunk_num"],
-                )
-
-                if chunk_file_path:
-                    # Create S3 key for chunk
-                    base_name = os.path.splitext(s3_key)[0]
-                    chunk_s3_key = f"{base_name}_chunk_{chunk['chunk_num']:03d}.mp4"
-
-                    sanitized_source_url = self._sanitize_drive_file_url(source_url) if source_url else None
-                    chunk_success = self.s3_uploader.upload_file(
-                        chunk_file_path,
-                        chunk_s3_key,
-                        is_subscriber_content,
-                        source_url=sanitized_source_url,
-                        parent_folder_name=parent_folder_name,
-                        parent_folder_url=parent_folder_url,
-                        relative_start_time=int(chunk["relative_time"]),
-                        skip_if_exists=self.skip_existing,
-                    )
-
-                    if chunk_success:
-                        self.global_timestamp_seconds += int(chunk["duration"])
-                    else:
-                        success = False
-                    self._record_upload(chunk_success, chunk_s3_key)
-                    # add other meta data stuff
-                    chunk["source_url"] = source_url
-                    chunk["parent_folder_name"] = parent_folder_name
-                    chunk["parent_folder_url"] = parent_folder_url
-
-                    # Clean up chunk file
-                    os.remove(chunk_file_path)
-                else:
-                    success = False
-
-            return success
-
-        except Exception as e:
-            logger.error(f"Error processing video file {file_path}: {e}")
-            return False
-
-    def _create_video_chunk(
-        self, input_file: str, start_time: float, duration: float, chunk_num: int
-    ) -> Optional[str]:
-        # ffmpeg
-        try:
-            output_file = f"{input_file}_chunk_{chunk_num:03d}.mp4"
-
-            # ffmpeg  to slice
-            cmd = [
-                "ffmpeg",
-                "-i",
-                input_file,
-                "-ss",
-                str(start_time),
-                "-t",
-                str(duration),
-                "-c",
-                "copy",  # Copy without re-encoding for speed
-                "-avoid_negative_ts",
-                "make_zero",
-                "-y",  # Overwrite output file
-                output_file,
-            ]
-
-            result = subprocess.run(cmd, capture_output=True, text=True)
-
-            if result.returncode == 0:
-                logger.info(f"Created chunk {chunk_num}: {output_file}")
-                return output_file
-            else:
-                logger.error(f"ffmpeg failed for chunk {chunk_num}: {result.stderr}")
-                return None
-
-        except Exception as e:
-            logger.error(f"Error creating video chunk {chunk_num}: {e}")
             return None
 
     def _process_folder_recursively(

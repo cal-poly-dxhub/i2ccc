@@ -44,6 +44,8 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+from .shared_code import SHARED_DIR, code_with_shared, processing_config, shared_hash
+
 
 class RagIngest(Construct):
     def __init__(
@@ -339,7 +341,7 @@ class RagIngest(Construct):
             "RoutingLambda",
             runtime=lambda_.Runtime.PYTHON_3_13,
             handler="routing_lambda.lambda_handler",
-            code=lambda_.Code.from_asset("src/ingest/routing"),
+            code=code_with_shared("src/ingest/routing"),
             timeout=Duration.minutes(1),
             memory_size=1024,
             environment={
@@ -430,7 +432,7 @@ class RagIngest(Construct):
             "CheckFileSizeLambda",
             runtime=lambda_.Runtime.PYTHON_3_13,
             handler="check_file_size.lambda_handler",
-            code=lambda_.Code.from_asset("src/ingest/video_chunker"),
+            code=code_with_shared("src/ingest/video_chunker"),
             timeout=Duration.minutes(1),
             memory_size=256,
         )
@@ -456,6 +458,10 @@ class RagIngest(Construct):
                 directory="src/ingest/video_chunker",
                 asset_name="video-chunker-service",
                 platform=ecr_assets.Platform.LINUX_AMD64,
+                # Dockerfile does COPY --from=shared processing_config.py
+                build_contexts={"shared": SHARED_DIR},
+                # Build contexts are hashed by path only, so add their content
+                extra_hash=shared_hash(),
             ),
             memory_size=10240,  # 10GB memory for large video processing
             timeout=Duration.minutes(15),
@@ -1069,17 +1075,18 @@ class RagIngest(Construct):
 
         process_video.next(delete_transcription_job)
 
-        # Connect the branches to the choice state
+        # Connect the branches to the choice state. Names come from
+        # processing_config.PROCESSORS; anything else is text
         choice.when(
-            sfn.Condition.string_matches("$.lambda_name", "process-video"),
+            sfn.Condition.string_matches("$.lambda_name", processing_config.PROCESS_VIDEO),
             check_video_file_size,  # Changed to start with file size check
         )
         choice.when(
-            sfn.Condition.string_matches("$.lambda_name", "process-audio"),
+            sfn.Condition.string_matches("$.lambda_name", processing_config.PROCESS_AUDIO),
             start_audio_transcription,
         )
         choice.when(
-            sfn.Condition.string_matches("$.lambda_name", "process-pdf"),
+            sfn.Condition.string_matches("$.lambda_name", processing_config.PROCESS_PDF),
             process_pdf,
         )
         choice.otherwise(process_text)

@@ -14,8 +14,10 @@ RUN dnf install -y tar gzip xz && \
 COPY requirements.txt ${LAMBDA_TASK_ROOT}/
 RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
 
-# Copy function code
+# Copy function code; processing_config comes from the "shared" build context
+# (src/ingest/shared, wired up in cdk/ingest.py)
 COPY chunk_video.py ${LAMBDA_TASK_ROOT}/
+COPY --from=shared processing_config.py ${LAMBDA_TASK_ROOT}/
 
 # Set the CMD to your handler
 CMD [ "chunk_video.lambda_handler" ]

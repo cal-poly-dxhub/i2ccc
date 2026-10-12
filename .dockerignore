@@ -2,6 +2,7 @@
 *
 !config.yaml
 !ingest_utils
+!src/ingest/shared/processing_config.py
 ingest_utils/confluence_processor/confluence_downloads
 ingest_utils/confluence_processor/google_drive_downloads
 ingest_utils/confluence_processor/service-credentials.json

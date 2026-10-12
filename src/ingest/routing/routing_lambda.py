@@ -4,6 +4,8 @@ import time
 import boto3
 from botocore.exceptions import ClientError
 
+from processing_config import EXTENSION_TO_PROCESSOR
+
 # Get DynamoDB table name from environment variable
 PROCESSED_FILES_TABLE = os.getenv("PROCESSED_FILES_TABLE")
 
@@ -121,18 +123,6 @@ def lambda_handler(event, context):
     if event.get("cache") == "reset":
         return reset_processed_files()
 
-    lambda_mappings = {
-        "mp4": "process-video",
-        "webm": "process-video",
-        "pdf": "process-pdf",
-        "mp3": "process-audio",
-        "wav": "process-audio",
-        "flac": "process-audio",
-        "m4a": "process-audio",
-        "txt": "process-text",
-        "vtt": "process-text",
-    }
-
     # Get processed files to avoid reprocessing
     processed_uris = get_processed_files()
     print(f"Found {len(processed_uris)} files already processed")
@@ -160,7 +150,7 @@ def lambda_handler(event, context):
                 continue
 
             file_extension = key.split(".")[-1].lower()
-            lambda_name = lambda_mappings.get(file_extension)
+            lambda_name = EXTENSION_TO_PROCESSOR.get(file_extension)
             if lambda_name:
                 results.append(
                     {

@@ -3,13 +3,12 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
+from processing_config import VIDEO_MAX_SIZE_BYTES, VIDEO_MAX_SIZE_GB
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 s3_client = boto3.client("s3")
-
-# Size threshold in bytes (1.8 GB to leave buffer before 2GB limit)
-SIZE_THRESHOLD_BYTES = 1.8 * 1024 * 1024 * 1024  # 1,932,735,283 bytes
 
 
 def parse_s3_uri(s3_uri):
@@ -59,7 +58,7 @@ def lambda_handler(event, context):
         file_size_gb = file_size_bytes / (1024 ** 3)
 
         # Determine if chunking is needed
-        needs_chunking = file_size_bytes > SIZE_THRESHOLD_BYTES
+        needs_chunking = file_size_bytes > VIDEO_MAX_SIZE_BYTES
 
         logger.info(
             f"File size: {file_size_gb:.2f} GB ({file_size_bytes:,} bytes), "
@@ -72,7 +71,7 @@ def lambda_handler(event, context):
             "file_size_bytes": file_size_bytes,
             "file_size_gb": round(file_size_gb, 2),
             "needs_chunking": needs_chunking,
-            "size_threshold_gb": 1.8,
+            "size_threshold_gb": VIDEO_MAX_SIZE_GB,
         }
 
         return result

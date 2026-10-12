@@ -6,17 +6,12 @@ import pandas as pd #type: ignore
 import requests #type: ignore
 from dotenv import load_dotenv
 from confluence_scraper import ConfluenceScraper
+from pipeline_config import SUPPORTED_EXTENSIONS, extension_of, pipeline_output_keys
 from s3_uploader import S3Uploader
 from stack_config import load_config
 
 DOWNLOAD_DIR = "confluence_downloads"
 ASSET_LINKS_CSV = "confluence_asset_links.csv"
-
-# Must match the lambda_mappings keys in src/ingest/routing/routing_lambda.py -
-# anything else lands in S3 but is skipped by the ingest pipeline
-PIPELINE_SUPPORTED_EXTENSIONS = {
-    "mp4", "webm", "pdf", "mp3", "wav", "flac", "m4a", "txt", "vtt",
-}
 
 
 def _sanitize_drive_file_url(url):
@@ -178,8 +173,8 @@ def main() -> dict:
         file_name = _derive_file_name(url, file_type)
 
         # Only download files the ingest pipeline can actually process
-        extension = os.path.splitext(file_name)[1].lstrip(".").lower()
-        if extension not in PIPELINE_SUPPORTED_EXTENSIONS:
+        extension = extension_of(file_name)
+        if extension not in SUPPORTED_EXTENSIONS:
             print(f"Skipping (unsupported by ingest pipeline, ext='{extension}'): {url}")
             summary["unsupported_skipped"] += 1
             continue
@@ -194,8 +189,11 @@ def main() -> dict:
 
         print(f"Processing asset: {url}")
 
-        # Skip before downloading so already-synced assets cost nothing
-        if skip_existing and uploader.file_exists(s3_object_key):
+        # Skip before downloading so already-synced assets cost nothing (large
+        # videos only survive as chunks once the pipeline has split them)
+        if skip_existing and any(
+            uploader.file_exists(k) for k in pipeline_output_keys(s3_object_key)
+        ):
             print(f"Skipping {file_name} - already exists in S3")
             summary["already_in_s3"] += 1
             continue
