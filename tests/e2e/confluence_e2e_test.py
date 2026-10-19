@@ -26,9 +26,15 @@ Inputs, all uploaded under PREFIX so the state machine runs on just them:
     description .txt files by the real confluence_event_descriptions_to_s3
     (the page fetch is served from the fixture: the live page is behind a
     WAF challenge)
-  - four files from those events' Drive folders (video, audio, chat txt,
-    pdf), uploaded by the real GoogleDriveProcessor with the same arguments
-    its folder walk passes
+  - three files from those events' Drive folders (video, chat txt, pdf),
+    uploaded by the real GoogleDriveProcessor with the same arguments its
+    folder walk passes
+
+No audio input: in practice the Drive collector doesn't collect audio. It
+skips .m4a files Drive labels audio/x-m4a (not in its blob_types), and skips
+audio/mp4 and audio/mpeg files when an .mp4 with the same name is in the
+folder. The pipeline itself still routes .mp3/.wav/.flac/.m4a to the audio
+processor if such a file reaches the bucket some other way.
 
 Every run writes its snapshot to tests/e2e/last_run.json. Exit codes:
 0 = passed (or golden recorded), 1 = output differs from the golden,
@@ -81,17 +87,12 @@ PAGE_URL = (
 # Both events are "(Open)" on the calendar, so their files are non-member content
 RD_STUDIO_FOLDER = "16K4NcDG5FnANTY3ZUs47r3DpsDbyRxXa"  # 04/17/2024 Research and Engineering Studio and HPC on AWS
 NIH_FOLDER = "13CiH9pKBxAI5zl-LrgjY-ZiV_zC5FxmX"  # 1/15/2025 NIH Genomic Data Sharing requirement
-GEMINI_FOLDER = "19ANbMRmcCMwCS-BiLPaahTbUIjn2PKqy"  # 12/16/2025 NET+ GCP Town Hall - Gemini Enterprise
 _RD = "April 24 - NET+ AWS Town Hall - Research and Engineering Studio and HPC on AWS"
 
 # (Drive file id, folder id, file name, md5). The md5 pins the exact bytes the
 # golden was recorded from; the test refuses to run if Drive has changed them.
 DRIVE_FILES = [
     ("1Fph-gwvwx-CWzYsK3fPkWE9Q5BrKxBP7", RD_STUDIO_FOLDER, f"{_RD}_recording.mp4", "2d16f084253444161fb9c22f136354c2"),  # 94.6 MB
-    # Drive labels this .m4a video/mp4. The collector only downloads MIME types
-    # in its blob_types list, which has no audio/x-m4a, so an .m4a labelled
-    # that way (like this event's own _audio.m4a) is never collected.
-    ("1eiOwByhOni7_7M8vRMFq2igVAKI9p9CD", GEMINI_FOLDER, "NET+ GCP - Gemini Enterprise audio.m4a", "7512678ed6de4d19c9d75628e61ac612"),  # 37.0 MB
     ("1QH_O36h16YYtyRnyaeKpxqqBrruBkkxG", RD_STUDIO_FOLDER, f"{_RD}_chat.txt", "00845b7e125e41c9471dc44ba12d933e"),
     ("1qbRKOHY-7FoDTLMmxG3_X-L3AtxRaulp", NIH_FOLDER, "What is Internet2 NET+ AWS.pdf", "c0fde7607dd79e13452c99a3c0d0754e"),
 ]
