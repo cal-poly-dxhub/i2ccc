@@ -3,6 +3,7 @@ import yaml
 
 import confluence_processor as cp
 import processing_config as pc
+import stack_config
 from tests.conftest import BUCKET
 
 ASSETS = [
@@ -24,7 +25,6 @@ def run_main(s3, monkeypatch, tmp_path):
     """Runs main() against moto S3 with a fake scraper and downloader."""
     config = {
         "confluence_urls": ["https://confluence.example.org/page"],
-        "s3_bucket_name": BUCKET,
         "aws_region": "us-west-2",
         "env_file": str(tmp_path / "names.env"),
     }
@@ -33,12 +33,6 @@ def run_main(s3, monkeypatch, tmp_path):
         config["skip_existing_s3_files"] = skip_existing
         config_file = tmp_path / "config.yaml"
         config_file.write_text(yaml.safe_dump(config))
-
-        def fake_open(path, *args, **kwargs):
-            # config.yaml is gitignored, so point main() at a test copy
-            if str(path).endswith("config.yaml"):
-                path = config_file
-            return open(path, *args, **kwargs)
 
         downloaded = []
 
@@ -50,8 +44,14 @@ def run_main(s3, monkeypatch, tmp_path):
 
         scraper = type("Scraper", (), {"__init__": lambda self, **kw: None, "scrape_assets": lambda self: [dict(a) for a in ASSETS]})
         monkeypatch.chdir(tmp_path)
-        # Shadows open() inside confluence_processor only
-        monkeypatch.setattr(cp, "open", fake_open, raising=False)
+        # config.yaml is gitignored, so point main() at a test copy. The bucket
+        # comes from the environment, as it does in the collector container.
+        monkeypatch.setenv("S3_BUCKET_NAME", BUCKET)
+        monkeypatch.setattr(
+            cp,
+            "load_config",
+            lambda needs: stack_config.load_config(needs, config_path=str(config_file)),
+        )
         monkeypatch.setattr(cp, "ConfluenceScraper", scraper)
         monkeypatch.setattr(cp, "download_file", fake_download)
         return cp.main(), downloaded
