@@ -1,44 +1,15 @@
 #!/usr/bin/env python3
 """
-End-to-end ingest test: Confluence calendar rows + pinned Google Drive files
--> S3 -> ingest state machine -> OpenSearch, compared against a golden file.
-
-Runs against the stack named by the values in config.yaml (bucket, state
-machine, table, OpenSearch endpoint and index), using your current AWS
-credentials, and makes real calls: Drive downloads, S3 uploads, the deployed
-state machine (Transcribe, Textract, Bedrock) and OpenSearch.
-
-Run from the repo root (needs config.yaml there, and names.env for Drive):
-
-    # 1. With the original (main) code deployed, record the expected output
+This files tests the entire ingestion pipeline from Confluence to the Opensearch outputs.
+Can be used to see whether end to end pipeline works after changes.
+    # 1. With the original code deploy, record the expected output
     python tests/e2e/confluence_e2e_test.py --record-golden
 
-    # 2. Deploy the code under test, then compare against the golden
+    # 2. Deploy the code under test, then compare against the gold standard
     python tests/e2e/confluence_e2e_test.py
 
-    # Remove leftovers from an interrupted run
+    # Optionally leftover test data from an interrupted run
     python tests/e2e/confluence_e2e_test.py --cleanup
-
-Options: --keep (skip cleanup), --timeout-minutes N, --env-file PATH.
-
-Inputs, all uploaded under PREFIX so the state machine runs on just them:
-  - the two calendar rows in fixtures/calendar_rows.html, uploaded as event
-    description .txt files by the real confluence_event_descriptions_to_s3
-    (the page fetch is served from the fixture: the live page is behind a
-    WAF challenge)
-  - three files from those events' Drive folders (video, chat txt, pdf),
-    uploaded by the real GoogleDriveProcessor with the same arguments its
-    folder walk passes
-
-No audio input: in practice the Drive collector doesn't collect audio. It
-skips .m4a files Drive labels audio/x-m4a (not in its blob_types), and skips
-audio/mp4 and audio/mpeg files when an .mp4 with the same name is in the
-folder. The pipeline itself still routes .mp3/.wav/.flac/.m4a to the audio
-processor if such a file reaches the bucket some other way.
-
-Every run writes its snapshot to tests/e2e/last_run.json. Exit codes:
-0 = passed (or golden recorded), 1 = output differs from the golden,
-2 = the run itself failed. Plain `pytest` does not collect this file.
 """
 
 import argparse
@@ -504,13 +475,19 @@ def cleanup(stack, stems, confirm=False):
     with stack.table.batch_writer() as batch:
         for uri in uris:
             batch.delete_item(Key={"s3_uri": uri})
-    from opensearchpy.exceptions import NotFoundError
+    from opensearchpy.helpers import bulk
 
-    for doc in docs:
-        try:
-            stack.os.delete(index=stack.index, id=doc["_id"])
-        except NotFoundError:
-            pass
+    # One _bulk request instead of a DELETE per doc. The ids go in the request
+    # body, so the AOSS ids (e.g. "1:0:Vi8F...") aren't URL-encoded.
+    deleted, errors = bulk(
+        stack.os,
+        [{"_op_type": "delete", "_index": stack.index, "_id": doc["_id"]} for doc in docs],
+        raise_on_error=False,
+    )
+    failed = [e for e in errors if e.get("delete", {}).get("status") != 404]
+    print(f"  bulk delete: {deleted} deleted, {len(failed)} failed")
+    for error in failed[:5]:
+        print(f"    {error}")
 
     deadline = time.time() + OS_DELETE_TIMEOUT
     while (remaining := len(find_docs(stack, stems))) and time.time() < deadline:
@@ -572,6 +549,8 @@ def main():
     parser.add_argument("--env-file", default=DEFAULT_ENV_FILE, help="dotenv file with GOOGLE_DRIVE_CREDENTIALS")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    # The client logs every request at INFO; only show problems
+    logging.getLogger("opensearch").setLevel(logging.WARNING)
 
     try:
         stack = Stack()
