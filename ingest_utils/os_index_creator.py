@@ -4,10 +4,11 @@ Creates index if it does not already exist.
 """
 
 import boto3 # type: ignore
-import yaml
 from opensearchpy import AWSV4SignerAuth, OpenSearch, RequestsHttpConnection # type: ignore
 
-config = yaml.safe_load(open("../config.yaml"))
+from confluence_processor.stack_config import load_config
+
+config = load_config(needs=("opensearch_endpoint",))
 service = "aoss"
 # replace with your OpenSearch Service domain/Serverless endpoint
 domain_endpoint = config["opensearch_endpoint"]

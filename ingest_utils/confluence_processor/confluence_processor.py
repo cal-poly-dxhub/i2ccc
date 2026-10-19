@@ -4,10 +4,10 @@ from typing import Optional
 
 import pandas as pd #type: ignore
 import requests #type: ignore
-import yaml  #type: ignore
 from dotenv import load_dotenv
 from confluence_scraper import ConfluenceScraper
 from s3_uploader import S3Uploader
+from stack_config import load_config
 
 DOWNLOAD_DIR = "confluence_downloads"
 ASSET_LINKS_CSV = "confluence_asset_links.csv"
@@ -97,9 +97,7 @@ def main() -> dict:
     }
 
     # Load config from config.yaml
-    config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config.yaml")
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
+    config = load_config(needs=("s3_bucket_name",))
 
     # Load environment variables
     env_file = config.get("env_file", "names.env")

@@ -10,7 +10,6 @@ from dotenv import dotenv_values
 import re  # Added for regular expressions
 from googleapiclient.errors import HttpError# type: ignore
 import subprocess
-import yaml # type: ignore
 import logging
 import pymediainfo # type: ignore
 
@@ -840,10 +839,7 @@ class GoogleDriveProcessor:
 def main() -> dict:
     logger.debug(f"Starting main function for Google Drive processing.")
     # Load config and get env file path
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    config_path = os.path.join(project_root, "config.yaml")
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
+    config = load_config(needs=("s3_bucket_name",))
     env_file = config.get("env_file", "names.env")
     env_vars = dotenv_values(env_file)
     logger.debug(f"Loaded environment variables from {env_file}: {list(env_vars.keys())}")

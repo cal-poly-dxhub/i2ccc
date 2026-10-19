@@ -5,16 +5,11 @@ Useful for uploading leftover files from failed runs.
 """
 import os
 import sys
-import yaml
 from s3_uploader import S3Uploader
-
-# Add parent directory to path to import config
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-config_path = os.path.join(project_root, "config.yaml")
+from stack_config import load_config
 
 # Load config
-with open(config_path, "r") as f:
-    config = yaml.safe_load(f)
+config = load_config(needs=("s3_bucket_name",))
 
 # Configuration
 UPLOAD_DIR = config.get("google_drive_download_dir", "google_drive_downloads")

@@ -10,7 +10,9 @@ config = yaml.safe_load(open(CONFIG_PATH))
 app = cdk.App()
 RagChatbotStack(
     app,
-    "RagChatbotStack",
+    # Must match stack_config.DEFAULT_STACK_NAME: the ingest scripts look the
+    # stack up by this name to read its outputs
+    config.get("stack_name", "RagChatbotStack"),
     embeddings_model_id=config["model"]["embedding"],
     opensearch_collection_name=config["opensearch_collection_name"],
     opensearch_index_name=config["opensearch_index_name"],

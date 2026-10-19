@@ -1,20 +1,9 @@
 """Script to reset the document cache held in DynamoDB."""
 
 import boto3
-import yaml
 import sys
 
-def load_config():
-    """Load configuration from config.yaml file."""
-    try:
-        with open("../config.yaml", "r") as config_file:
-            return yaml.safe_load(config_file)
-    except FileNotFoundError:
-        print("Error: config.yaml file not found in the parent directory.")
-        sys.exit(1)
-    except yaml.YAMLError as e:
-        print(f"Error parsing config.yaml: {e}")
-        sys.exit(1)
+from confluence_processor.stack_config import load_config
 
 def reset_dynamodb_cache():
     """
@@ -23,12 +12,7 @@ def reset_dynamodb_cache():
     Returns:
         bool: True if successful, False otherwise
     """
-    config = load_config()
-    
-    if 'processed_files_table' not in config:
-        print("Error: 'processed_files_table' not found in config.yaml")
-        return False
-    
+    config = load_config(needs=("processed_files_table",))
     table_name = config['processed_files_table']
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)

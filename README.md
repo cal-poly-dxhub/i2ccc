@@ -76,20 +76,16 @@ cp config.yaml.example config.yaml
 cdk deploy
 ```
 
-### 3. Populate `config.yaml` from stack outputs
+### 3. Nothing to copy back
 
-The deploy prints a set of `CfnOutput` values. Map them into `config.yaml`:
+The bucket, state machine, table, OpenSearch endpoint and API URLs are read from the stack's CloudFormation outputs each time a script runs, so `config.yaml` doesn't hold them. The scripts look the stack up by `stack_name` (default `RagChatbotStack`) in `aws_region`, using your current AWS credentials. Set those two keys in `config.yaml` if your stack differs.
 
-| CDK output | `config.yaml` key |
-| --- | --- |
-| `OpensearchAPIEndpoint` | `opensearch_endpoint` |
-| `RagApiEndpoint` | `rag_api_endpoint` |
-| `ProxyAPIEndpoint` | `proxy_api_endpoint` |
-| `FrontendBucketName` | (used by `deploy-frontend.sh`) |
-| `DistributionId` | (used by `deploy-frontend.sh`) |
-| `CloudFrontURL` / `CustomDomainURL` | frontend URL |
+To read an output by hand:
 
-Also set `api_key` (API Gateway → API Keys → reveal), `step_function_arn`, `processed_files_table`, and `s3_bucket_name`.
+```bash
+aws cloudformation describe-stacks --stack-name RagChatbotStack \
+  --query "Stacks[0].Outputs[].[OutputKey,OutputValue]" --output text
+```
 
 A second `cdk deploy` is not required unless you change infrastructure-affecting fields (prompts, models, auth, custom domain, etc.).
 

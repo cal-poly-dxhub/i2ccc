@@ -167,6 +167,9 @@ class ContentSync(Construct):
                 stream_prefix="collector",
                 log_group=collector_log_group,
             ),
+            # The task role can't read CloudFormation outputs, so the bucket
+            # is passed in directly (stack_config reads S3_BUCKET_NAME first)
+            environment={"S3_BUCKET_NAME": input_assets_bucket.bucket_name},
             secrets={
                 "CONFLUENCE_API": ecs.Secret.from_secrets_manager(confluence_secret),
                 "GOOGLE_SERVICE_ACCOUNT_JSON": ecs.Secret.from_secrets_manager(

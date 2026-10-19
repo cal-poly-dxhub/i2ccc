@@ -11,9 +11,10 @@ import sys
 from typing import Any, Dict, List
 
 import boto3
-import yaml
 from opensearchpy import AWSV4SignerAuth, OpenSearch, RequestsHttpConnection
 from opensearchpy.helpers import bulk
+
+from confluence_processor.stack_config import load_config
 
 # Configure logging
 logging.basicConfig(
@@ -22,7 +23,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Load configuration
-config = yaml.safe_load(open("../config.yaml"))
+config = load_config(needs=("opensearch_endpoint",))
 
 
 class OpenSearchBulkDeleter:
