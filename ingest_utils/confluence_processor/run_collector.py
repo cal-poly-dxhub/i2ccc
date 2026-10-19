@@ -17,7 +17,7 @@ import time
 import traceback
 
 import boto3  # type: ignore
-import yaml  # type: ignore
+from stack_config import load_config
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 SYNC_RUNS_PREFIX = "sync-runs"
@@ -44,9 +44,7 @@ def main() -> int:
     # The processor scripts use paths relative to their own directory
     os.chdir(SCRIPT_DIR)
 
-    config_path = os.path.join(SCRIPT_DIR, "..", "..", "config.yaml")
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
+    config = load_config(needs=("s3_bucket_name",))
     bucket = config["s3_bucket_name"]
     region = config.get("aws_region", "us-west-2")
 
