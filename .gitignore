@@ -27,3 +27,5 @@ ingest_utils/confluence_processor/confluence_asset_links.csv
 ingest_utils/confluence_processor/confluence_downloads/
 ingest_utils/confluence_processor/google_drive_downloads/
 ingest_utils/confluence_processor/run_summary.json
+
+tests/e2e/golden/confluence_e2e.json
