@@ -1,0 +1,298 @@
+{
+  "asset_csv": [
+    "url,file_type,is_subscriber_content",
+    "https://drive.google.com/drive/folders/FOLDER_MAIN,,True",
+    "https://wiki.example.edu/x/AbC123,,True",
+    "https://docs.google.com/presentation/d/SLIDES_LINKED,,True",
+    "https://files.example.edu/webinars/direct-webinar.mp4,mp4,False",
+    "https://example.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=00000000-0000-0000-0000-000000000001,aspx,False",
+    "https://www.youtube.com/watch?v=AAAAAAAAAAA,,False",
+    "https://drive.google.com/open?id=FOLDER_OPEN&usp=sharing,,False",
+    "https://files.example.edu/briefings/audio-only.m4a,m4a,False",
+    "https://files.example.edu/missing/gone.pdf,pdf,False",
+    "https://drive.google.com/drive/folders/FOLDER_BROKEN,,True",
+    "https://files.example.edu/members/strategy-slides.pdf?version=2,pdf,True",
+    "https://drive.google.com/file/d/FILE_LINKED,,True",
+    "https://wiki.example.edu/pages/viewpage.action?pageId=1001,action,True"
+  ],
+  "drive_downloads": [
+    "f-chat",
+    "f-doc-corrupt",
+    "f-download-fails",
+    "f-handout",
+    "f-m4a-as-video",
+    "f-no-duration",
+    "f-recording",
+    "f-slides-big"
+  ],
+  "exit_code": 1,
+  "http_requests": [
+    [
+      "https://docs.google.com/presentation/d/f-slides-big/export/pptx",
+      null
+    ],
+    [
+      "https://files.example.edu/briefings/audio-only.m4a",
+      null
+    ],
+    [
+      "https://files.example.edu/members/strategy-slides.pdf?version=2",
+      null
+    ],
+    [
+      "https://files.example.edu/missing/gone.pdf",
+      null
+    ],
+    [
+      "https://wiki.example.edu/display/EX/Empty+Page",
+      "Bearer test-confluence-token"
+    ],
+    [
+      "https://wiki.example.edu/display/EX/Empty+Page",
+      "Bearer test-confluence-token"
+    ],
+    [
+      "https://wiki.example.edu/display/EX/Example+Program+Calendar",
+      "Bearer test-confluence-token"
+    ],
+    [
+      "https://wiki.example.edu/display/EX/Example+Program+Calendar",
+      "Bearer test-confluence-token"
+    ]
+  ],
+  "objects": [
+    {
+      "key": "Breakout_audio.m4a",
+      "metadata": {
+        "member-content": "true",
+        "parent-folder-name": "2026-01-15 Example Town Hall",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "source-url": "https://drive.google.com/file/d/f-m4a-as-video"
+      },
+      "preexisting": false,
+      "sha256": "aa686f35bbcddc67"
+    },
+    {
+      "key": "Corrupt Notes.docx",
+      "metadata": {
+        "member-content": "true",
+        "parent-folder-name": "2026-01-15 Example Town Hall",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "source-url": "https://docs.google.com/document/d/f-doc-corrupt"
+      },
+      "preexisting": false,
+      "sha256": "8ffe075efaffe509"
+    },
+    {
+      "key": "Example_Briefing__Audio_Only.txt",
+      "metadata": {
+        "member-content": "False",
+        "parent-folder-name": "Example Briefing: Audio Only",
+        "parent-folder-url": "https://drive.google.com/open?id=FOLDER_OPEN&usp=sharing",
+        "source-url": "https://drive.google.com/open?id=FOLDER_OPEN&usp=sharing"
+      },
+      "preexisting": false,
+      "sha256": "d691a9a92fec5454"
+    },
+    {
+      "key": "Example_Strategy_Call__Members_Only.txt",
+      "metadata": {
+        "member-content": "False",
+        "parent-folder-name": "Example Strategy Call: Members Only",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_BROKEN",
+        "source-url": "https://drive.google.com/drive/folders/FOLDER_BROKEN"
+      },
+      "preexisting": false,
+      "sha256": "d9b22522f34726a8"
+    },
+    {
+      "key": "Example_Tech_Jam__Placeholder.txt",
+      "metadata": {
+        "member-content": "False",
+        "parent-folder-name": "Example Tech Jam: Placeholder"
+      },
+      "preexisting": false,
+      "sha256": "8726271b872f4965"
+    },
+    {
+      "key": "Example_Town_Hall__Cloud_Basics.txt",
+      "metadata": {
+        "member-content": "False",
+        "parent-folder-name": "Example Town Hall: Cloud Basics",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "source-url": "https://drive.google.com/drive/folders/FOLDER_MAIN"
+      },
+      "preexisting": false,
+      "sha256": "5cebf99435529c77"
+    },
+    {
+      "key": "Example_Webinar__Direct_Media.txt",
+      "metadata": {},
+      "preexisting": true,
+      "sha256": "b015c857d208c537"
+    },
+    {
+      "key": "Long Session_chunk_001.mp4",
+      "metadata": {},
+      "preexisting": true,
+      "sha256": "b015c857d208c537"
+    },
+    {
+      "key": "Members Deck.pdf",
+      "metadata": {
+        "member-content": "true",
+        "parent-folder-name": "2026-01-15 Example Town Hall",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "source-url": "https://docs.google.com/presentation/d/f-slides-big"
+      },
+      "preexisting": false,
+      "sha256": "eb1b1f1ccd689fe2"
+    },
+    {
+      "key": "No Duration.mp4",
+      "metadata": {
+        "member-content": "false",
+        "parent-folder-name": "2026-01-15 Example Town Hall",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "source-url": "https://drive.google.com/file/d/f-no-duration"
+      },
+      "preexisting": false,
+      "sha256": "6367af8eb5aaae17"
+    },
+    {
+      "key": "Q3_Q4 Handout.pdf",
+      "metadata": {
+        "member-content": "true",
+        "parent-folder-name": "error_folder_name_FOLDER_SUB",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_SUB",
+        "source-url": "https://drive.google.com/file/d/f-handout"
+      },
+      "preexisting": false,
+      "sha256": "5a59e940113aa57f"
+    },
+    {
+      "key": "Title.txt",
+      "metadata": {
+        "member-content": "False",
+        "parent-folder-name": "Title"
+      },
+      "preexisting": false,
+      "sha256": "4117e98bf61909ee"
+    },
+    {
+      "key": "Town Hall Transcript.pdf",
+      "metadata": {},
+      "preexisting": true,
+      "sha256": "b015c857d208c537"
+    },
+    {
+      "key": "Town Hall_chat.txt",
+      "metadata": {
+        "member-content": "true",
+        "parent-folder-name": "2026-01-15 Example Town Hall",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "source-url": "https://drive.google.com/file/d/f-chat"
+      },
+      "preexisting": false,
+      "sha256": "da6ee0169a524991"
+    },
+    {
+      "key": "Town Hall_recording.mp4",
+      "metadata": {
+        "member-content": "false",
+        "parent-folder-name": "2026-01-15 Example Town Hall",
+        "parent-folder-url": "https://drive.google.com/drive/folders/FOLDER_MAIN",
+        "relative-start-time": "0",
+        "source-url": "https://drive.google.com/file/d/f-recording"
+      },
+      "preexisting": false,
+      "sha256": "b6268940983a84b1"
+    },
+    {
+      "key": "audio-only.m4a",
+      "metadata": {
+        "member-content": "false"
+      },
+      "preexisting": false,
+      "sha256": "dcce9ff770d8b2d7"
+    },
+    {
+      "key": "direct-webinar.mp4",
+      "metadata": {},
+      "preexisting": true,
+      "sha256": "b015c857d208c537"
+    },
+    {
+      "key": "quarantine/briefing.pdf",
+      "metadata": {},
+      "preexisting": true,
+      "sha256": "b015c857d208c537"
+    },
+    {
+      "key": "strategy-slides.pdf",
+      "metadata": {
+        "member-content": "true"
+      },
+      "preexisting": false,
+      "sha256": "72c1dadc7279ee65"
+    }
+  ],
+  "run_summary": {
+    "run_id": "test-run",
+    "stages": {
+      "confluence_assets": {
+        "counts": {
+          "already_in_s3": 1,
+          "drive_folders_deferred": 2,
+          "failed": 1,
+          "total_assets": 13,
+          "unsupported_skipped": 7,
+          "uploaded": 2,
+          "uploaded_files": [
+            "audio-only.m4a",
+            "strategy-slides.pdf"
+          ]
+        },
+        "error": null,
+        "status": "completed_with_failures"
+      },
+      "event_descriptions": {
+        "counts": {
+          "already_in_s3": 1,
+          "events_found": 6,
+          "uploaded": 5,
+          "uploaded_files": [
+            "Title.txt",
+            "Example_Town_Hall__Cloud_Basics.txt",
+            "Example_Briefing__Audio_Only.txt",
+            "Example_Strategy_Call__Members_Only.txt",
+            "Example_Tech_Jam__Placeholder.txt"
+          ]
+        },
+        "error": null,
+        "status": "succeeded"
+      },
+      "google_drive": {
+        "counts": {
+          "already_in_s3": 3,
+          "failed": 2,
+          "mp4_dominance_skipped": 1,
+          "unsupported_skipped": 1,
+          "uploaded": 7,
+          "uploaded_files": [
+            "Town Hall_recording.mp4",
+            "Town Hall_chat.txt",
+            "Corrupt Notes.docx",
+            "Members Deck.pdf",
+            "No Duration.mp4",
+            "Breakout_audio.m4a",
+            "Q3_Q4 Handout.pdf"
+          ]
+        },
+        "error": null,
+        "status": "completed_with_failures"
+      }
+    },
+    "status": "failed"
+  }
+}
