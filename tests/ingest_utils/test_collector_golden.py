@@ -49,6 +49,7 @@ COLLECTOR_MODULES = [
     "confluence_event_descriptions_to_s3",
     "google_drive_processor",
     "s3_uploader",
+    "stack_config"
 ]
 
 # Direct downloads linked from confluence_page.html
