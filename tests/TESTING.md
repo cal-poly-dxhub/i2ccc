@@ -25,7 +25,8 @@ To prevent regressions across the whole system, we provide e2e test using `i2ccc
 
 Record the gold standard of OpenSearch output (do this once before any refactoring):
 The only time this will be recorded is at the start of development, and whenever new functionality that has a different expected
-output is implemented.
+output is implemented. Note that this output will depend on some config settings, 
+such as chunk size and embedding model, so keep these consistent across runs.
 
 ```bash
 python tests/e2e/confluence_e2e_test.py --record-golden
