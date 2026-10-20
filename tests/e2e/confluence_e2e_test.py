@@ -17,6 +17,7 @@ import datetime as dt
 import json
 import logging
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -25,7 +26,6 @@ from collections import Counter
 from unittest import mock
 
 import boto3
-import yaml
 from dotenv import dotenv_values
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -35,16 +35,9 @@ COLLECTOR_DIR = os.path.join(UTILS_DIR, "confluence_processor")
 sys.path.insert(0, COLLECTOR_DIR)
 
 from s3_uploader import S3Uploader  # noqa: E402
+import stack_config  # noqa: E402
 
-CONFIG_PATH = os.path.join(REPO_ROOT, "config.yaml")
-REQUIRED_CONFIG = (
-    "aws_region",
-    "s3_bucket_name",
-    "step_function_arn",
-    "processed_files_table",
-    "opensearch_endpoint",
-    "opensearch_index_name",
-)
+STACK_KEYS = ("s3_bucket_name", "step_function_arn", "processed_files_table", "opensearch_endpoint")
 PREFIX = "e2e-confluence-test/"
 FIXTURE = os.path.join(HERE, "fixtures", "calendar_rows.html")
 GOLDEN = os.path.join(HERE, "golden", "confluence_e2e.json")
@@ -95,14 +88,13 @@ class PrefixedUploader(S3Uploader):
 
 
 def load_config():
+    """config.yaml with the stack-owned values resolved the same way the scripts do."""
     try:
-        with open(CONFIG_PATH) as f:
-            config = yaml.safe_load(f) or {}
-    except FileNotFoundError:
-        raise E2EError(f"config.yaml not found at {CONFIG_PATH}") from None
-    missing = [key for key in REQUIRED_CONFIG if not config.get(key)]
-    if missing:
-        raise E2EError(f"config.yaml is missing {missing}; copy them from the stack outputs")
+        config = stack_config.load_config(needs=STACK_KEYS)
+    except stack_config.StackConfigError as e:
+        raise E2EError(str(e)) from e
+    if not config.get("opensearch_index_name"):
+        raise E2EError("config.yaml is missing opensearch_index_name")
     return config
 
 
@@ -568,15 +560,7 @@ def main():
         env = dotenv_values(args.env_file) if os.path.exists(args.env_file) else {}
         drive_files = pinned_drive_files(env)
 
-        # os_index_creator creates the index if it's missing, as run_step_function
-        # does. It reads ../config.yaml relative to the working directory.
-        sys.path.insert(0, UTILS_DIR)
-        cwd = os.getcwd()
-        os.chdir(UTILS_DIR)
-        try:
-            import os_index_creator  # noqa: F401
-        finally:
-            os.chdir(cwd)
+        subprocess.run([sys.executable, "os_index_creator.py"], cwd=UTILS_DIR, check=True)
 
         ids_before = all_doc_ids(stack)
         try:
