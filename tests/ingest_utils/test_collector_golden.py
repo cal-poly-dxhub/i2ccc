@@ -76,7 +76,6 @@ PRESEEDED_BODY = b"preexisting\n"
 
 def _config(skip_existing: bool) -> dict:
     return {
-        "s3_bucket_name": BUCKET,
         "aws_region": REGION,
         "confluence_urls": [PAGE_URL, EMPTY_PAGE_URL],
         "google_drive_download_dir": "google_drive_downloads",
@@ -127,6 +126,7 @@ def isolated_env(tmp_path, monkeypatch, tree):
     monkeypatch.setenv("AWS_CONFIG_FILE", str(tmp_path / "no-aws-config"))
     monkeypatch.setenv("AWS_SHARED_CREDENTIALS_FILE", str(tmp_path / "no-aws-credentials"))
     monkeypatch.setenv("RUN_ID", RUN_ID)
+    monkeypatch.setenv("S3_BUCKET_NAME", BUCKET)
     bin_dir = tmp_path / "bin"
     fakes.install_fake_binaries(bin_dir, convert_fail_ids=tree.get("convert_fails", []))
     monkeypatch.setenv("PATH", f"{bin_dir}{os.pathsep}{os.environ['PATH']}")
