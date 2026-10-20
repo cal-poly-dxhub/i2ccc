@@ -1,8 +1,9 @@
+# .coveragerc
 [run]
-include =
-    ingest_utils/*
-    */app/ingest_utils/*
 parallel = true
+omit =
+    .venv/*
+    tests/*
 
 [paths]
 source =

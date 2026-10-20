@@ -44,4 +44,13 @@ Remove leftovers from an interrupted run:
 python tests/e2e/confluence_e2e_test.py --cleanup
 ```
 
+## Test coverage
+
+To check coverage run:
+
+```bash
+pytest tests --cov
+coverage report --include="ingest_utils/*" # Scope report to certain modules
+```
+
 The golden (`tests/e2e/golden/confluence_e2e.json`) and `tests/e2e/last_run.json` are gitignored because they contain real data. Record these yourself.
