@@ -1,0 +1,10 @@
+[run]
+include =
+    ingest_utils/*
+    */app/ingest_utils/*
+parallel = true
+
+[paths]
+source =
+    ingest_utils/
+    */app/ingest_utils/
