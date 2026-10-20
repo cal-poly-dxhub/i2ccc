@@ -1,5 +1,6 @@
 # Test-only dependencies. Install with: pip install -r requirements-dev.txt
 -r ingest_utils/confluence_processor/requirements.txt
 pytest==9.1.1
+pytest-cov==7.1.0
 moto[s3]==5.2.4
 responses==0.26.3
