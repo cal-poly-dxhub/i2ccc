@@ -12,6 +12,7 @@ from googleapiclient.errors import HttpError# type: ignore
 import subprocess
 import logging
 import pymediainfo # type: ignore
+from stack_config import load_config
 
 
 # Configure logging
