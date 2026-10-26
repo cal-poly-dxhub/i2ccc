@@ -68,26 +68,15 @@ pip install -r requirements.txt
 cp config.yaml.example config.yaml
 ```
 
-### 2. Deploy infrastructure
+### 2. Adjust config
 
-`config.yaml` ships with sensible defaults — you only need to fill in real values after the first deploy. The initial `cdk deploy` will succeed with placeholders for any field the stack itself produces (OpenSearch endpoint, API endpoints, table names).
+`config.yaml` ships with sensible defaults, change settings according to your needs.
+
+### 3. Deploy infrastructure
 
 ```bash
 cdk deploy
 ```
-
-### 3. Nothing to copy back
-
-The bucket, state machine, table, OpenSearch endpoint and API URLs are read from the stack's CloudFormation outputs each time a script runs, so `config.yaml` doesn't hold them. The scripts look the stack up by `stack_name` (default `RagChatbotStack`) in `aws_region`, using your current AWS credentials. Set those two keys in `config.yaml` if your stack differs.
-
-To read an output by hand:
-
-```bash
-aws cloudformation describe-stacks --stack-name RagChatbotStack \
-  --query "Stacks[0].Outputs[].[OutputKey,OutputValue]" --output text
-```
-
-A second `cdk deploy` is not required unless you change infrastructure-affecting fields (prompts, models, auth, custom domain, etc.).
 
 ### 4. Deploy the frontend
 
