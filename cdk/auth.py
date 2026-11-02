@@ -33,23 +33,24 @@ class CognitoSamlAuth(Construct):
         saml_attribute_mapping: dict = None,
         dev_user_email: str = None,
         cloudfront_url: str = None,
-        extra_callback_urls: list = None,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Callback and logout URLs for the Cognito App Client.
-        # Cognito redirects here after a successful SAML login / logout.
-        callback_urls = ["http://localhost:5173"]  # local dev
-        logout_urls = ["http://localhost:5173"]
-
-        for url in [cloudfront_url, *(extra_callback_urls or [])]:
-            if not url:
-                continue
-            base = url.rstrip("/")
-            if base not in callback_urls:
-                callback_urls.append(base)
-                logout_urls.append(base)
+        # Cognito redirects here after a successful login / logout.
+        # Only the frontend's public URL (custom domain if set, else CloudFront)
+        # is registered. localhost is added in dev mode only, so a production
+        # pool never accepts logins from a locally-run frontend.
+        callback_urls = []
+        logout_urls = []
+        if cloudfront_url:
+            base = cloudfront_url.rstrip("/")
+            callback_urls.append(base)
+            logout_urls.append(base)
+        if dev_user_email:
+            callback_urls.append("http://localhost:5173")
+            logout_urls.append("http://localhost:5173")
 
         # ------------------------------------------------------------------
         # User Pool
@@ -212,13 +213,6 @@ class CognitoSamlAuth(Construct):
             "SPMetadataUrl",
             value=f"https://{cognito_domain_prefix}.auth.{Stack.of(self).region}.amazoncognito.com/saml2/metadata",
             description="SP Metadata URL — your IAM team can import this directly",
-        )
-
-        CfnOutput(
-            self,
-            "HostedUILoginUrl",
-            value=f"{hosted_ui_base}/oauth2/authorize?client_id={self.app_client.user_pool_client_id}&response_type=code&scope=openid+email+profile&redirect_uri={callback_urls[-1]}",
-            description="Hosted UI login URL for testing",
         )
 
         # Expose for use by other constructs (e.g. Lambda@Edge)

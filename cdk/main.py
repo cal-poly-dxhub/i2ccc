@@ -99,7 +99,6 @@ class RagChatbotStack(Stack):
             saml_attribute_mapping=saml_attribute_mapping,
             dev_user_email=dev_user_email,
             cloudfront_url=frontend_stack.public_url,
-            extra_callback_urls=extra_callbacks,
         )
 
         # Create backend stack with frontend domain for CORS configuration
