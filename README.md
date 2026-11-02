@@ -104,12 +104,6 @@ cdk deploy
 
 ### 4. Deploy the frontend
 
-```bash
-cd frontend
-cp .env.example .env
-# Set VITE_API_ENDPOINT to the ProxyAPIEndpoint from CDK output
-```
-
 From the repository root:
 
 ```bash
