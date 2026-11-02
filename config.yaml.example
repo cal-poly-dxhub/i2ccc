@@ -108,11 +108,11 @@ overlap: "0.1" # Overlap percentage (0.1 = 10%), must be a string
 
 # The Bedrock Model IDs for each function
 model:
-  chat: us.anthropic.claude-3-5-sonnet-20241022-v2:0
+  chat: us.anthropic.claude-haiku-5-5
   embedding: amazon.titan-embed-text-v2:0
-  video_ingest: anthropic.claude-3-haiku-20240307-v1:0 # Also used for audio transcription enrichment
-  classifier: anthropic.claude-3-haiku-20240307-v1:0
-  document_filter: anthropic.claude-3-haiku-20240307-v1:0
+  video_ingest: us.anthropic.claude-haiku-5-5 # Also used for audio transcription enrichment
+  classifier: us.anthropic.claude-haiku-5-5
+  document_filter: us.anthropic.claude-haiku-5-5
 
 chat_prompt: |
   You are a knowledgeable help desk assistant for Internet2 with detailed knowledge of the content of the meetings under the Internet2 Cloud Infrastructure Community Program and the broader higher education cloud community, including the Cloud Computing Community Group.
