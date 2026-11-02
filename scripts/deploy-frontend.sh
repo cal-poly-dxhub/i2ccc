@@ -63,11 +63,18 @@ if [ -z "$BUCKET_NAME" ] || [ -z "$DISTRIBUTION_ID" ]; then
 fi
 
 # Cognito settings for the frontend build (exported below, after the .env check)
+# "| [0]" takes the first match only. Output names are matched by substring, and
+# CDK adds its own "Endpoint" output to every RestApi, so ProxyAPIEndpoint matches
+# two outputs (same URL). Without it, text output joins them with a tab.
 get_output() {
-    aws cloudformation describe-stacks \
+    local value
+    value=$(aws cloudformation describe-stacks \
         --stack-name "$STACK_NAME" \
-        --query "Stacks[0].Outputs[?contains(OutputKey, '$1')].OutputValue" \
-        --output text
+        --query "Stacks[0].Outputs[?contains(OutputKey, '$1')].OutputValue | [0]" \
+        --output text)
+    # A missing output prints "None"; return empty so the checks below catch it
+    [ "$value" = "None" ] && value=""
+    printf '%s' "$value"
 }
 COGNITO_DOMAIN=$(get_output CognitoHostedUiDomain)
 COGNITO_CLIENT_ID=$(get_output CognitoAppClientId)
