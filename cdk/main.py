@@ -37,16 +37,17 @@ class RagChatbotStack(Stack):
         overlap: str,
         docs_retrieved: int,
         docs_after_falloff: int,
+        # Cognito / SAML auth (required)
+        cognito_domain_prefix: str,
+        saml_idp_name: str = None,
+        saml_idp_metadata_url: str = None,
+        saml_attribute_mapping: dict = None,
+        dev_user_email: str = None,
         conversation_history_turns: int = 4,
         max_history_characters: int = 100000,
         temperature: float = 1.0,
         top_p: float = 0.999,
         max_tokens: int = 4096,
-        # Cognito / SAML auth (optional)
-        cognito_domain_prefix: str = None,
-        saml_idp_name: str = None,
-        saml_idp_metadata_url: str = None,
-        saml_attribute_mapping: dict = None,
         # Custom domain for CloudFront (optional)
         frontend_domain_name: str = None,
         frontend_certificate_arn: str = None,
@@ -89,25 +90,17 @@ class RagChatbotStack(Stack):
             certificate_arn=frontend_certificate_arn,
         )
 
-        # Create Cognito SAML auth (optional — only if all required config is provided)
-        auth = None
-        if all([cognito_domain_prefix, saml_idp_name, saml_idp_metadata_url, saml_attribute_mapping]):
-            # Allow both the custom domain (primary) and the default CloudFront URL
-            # (fallback) as valid OAuth callbacks.
-            extra_callbacks = []
-            if frontend_stack.custom_domain_name:
-                extra_callbacks.append(f"https://{frontend_stack.distribution_domain_name}")
-
-            auth = CognitoSamlAuth(
-                self,
-                "CognitoSamlAuth",
-                cognito_domain_prefix=cognito_domain_prefix,
-                saml_idp_name=saml_idp_name,
-                saml_idp_metadata_url=saml_idp_metadata_url,
-                saml_attribute_mapping=saml_attribute_mapping,
-                cloudfront_url=frontend_stack.public_url,
-                extra_callback_urls=extra_callbacks,
-            )
+        auth = CognitoSamlAuth(
+            self,
+            "CognitoSamlAuth",
+            cognito_domain_prefix=cognito_domain_prefix,
+            saml_idp_name=saml_idp_name,
+            saml_idp_metadata_url=saml_idp_metadata_url,
+            saml_attribute_mapping=saml_attribute_mapping,
+            dev_user_email=dev_user_email,
+            cloudfront_url=frontend_stack.public_url,
+            extra_callback_urls=extra_callbacks,
+        )
 
         # Create backend stack with frontend domain for CORS configuration
         rag_api_stack = RagBackend(
@@ -132,7 +125,7 @@ class RagChatbotStack(Stack):
             top_p=top_p,
             max_tokens=max_tokens,
             frontend_distribution_domain=frontend_stack.public_domain_name,
-            user_pool=auth.user_pool if auth else None,
+            user_pool=auth.user_pool,
         )
 
         # One-command content collection: collector Fargate task -> data

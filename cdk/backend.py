@@ -9,6 +9,9 @@ from aws_cdk import (
     aws_apigateway as apigw,
 )
 from aws_cdk import (
+    aws_cognito as cognito,
+)
+from aws_cdk import (
     aws_dynamodb as dynamodb,
 )
 from aws_cdk import (
@@ -44,36 +47,36 @@ class RagBackend(Construct):
         bucket_arn: str,
         docs_retrieved: int,
         docs_after_falloff: int,
+        user_pool: cognito.IUserPool,
         conversation_history_turns: int = 4,
         max_history_characters: int = 100000,
         temperature: float = 1.0,
         top_p: float = 0.999,
         max_tokens: int = 4096,
         frontend_distribution_domain: str = None,
-        user_pool=None,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
-        
+
         # Create Parameter Store entries for prompts
         chat_prompt_param = ssm.StringParameter(
             self, "ChatPromptParameter",
             parameter_name="/chatbot/prompts/chat",
             string_value=chat_prompt
         )
-        
+
         classifier_prompt_param = ssm.StringParameter(
-            self, "ClassifierPromptParameter", 
+            self, "ClassifierPromptParameter",
             parameter_name="/chatbot/prompts/classifier",
             string_value=platform_classifier_prompt
         )
-        
+
         filter_prompt_param = ssm.StringParameter(
             self, "FilterPromptParameter",
-            parameter_name="/chatbot/prompts/filter", 
+            parameter_name="/chatbot/prompts/filter",
             string_value=document_filter_prompt
         )
-        
+
         # Create DynamoDB table for conversation history
         conversation_table = dynamodb.Table(
             self,
@@ -410,17 +413,14 @@ class RagBackend(Construct):
         api_resource = proxy_api.root.add_resource("api")
 
         # Cognito authorizer — validates the JWT (signature, issuer, expiry)
-        # at the gateway, before the proxy Lambda runs. Optional so deploys
-        # without SAML config still work.
-        method_auth = {}
-        if user_pool is not None:
-            authorizer = apigw.CognitoUserPoolsAuthorizer(
-                self, "ChatProxyAuthorizer", cognito_user_pools=[user_pool]
-            )
-            method_auth = {
-                "authorizer": authorizer,
-                "authorization_type": apigw.AuthorizationType.COGNITO,
-            }
+        # at the gateway, before the proxy Lambda runs.
+        authorizer = apigw.CognitoUserPoolsAuthorizer(
+            self, "ChatProxyAuthorizer", cognito_user_pools=[user_pool]
+        )
+        method_auth = {
+            "authorizer": authorizer,
+            "authorization_type": apigw.AuthorizationType.COGNITO,
+        }
 
         # Create /api/chat-response resource
         chat_proxy_resource = api_resource.add_resource("chat-response")
@@ -451,7 +451,7 @@ class RagBackend(Construct):
             "OpensearchAPIEndpoint",
             value=opensearch_endpoint,
         )
-        
+
         CfnOutput(
             self,
             "ConversationTableName",

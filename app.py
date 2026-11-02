@@ -7,6 +7,33 @@ from cdk.main import RagChatbotStack
 CONFIG_PATH = "./config.yaml"
 config = yaml.safe_load(open(CONFIG_PATH))
 
+SSO_KEYS = (
+    "cognito_domain_prefix",
+    "saml_idp_name",
+    "saml_idp_metadata_url",
+    "saml_attribute_mapping",
+)
+
+if config.get("saml_idp_metadata_url"):
+    auth_mode = "SAML"
+    dev_user_email = None
+    if config.get("dev_user_email"):
+        print("WARNING: saml_idp_metadata_url is set, so dev_user_email is ignored.")
+    required_keys = SSO_KEYS
+else:
+    auth_mode = "DEV"
+    dev_user_email = config.get("dev_user_email") or None
+    required_keys = ("cognito_domain_prefix", "dev_user_email")
+
+missing_sso = [k for k in required_keys if not config.get(k) or "<" in str(config[k])]
+if missing_sso:
+    raise SystemExit(
+        f"config.yaml: set {', '.join(missing_sso)} before deploying "
+        "(set the SAML keys for production, or dev_user_email for a dev stack; "
+        "see 'Authentication' in README.md)"
+    )
+print(f"Auth mode: {auth_mode}")
+
 app = cdk.App()
 RagChatbotStack(
     app,
@@ -54,13 +81,12 @@ RagChatbotStack(
     ),
     # Bedrock model lifecycle alert recipients (optional; one address or a list)
     model_lifecycle_notification_email=config.get("model_lifecycle_notification_email"),
-    # Cognito SAML auth — only active when enable_saml_auth: true in config.yaml
-    **({
-        "cognito_domain_prefix": config.get("cognito_domain_prefix"),
-        "saml_idp_name": config.get("saml_idp_name"),
-        "saml_idp_metadata_url": config.get("saml_idp_metadata_url"),
-        "saml_attribute_mapping": config.get("saml_attribute_mapping"),
-    } if config.get("enable_saml_auth") else {}),
+    # Cognito SAML auth (required, validated above)
+    cognito_domain_prefix=config["cognito_domain_prefix"],
+    saml_idp_name=config.get("saml_idp_name"),
+    saml_idp_metadata_url=config.get("saml_idp_metadata_url"),
+    saml_attribute_mapping=config.get("saml_attribute_mapping"),
+    dev_user_email=dev_user_email,
 )
 
 app.synth()

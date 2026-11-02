@@ -28,9 +28,10 @@ class CognitoSamlAuth(Construct):
         scope: Construct,
         construct_id: str,
         cognito_domain_prefix: str,
-        saml_idp_name: str,
-        saml_idp_metadata_url: str,
-        saml_attribute_mapping: dict,
+        saml_idp_name: str = None,
+        saml_idp_metadata_url: str = None,
+        saml_attribute_mapping: dict = None,
+        dev_user_email: str = None,
         cloudfront_url: str = None,
         extra_callback_urls: list = None,
         **kwargs,
@@ -83,22 +84,34 @@ class CognitoSamlAuth(Construct):
         # ------------------------------------------------------------------
         # Build attribute mapping from config dict.
         # Keys are Cognito standard attribute names; values are SAML claim URIs.
-        attr_map = {}
-        for cognito_attr, saml_attr in saml_attribute_mapping.items():
-            attr_map[cognito_attr] = cognito.ProviderAttribute.other(saml_attr)
+        # SAML is skipped only when a dev user is configured and no metadata URL is set
+        saml_idp = None
+        if saml_idp_metadata_url:
+            attr_map = {}
+            for cognito_attr, saml_attr in (saml_attribute_mapping or {}).items():
+                attr_map[cognito_attr] = cognito.ProviderAttribute.other(saml_attr)
 
-        saml_idp = cognito.UserPoolIdentityProviderSaml(
-            self,
-            "SamlIdP",
-            user_pool=self.user_pool,
-            name=saml_idp_name,
-            metadata=cognito.UserPoolIdentityProviderSamlMetadata.url(
-                saml_idp_metadata_url
-            ),
-            attribute_mapping=cognito.AttributeMapping(**attr_map),
-            # Require signed SAML assertions (recommended for production)
-            request_signing_algorithm=cognito.SigningAlgorithm.RSA_SHA256,
-        )
+            saml_idp = cognito.UserPoolIdentityProviderSaml(
+                self,
+                "SamlIdP",
+                user_pool=self.user_pool,
+                name=saml_idp_name,
+                metadata=cognito.UserPoolIdentityProviderSamlMetadata.url(
+                    saml_idp_metadata_url
+                ),
+                attribute_mapping=cognito.AttributeMapping(**attr_map),
+                # Require signed SAML assertions (recommended for production)
+                request_signing_algorithm=cognito.SigningAlgorithm.RSA_SHA256,
+            )
+
+        identity_providers = []
+        if saml_idp:
+            identity_providers.append(
+                cognito.UserPoolClientIdentityProvider.custom(saml_idp_name)
+            )
+        if dev_user_email:
+            # Dev only: enables Cognito username/password login on the hosted UI
+            identity_providers.append(cognito.UserPoolClientIdentityProvider.COGNITO)
 
         # ------------------------------------------------------------------
         # App Client
@@ -119,15 +132,37 @@ class CognitoSamlAuth(Construct):
                 callback_urls=callback_urls,
                 logout_urls=logout_urls,
             ),
-            supported_identity_providers=[
-                cognito.UserPoolClientIdentityProvider.custom(saml_idp_name)
-            ],
+            supported_identity_providers=identity_providers,
             # Do not generate a client secret (SPA/Lambda@Edge can't store it securely)
             generate_secret=False,
         )
 
         # Ensure the IdP is created before the client references it
-        self.app_client.node.add_dependency(saml_idp)
+        if saml_idp:
+            self.app_client.node.add_dependency(saml_idp)
+
+        # ------------------------------------------------------------------
+        # Optional dev user (dev stacks only; app.py never passes this in SAML mode)
+        # ------------------------------------------------------------------
+        # Cognito emails a temporary password to dev_user_email and forces a
+        # password change on first sign-in. No password is stored in code or
+        # the template, so the email must be a real inbox.
+        if dev_user_email:
+            cognito.CfnUserPoolUser(
+                self,
+                "DevUser",
+                user_pool_id=self.user_pool.user_pool_id,
+                username=dev_user_email,
+                desired_delivery_mediums=["EMAIL"],
+                user_attributes=[
+                    cognito.CfnUserPoolUser.AttributeTypeProperty(
+                        name="email", value=dev_user_email
+                    ),
+                    cognito.CfnUserPoolUser.AttributeTypeProperty(
+                        name="email_verified", value="true"
+                    ),
+                ],
+            )
 
         # ------------------------------------------------------------------
         # Cognito Domain (Hosted UI)
