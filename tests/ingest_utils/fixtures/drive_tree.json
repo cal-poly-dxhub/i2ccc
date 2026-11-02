@@ -1,0 +1,62 @@
+{
+  "_comment": "Anonymized Drive tree. Field names, MIME types and name patterns (_recording/_transcript/_audio/_chat, captions.cc.vtt as octet-stream, audio/x-m4a, video/mp4 .m4a) mirror what the production Drive folders contain; all names and ids are made up. Error keys (name_error, list_error, download_errors, convert_fails, export_too_large) drive the fake's failure modes.",
+  "folders": {
+    "FOLDER_MAIN": {
+      "name": "2026-01-15 Example Town Hall",
+      "files": [
+        {"id": "f-recording", "name": "Town Hall_recording.mp4", "mimeType": "video/mp4", "webViewLink": "https://drive.google.com/file/d/f-recording/view?usp=drivesdk", "webContentLink": "https://drive.google.com/uc?id=f-recording&export=download"},
+        {"id": "f-transcript", "name": "Town Hall_transcript.vtt", "mimeType": "text/vtt", "webViewLink": "https://drive.google.com/file/d/f-transcript/view?usp=drivesdk"},
+        {"id": "f-audio", "name": "Town Hall_audio.m4a", "mimeType": "audio/x-m4a", "webViewLink": "https://drive.google.com/file/d/f-audio/view?usp=drivesdk"},
+        {"id": "f-captions", "name": "Town Hall captions.cc.vtt", "mimeType": "application/octet-stream", "webViewLink": "https://drive.google.com/file/d/f-captions/view?usp=drivesdk"},
+        {"id": "f-chat", "name": "Town Hall_chat.txt", "mimeType": "text/plain", "webViewLink": "https://drive.google.com/file/d/f-chat/view?usp=drivesdk"},
+        {"id": "f-doc", "name": "Town Hall Transcript", "mimeType": "application/vnd.google-apps.document", "webViewLink": "https://docs.google.com/document/d/f-doc/edit?usp=drivesdk"},
+        {"id": "f-doc-corrupt", "name": "Corrupt Notes", "mimeType": "application/vnd.google-apps.document", "webViewLink": "https://docs.google.com/document/d/f-doc-corrupt/edit?usp=drivesdk"},
+        {"id": "f-slides-big", "name": "Members Deck", "mimeType": "application/vnd.google-apps.presentation", "webViewLink": "https://docs.google.com/presentation/d/f-slides-big/edit?usp=drivesdk"},
+        {"id": "f-pptx", "name": "Town Hall Slides.pptx", "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation", "webViewLink": "https://drive.google.com/file/d/f-pptx/view?usp=drivesdk"},
+        {"id": "f-long", "name": "Long Session.mp4", "mimeType": "video/mp4", "webViewLink": "https://drive.google.com/file/d/f-long/view?usp=drivesdk"},
+        {"id": "f-no-duration", "name": "No Duration.mp4", "mimeType": "video/mp4", "webViewLink": "https://drive.google.com/file/d/f-no-duration/view?usp=drivesdk"},
+        {"id": "f-m4a-as-video", "name": "Breakout_audio.m4a", "mimeType": "video/mp4", "webViewLink": "https://drive.google.com/file/d/f-m4a-as-video/view?usp=drivesdk"},
+        {"id": "f-download-fails", "name": "Download Fails.pdf", "mimeType": "application/pdf", "webViewLink": "https://drive.google.com/file/d/f-download-fails/view?usp=drivesdk"},
+        {"id": "FOLDER_SUB", "name": "Breakouts", "mimeType": "application/vnd.google-apps.folder", "webViewLink": "https://drive.google.com/drive/folders/FOLDER_SUB"}
+      ]
+    },
+    "FOLDER_SUB": {
+      "name": "Breakouts",
+      "name_error": 404,
+      "files": [
+        {"id": "f-handout", "name": "Q3/Q4 Handout.pdf", "mimeType": "application/pdf", "webViewLink": "https://drive.google.com/file/d/f-handout/view?usp=drivesdk"}
+      ]
+    },
+    "FOLDER_OPEN": {
+      "name": "2026-03-10 Example Briefing",
+      "files": [
+        {"id": "f-briefing", "name": "briefing.pdf", "mimeType": "application/pdf", "webViewLink": "https://drive.google.com/file/d/f-briefing/view?usp=drivesdk"}
+      ]
+    },
+    "FOLDER_BROKEN": {
+      "name": "Unlistable Folder",
+      "list_error": 500,
+      "files": []
+    }
+  },
+  "permissions": {
+    "f-recording": [{"type": "anyone", "role": "reader"}],
+    "f-chat": [{"type": "user", "role": "owner"}],
+    "f-doc": [{"type": "anyone", "role": "reader"}],
+    "f-doc-corrupt": [{"type": "user", "role": "owner"}],
+    "f-slides-big": [{"type": "domain", "role": "reader"}],
+    "f-long": [{"type": "user", "role": "writer"}],
+    "f-no-duration": [{"type": "anyone", "role": "commenter"}],
+    "f-m4a-as-video": [{"type": "user", "role": "owner"}],
+    "f-handout": {"error": 403},
+    "f-briefing": [{"type": "anyone", "role": "reader"}]
+  },
+  "durations_ms": {
+    "f-recording": 3600000,
+    "f-long": 10801000,
+    "f-m4a-as-video": 1800000
+  },
+  "download_errors": {"f-download-fails": 500},
+  "convert_fails": ["f-doc-corrupt"],
+  "export_too_large": ["f-slides-big"]
+}

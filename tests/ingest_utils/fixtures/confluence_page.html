@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- Anonymized calendar page. Markup mirrors the real Confluence page
+     (wiki-content > table-wrap > confluenceTable, highlight cells, embedded
+     thumbnails, a banner row, repeated header rows as <td>, one <th> header
+     row mid-table, which is what the scrapers use to find the table). -->
+<html lang="en-US">
+<head><title>Example Program Calendar - Example Wiki</title></head>
+<body>
+<main class="aui-page-panel clearfix"><div class="page view"><div class="wiki-content">
+<div class="table-wrap"><table class="relative-table wrapped confluenceTable" style="width: 89.6%;">
+<colgroup><col style="width: 9.7%;"/><col style="width: 16.9%;"/><col style="width: 48.4%;"/><col style="width: 14.2%;"/><col style="width: 10.8%;"/></colgroup>
+<tbody>
+
+<!-- Banner row: one cell, skipped by both scrapers -->
+<tr><td class="confluenceTd" colspan="5" style="text-align: center;"><h2 id="Calendar-2026"><strong>2026</strong></h2></td></tr>
+
+<!-- Header repeated as <td>: both scrapers treat it as an event row -->
+<tr><td class="highlight-#f4f5f7 confluenceTd"><p title=""><strong>Date</strong></p></td><td class="highlight-#f4f5f7 confluenceTd"><p title=""><strong>Title</strong></p></td><td class="highlight-#f4f5f7 confluenceTd"><p title=""><strong>Description</strong></p></td><td class="highlight-#f4f5f7 confluenceTd"><p title=""><strong>Speaker(s)</strong></p></td><td class="highlight-#f4f5f7 confluenceTd"><p title=""><strong>Assets</strong></p></td></tr>
+
+<!-- A: subscriber row. Drive folder, thumbnail, Confluence short link, Google Slides link -->
+<tr><td class="highlight-#79f2c0 confluenceTd"><p title="">1/15/2026</p></td><td class="highlight-#79f2c0 confluenceTd"><p title=""><span>Example Town Hall: Cloud Basics</span></p></td><td class="highlight-#79f2c0 confluenceTd"><p title=""><span>An introduction to running research workloads in the cloud.</span></p><p title=""><span>Bring your questions for the panel.</span></p></td><td class="highlight-#79f2c0 confluenceTd"><p title="">Jordan Lee, Example University</p><p title="">Casey Park, Sample College</p></td><td class="highlight-#79f2c0 confluenceTd"><div class="content-wrapper" title=""><p title=""><strong><a class="external-link" href="https://drive.google.com/drive/folders/FOLDER_MAIN?usp=drive_link"><span class="confluence-embedded-file-wrapper confluence-embedded-manual-size"><img alt="" class="confluence-embedded-image confluence-thumbnail" src="/download/thumbnails/1000/presentation-icon.png?version=1&amp;api=v2" width="50"/></span></a></strong></p><p title="">(Subscribers)</p><p title=""><a href="https://wiki.example.edu/x/AbC123"><span class="confluence-embedded-file-wrapper"><img alt="" class="confluence-embedded-image confluence-thumbnail" src="/download/thumbnails/1000/typewriter-icon.png?version=1&amp;api=v2" width="50"/></span></a></p><p title=""><a href="https://docs.google.com/presentation/d/SLIDES_LINKED/edit?usp=sharing">Slides</a></p></div></td></tr>
+
+<!-- B: public row. Direct mp4 + vtt + m4a (MP4 dominance), Panopto and YouTube links -->
+<tr><td class="highlight-#fea362 confluenceTd"><p title="">2/3/2026</p></td><td class="highlight-#fea362 confluenceTd"><p title="">Example Webinar: Direct Media</p></td><td class="highlight-#fea362 confluenceTd"><p title=""><span>Recording, captions and audio hosted as direct files.</span></p></td><td class="highlight-#fea362 confluenceTd"><p title="">Riley Chen, Example Institute</p></td><td class="highlight-#fea362 confluenceTd"><div class="content-wrapper"><p title=""><a href="https://files.example.edu/webinars/direct-webinar.mp4">Recording</a> <a href="https://files.example.edu/webinars/direct-webinar.vtt">Captions</a> <a href="https://files.example.edu/webinars/direct-webinar.m4a">Audio</a></p><p title=""><a href="https://example.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=00000000-0000-0000-0000-000000000001">Panopto</a> <a href="https://www.youtube.com/watch?v=AAAAAAAAAAA">YouTube</a></p></div></td></tr>
+
+<!-- C: public row. Audio only (kept), Drive folder in open?id= form, a 404 -->
+<tr><td class="highlight-#fea362 confluenceTd"><p title="">3/10/2026</p></td><td class="highlight-#fea362 confluenceTd"><p title="">Example Briefing: Audio Only</p></td><td class="highlight-#fea362 confluenceTd"><p title=""><span>No recording, so the audio is kept.</span></p></td><td class="highlight-#fea362 confluenceTd"><p title=""></p></td><td class="highlight-#fea362 confluenceTd"><div class="content-wrapper"><p title=""><a href="https://drive.google.com/open?id=FOLDER_OPEN&amp;usp=sharing">Folder</a> <a href="https://files.example.edu/briefings/audio-only.m4a">Audio</a> <a href="https://files.example.edu/missing/gone.pdf">Slides</a></p></div></td></tr>
+
+<!-- The only real <th> header row, mid-table: this is how the table is found -->
+<tr><th class="confluenceTh"><strong>Date</strong></th><th class="confluenceTh">Title</th><th class="confluenceTh">Description</th><th class="confluenceTh">Speaker(s)</th><th class="confluenceTh"><strong>Assets</strong></th></tr>
+
+<!-- D: subscriber row. Direct pdf with query, Drive file link, viewpage link, Drive folder whose listing fails -->
+<tr><td class="highlight-#79f2c0 confluenceTd"><p title="">11/18/2025</p></td><td class="highlight-#79f2c0 confluenceTd"><p title="">Example Strategy Call: Members Only</p></td><td class="highlight-#79f2c0 confluenceTd"><p title=""><span>Slides for members, plus links the pipeline cannot ingest.</span></p></td><td class="highlight-#79f2c0 confluenceTd"><p title="">Sam Ortiz, Example Network</p></td><td class="highlight-#79f2c0 confluenceTd"><div class="content-wrapper"><p title=""><a href="https://drive.google.com/drive/folders/FOLDER_BROKEN?usp=drive_link">Materials</a></p><p title="">(Subscribers)</p><p title=""><a href="https://files.example.edu/members/strategy-slides.pdf?version=2">Slides</a> <a href="https://drive.google.com/file/d/FILE_LINKED/view?usp=sharing">Handout</a> <a href="https://wiki.example.edu/pages/viewpage.action?pageId=1001">Notes</a></p></div></td></tr>
+
+<!-- E: row with only a thumbnail, no links (event description gets no URL) -->
+<tr><td class="highlight-#79f2c0 confluenceTd"><p title="">5/22/2025</p></td><td class="highlight-#79f2c0 confluenceTd"><p title="">Example Tech Jam: Placeholder</p></td><td class="highlight-#79f2c0 confluenceTd"><p title=""><span>Materials coming soon.</span></p></td><td class="highlight-#79f2c0 confluenceTd"><p title="">TBD</p></td><td class="highlight-#79f2c0 confluenceTd"><div class="content-wrapper"><p title=""><span class="confluence-embedded-file-wrapper"><img alt="" class="confluence-embedded-image confluence-thumbnail" src="/download/thumbnails/1000/presentation-icon.png?version=1&amp;api=v2" width="50"/></span></p><p title="">(Subscribers)</p></div></td></tr>
+
+</tbody></table></div>
+</div></div></main>
+</body></html>
