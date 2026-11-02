@@ -22,12 +22,15 @@ export interface CognitoUser {
 
 export function redirectToLogin(): void {
   const params = new URLSearchParams({
-    identity_provider: 'Internet2SSO',
     client_id: authConfig.clientId,
     response_type: 'code',
     scope: authConfig.scopes,
     redirect_uri: authConfig.redirectUri,
   });
+  // Uses IdP if set otherwise usees cognito hosted UI for development.
+  if (authConfig.identityProvider) {
+    params.set('identity_provider', authConfig.identityProvider);
+  }
 
   window.location.assign(`${authConfig.domain}/oauth2/authorize?${params.toString()}`);
 }

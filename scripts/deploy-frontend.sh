@@ -62,9 +62,34 @@ if [ -z "$BUCKET_NAME" ] || [ -z "$DISTRIBUTION_ID" ]; then
     exit 1
 fi
 
+# Cognito settings for the frontend build (exported below, after the .env check)
+get_output() {
+    aws cloudformation describe-stacks \
+        --stack-name "$STACK_NAME" \
+        --query "Stacks[0].Outputs[?contains(OutputKey, '$1')].OutputValue" \
+        --output text
+}
+COGNITO_DOMAIN=$(get_output CognitoHostedUiDomain)
+COGNITO_CLIENT_ID=$(get_output CognitoAppClientId)
+# Empty on dev stacks (no SAML provider), which makes the hosted UI show the password form
+COGNITO_IDP_NAME=$(get_output CognitoSamlIdpName)
+CUSTOM_DOMAIN_URL=$(get_output CustomDomainURL)
+# Must match a callback/logout URL registered on the Cognito app client:
+# the custom domain if set, otherwise the CloudFront URL
+APP_URL="${CUSTOM_DOMAIN_URL:-$CLOUDFRONT_URL}"
+APP_URL="${APP_URL%/}"
+
+if [ -z "$COGNITO_DOMAIN" ] || [ -z "$COGNITO_CLIENT_ID" ] || [ -z "$APP_URL" ]; then
+    echo -e "${RED}Error: Could not read Cognito outputs from stack $STACK_NAME.${NC}"
+    echo -e "${YELLOW}Run 'cdk deploy' with the latest code, then retry.${NC}"
+    exit 1
+fi
+
 echo -e "${GREEN}✓ S3 Bucket: $BUCKET_NAME${NC}"
 echo -e "${GREEN}✓ CloudFront Distribution: $DISTRIBUTION_ID${NC}"
 echo -e "${GREEN}✓ CloudFront URL: $CLOUDFRONT_URL${NC}"
+echo -e "${GREEN}✓ App URL (Cognito redirect): $APP_URL${NC}"
+echo -e "${GREEN}✓ Cognito domain: $COGNITO_DOMAIN${NC}"
 
 # Step 2: Build the frontend
 echo -e "\n${YELLOW}Step 2: Building frontend...${NC}"
@@ -76,9 +101,16 @@ if [ ! -f ".env" ]; then
     echo -e "${YELLOW}Please create a .env file with the following variables:${NC}"
     echo "VITE_ENVIRONMENT=production"
     echo "VITE_API_ENDPOINT=<your-api-gateway-endpoint>"
-    echo "VITE_API_KEY=<your-api-key>"
+    echo "(VITE_COGNITO_* values are filled in from the CDK stack outputs)"
     exit 1
 fi
+
+# Real environment variables override .env in Vite, so these get bundled into the build
+export VITE_COGNITO_DOMAIN="$COGNITO_DOMAIN"
+export VITE_COGNITO_CLIENT_ID="$COGNITO_CLIENT_ID"
+export VITE_COGNITO_REDIRECT_URI="$APP_URL"
+export VITE_COGNITO_LOGOUT_URI="$APP_URL"
+export VITE_COGNITO_IDP_NAME="$COGNITO_IDP_NAME"
 
 # Install dependencies if node_modules doesn't exist
 if [ ! -d "node_modules" ]; then

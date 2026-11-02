@@ -141,6 +141,14 @@ class CognitoSamlAuth(Construct):
         # Ensure the IdP is created before the client references it
         if saml_idp:
             self.app_client.node.add_dependency(saml_idp)
+            # Read by scripts/deploy-frontend.sh; absent in dev mode so the
+            # frontend shows the hosted UI login form instead of forcing SAML.
+            CfnOutput(
+                self,
+                "CognitoSamlIdpName",
+                value=saml_idp_name,
+                description="SAML identity provider name used for login redirect",
+            )
 
         # ------------------------------------------------------------------
         # Optional dev user (dev stacks only; app.py never passes this in SAML mode)
@@ -185,6 +193,13 @@ class CognitoSamlAuth(Construct):
             "CognitoUserPoolId",
             value=self.user_pool.user_pool_id,
             description="Cognito User Pool ID",
+        )
+
+        CfnOutput(
+            self,
+            "CognitoHostedUiDomain",
+            value=hosted_ui_base,
+            description="Cognito hosted UI base URL (read by scripts/deploy-frontend.sh)",
         )
 
         CfnOutput(
