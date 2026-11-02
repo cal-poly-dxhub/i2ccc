@@ -45,7 +45,6 @@ class RagChatbotStack(Stack):
         dev_user_email: str = None,
         conversation_history_turns: int = 4,
         max_history_characters: int = 100000,
-        temperature: float = 1.0,
         top_p: float = 0.999,
         max_tokens: int = 4096,
         # Custom domain for CloudFront (optional)
@@ -120,7 +119,6 @@ class RagChatbotStack(Stack):
             docs_after_falloff=docs_after_falloff,
             conversation_history_turns=conversation_history_turns,
             max_history_characters=max_history_characters,
-            temperature=temperature,
             top_p=top_p,
             max_tokens=max_tokens,
             frontend_distribution_domain=frontend_stack.public_domain_name,

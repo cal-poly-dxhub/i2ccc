@@ -60,7 +60,6 @@ RagChatbotStack(
     docs_after_falloff=int(config["docs_after_falloff"]),
     conversation_history_turns=int(config["conversation_history_turns"]),
     max_history_characters=int(config["max_history_characters"]),
-    temperature=float(config["temperature"]),
     top_p=float(config["top_p"]),
     max_tokens=int(config["max_tokens"]),
     # Custom CloudFront domain (optional — only applied if both fields are set)

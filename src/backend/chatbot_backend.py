@@ -174,7 +174,6 @@ def invoke_model(
     try:
         inference_config = {
             "maxTokens": int(os.environ.get("MAX_TOKENS", "4096")),
-            "temperature": float(os.environ.get("TEMPERATURE", "1.0")),
             "topP": float(os.environ.get("TOP_P", "0.999")),
         }
         messages = [{"role": "user", "content": [{"text": prompt}]}]
