@@ -29,7 +29,7 @@ cognito_domain_prefix: <globally-unique-prefix-eg-chatbot-yourorg> # used in the
 #   family_name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname
 
 # ---- Option B: dev user (development stacks) ----
-# To use this, comment out saml_* above, then uncomment below:
+# To use this uncomment below:
 # dev_user_email: dev@example.com
 # After deploy, Cognito emails a temp password to this
 # address and allows the user to set the password
