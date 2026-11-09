@@ -33,15 +33,15 @@ All infrastructure is defined with AWS CDK (Python) in [cdk/](cdk/) and deployed
 
 **Frontend** — React + TypeScript SPA built with Vite, hosted in S3 behind CloudFront with an Origin Access Identity. WAF protects the distribution with the AWS managed common ruleset, SQL injection ruleset, and per-IP rate limiting. An optional ACM certificate enables a custom domain.
 
-**Auth (optional)** — Cognito User Pool federated to a SAML IdP. The frontend uses the Authorization Code flow against the Cognito hosted UI; tokens are validated in the proxy Lambda.
+**Auth** — Cognito User Pool federated to a SAML IdP. The frontend uses the Authorization Code flow against the Cognito hosted UI; tokens are validated in the proxy Lambda.
 
 **API** — Two API Gateway endpoints:
 - A **proxy** Lambda fronts the chat API, validates Cognito tokens (when SAML is enabled), and injects the upstream API key from SSM Parameter Store so secrets never reach the browser.
 - A **RAG** Lambda performs classification, retrieval, filtering, and generation against Bedrock.
 
 **Retrieval & generation** — Bedrock models (configurable in `config.yaml`):
-- Chat: `moonshotai.kimi-k2.5`
-- Classification & document filtering: `anthropic.claude-3-haiku-20240307-v1:0`
+- Chat: `anthropic.claude-haiku-5-5`
+- Classification & document filtering: `anthropic.claude-haiku-5-5`
 - Embeddings: `amazon.titan-embed-text-v2:0`
 
 OpenSearch Serverless holds the vector index. Step Functions orchestrate ingestion with configurable concurrency.
@@ -68,38 +68,41 @@ pip install -r requirements.txt
 cp config.yaml.example config.yaml
 ```
 
-### 2. Deploy infrastructure
+### 2. Adjust config
 
-`config.yaml` ships with sensible defaults — you only need to fill in real values after the first deploy. The initial `cdk deploy` will succeed with placeholders for any field the stack itself produces (OpenSearch endpoint, API endpoints, table names).
+`config.yaml` ships with sensible defaults, change settings according to your needs.
+
+#### Authentication
+
+**Production (SAML):** `cdk deploy` stops with an error until these are set:
+
+```yaml
+cognito_domain_prefix: chatbot-yourorg          # globally unique
+saml_idp_name: CorporateSSO
+saml_idp_metadata_url: https://idp.example.edu/metadata   # from your IdP admins
+saml_attribute_mapping:
+  email: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
+  given_name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname
+  family_name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname
+```
+
+After `cdk deploy`, share the `SAMLAcsUrl`, `SAMLEntityId`, and `SPMetadataUrl` outputs with your IdP admins so they can register the app as a SAML Service Provider.
+
+**Dev stacks only (no IdP):** leave out all `saml_*` keys and set a test user instead:
+
+```yaml
+dev_user_email: dev@example.com   # must be a real inbox
+```
+
+Cognito emails a temporary password to that address; sign in on the Cognito UI and choose a new password. If `saml_idp_metadata_url` is set, `dev_user_email` is ignored. Do not use dev mode for production.
+
+### 3. Deploy infrastructure
 
 ```bash
 cdk deploy
 ```
 
-### 3. Populate `config.yaml` from stack outputs
-
-The deploy prints a set of `CfnOutput` values. Map them into `config.yaml`:
-
-| CDK output | `config.yaml` key |
-| --- | --- |
-| `OpensearchAPIEndpoint` | `opensearch_endpoint` |
-| `RagApiEndpoint` | `rag_api_endpoint` |
-| `ProxyAPIEndpoint` | `proxy_api_endpoint` |
-| `FrontendBucketName` | (used by `deploy-frontend.sh`) |
-| `DistributionId` | (used by `deploy-frontend.sh`) |
-| `CloudFrontURL` / `CustomDomainURL` | frontend URL |
-
-Also set `api_key` (API Gateway → API Keys → reveal), `step_function_arn`, `processed_files_table`, and `s3_bucket_name`.
-
-A second `cdk deploy` is not required unless you change infrastructure-affecting fields (prompts, models, auth, custom domain, etc.).
-
 ### 4. Deploy the frontend
-
-```bash
-cd frontend
-cp .env.example .env
-# Set VITE_API_ENDPOINT to the ProxyAPIEndpoint from CDK output
-```
 
 From the repository root:
 
@@ -208,23 +211,6 @@ Send `{"full": true, "advance_watermark": false}` instead to re-export the whole
 ## Optional Features
 
 These are gated by `config.yaml` flags and are inactive by default.
-
-### Cognito SAML SSO
-
-Federate the frontend with an institutional SAML IdP:
-
-```yaml
-enable_saml_auth: true
-cognito_domain_prefix: chatbot-yourorg          # globally unique
-saml_idp_name: CorporateSSO
-saml_idp_metadata_url: https://idp.example.edu/metadata
-saml_attribute_mapping:
-  email: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
-  given_name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname
-  family_name: http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname
-```
-
-After `cdk deploy`, share the `SAMLAcsUrl`, `SAMLEntityId`, and `SPMetadataUrl` outputs with your IAM team so they can register the app as a SAML Service Provider.
 
 ### Custom CloudFront domain
 

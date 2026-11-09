@@ -25,7 +25,13 @@ aws dynamodb scan \
 
 echo ""
 echo "=== Total Files in S3 Bucket ==="
-BUCKET=$(grep "s3_bucket_name:" config.yaml | awk '{print $2}')
+STACK_NAME=$(grep "^stack_name:" config.yaml 2>/dev/null | awk '{print $2}')
+STACK_NAME=${STACK_NAME:-RagChatbotStack}
+# Output keys carry a construct prefix and hash suffix, so match on the name
+BUCKET=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" \
+    --query "Stacks[0].Outputs[?contains(OutputKey, 'InputBucketName')].OutputValue | [0]" \
+    --output text 2>/dev/null || true)
+if [ "$BUCKET" = "None" ]; then BUCKET=""; fi
 if [ ! -z "$BUCKET" ]; then
     TOTAL=$(aws s3 ls s3://$BUCKET --recursive | wc -l)
     echo "$TOTAL total files in S3 (including generated files)"
@@ -45,5 +51,5 @@ if [ ! -z "$BUCKET" ]; then
     echo ""
     echo "Files remaining to process: $((PROCESSABLE - COUNT))"
 else
-    echo "Could not find bucket name in config.yaml"
+    echo "Could not read the input bucket from stack $STACK_NAME"
 fi

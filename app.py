@@ -7,10 +7,39 @@ from cdk.main import RagChatbotStack
 CONFIG_PATH = "./config.yaml"
 config = yaml.safe_load(open(CONFIG_PATH))
 
+SSO_KEYS = (
+    "cognito_domain_prefix",
+    "saml_idp_name",
+    "saml_idp_metadata_url",
+    "saml_attribute_mapping",
+)
+
+if config.get("saml_idp_metadata_url"):
+    auth_mode = "SAML"
+    dev_user_email = None
+    if config.get("dev_user_email"):
+        print("WARNING: saml_idp_metadata_url is set, so dev_user_email is ignored.")
+    required_keys = SSO_KEYS
+else:
+    auth_mode = "DEV"
+    dev_user_email = config.get("dev_user_email") or None
+    required_keys = ("cognito_domain_prefix", "dev_user_email")
+
+missing_sso = [k for k in required_keys if not config.get(k) or "<" in str(config[k])]
+if missing_sso:
+    raise SystemExit(
+        f"config.yaml: set {', '.join(missing_sso)} before deploying "
+        "(set the SAML keys for production, or dev_user_email for a dev stack; "
+        "see 'Authentication' in README.md)"
+    )
+print(f"Auth mode: {auth_mode}")
+
 app = cdk.App()
 RagChatbotStack(
     app,
-    "RagChatbotStack",
+    # Must match stack_config.DEFAULT_STACK_NAME: the ingest scripts look the
+    # stack up by this name to read its outputs
+    config.get("stack_name", "RagChatbotStack"),
     embeddings_model_id=config["model"]["embedding"],
     opensearch_collection_name=config["opensearch_collection_name"],
     opensearch_index_name=config["opensearch_index_name"],
@@ -31,8 +60,6 @@ RagChatbotStack(
     docs_after_falloff=int(config["docs_after_falloff"]),
     conversation_history_turns=int(config["conversation_history_turns"]),
     max_history_characters=int(config["max_history_characters"]),
-    temperature=float(config["temperature"]),
-    top_p=float(config["top_p"]),
     max_tokens=int(config["max_tokens"]),
     # Custom CloudFront domain (optional — only applied if both fields are set)
     frontend_domain_name=config.get("frontend_domain_name"),
@@ -52,13 +79,12 @@ RagChatbotStack(
     ),
     # Bedrock model lifecycle alert recipients (optional; one address or a list)
     model_lifecycle_notification_email=config.get("model_lifecycle_notification_email"),
-    # Cognito SAML auth — only active when enable_saml_auth: true in config.yaml
-    **({
-        "cognito_domain_prefix": config.get("cognito_domain_prefix"),
-        "saml_idp_name": config.get("saml_idp_name"),
-        "saml_idp_metadata_url": config.get("saml_idp_metadata_url"),
-        "saml_attribute_mapping": config.get("saml_attribute_mapping"),
-    } if config.get("enable_saml_auth") else {}),
+    # Cognito SAML auth (required, validated above)
+    cognito_domain_prefix=config["cognito_domain_prefix"],
+    saml_idp_name=config.get("saml_idp_name"),
+    saml_idp_metadata_url=config.get("saml_idp_metadata_url"),
+    saml_attribute_mapping=config.get("saml_attribute_mapping"),
+    dev_user_email=dev_user_email,
 )
 
 app.synth()

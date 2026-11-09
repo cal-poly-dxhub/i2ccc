@@ -3,5 +3,6 @@ export const authConfig = {
   clientId: import.meta.env.VITE_COGNITO_CLIENT_ID as string,
   redirectUri: import.meta.env.VITE_COGNITO_REDIRECT_URI as string,
   logoutUri: import.meta.env.VITE_COGNITO_LOGOUT_URI as string,
+  identityProvider: (import.meta.env.VITE_COGNITO_IDP_NAME as string | undefined) || undefined,
   scopes: 'openid email profile',
 } as const;

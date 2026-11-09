@@ -2,15 +2,12 @@ import os
 import re
 import requests
 from bs4 import BeautifulSoup
-import yaml # type: ignore
 import boto3 #type: ignore
 from dotenv import load_dotenv
+from stack_config import load_config
 
 # Load config and get env file path
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-config_path = os.path.join(project_root, "config.yaml")
-with open(config_path, "r") as f:
-    config = yaml.safe_load(f)
+config = load_config(needs=("s3_bucket_name",))
 
 env_file = config.get("env_file", "names.env")
 load_dotenv(env_file)

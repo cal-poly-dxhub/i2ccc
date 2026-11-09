@@ -147,8 +147,7 @@ def identify_speakers(labeled_transcript: str) -> Dict[str, Any]:
 
     messages = [{"role": "user", "content": prompt}]
     model_id = os.getenv("AUDIO_TEXT_MODEL_ID")
-    temperature = 0
-    response = generate_response(messages, model_id, temperature)
+    response = generate_response(messages, model_id)
     print(f"LLM response:\n {response}")
     print("Speakers identified. Parsing response...")
 

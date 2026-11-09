@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import boto3
 from boto3.dynamodb.conditions import Key
 from opensearch_query import generate_short_uuid, get_documents
+from opensearchpy.exceptions import NotFoundError
 from search_utils import generate_text_embedding
 
 logger = logging.getLogger()
@@ -173,8 +174,6 @@ def invoke_model(
     try:
         inference_config = {
             "maxTokens": int(os.environ.get("MAX_TOKENS", "4096")),
-            "temperature": float(os.environ.get("TEMPERATURE", "1.0")),
-            "topP": float(os.environ.get("TOP_P", "0.999")),
         }
         messages = [{"role": "user", "content": [{"text": prompt}]}]
 
@@ -185,7 +184,9 @@ def invoke_model(
             inferenceConfig=inference_config,
         )
 
-        return response["output"]["message"]["content"][0]["text"]
+        content = response["output"]["message"]["content"]
+        text = next(block["text"] for block in content if "text" in block)
+        return text or None
 
     except Exception:
         logger.exception("Error invoking the model")
@@ -496,9 +497,29 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
         embedding: List[float] = generate_text_embedding(user_query)
 
-        selected_docs: List[Dict[str, Any]] = get_documents(
-            user_query, embedding
-        )
+        try:
+            selected_docs: List[Dict[str, Any]] = get_documents(
+                user_query, embedding
+            )
+        except NotFoundError as e:
+            if e.error != "index_not_found_exception":
+                raise
+            logger.warning("OpenSearch index not found; nothing ingested yet")
+            return {
+                "statusCode": 200,
+                "body": json.dumps(
+                    {
+                        "response": (
+                            "The knowledge base is still being set up, so I can't "
+                            "answer questions yet. Please try again once documents "
+                            "have been loaded."
+                        ),
+                        "session_id": session_id,
+                        "timestamp": int(time.time() * 1000),
+                        "sources": [],
+                    }
+                ),
+            }
 
         # Platform classification and filtering
         is_platform_specific, platform = classify_platform_question(user_query)

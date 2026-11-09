@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to run a Step Function execution using the ARN from config.
+Script to run a Step Function execution using the ARN from the deployed stack.
 Automatically checks and creates OpenSearch index if needed before running.
 Uses DynamoDB for tracking processed files.
 """
@@ -8,21 +8,9 @@ Uses DynamoDB for tracking processed files.
 import argparse
 import boto3
 import json
-import yaml
 import sys
 from os_index_creator import check_create_index
-
-def load_config():
-    """Load configuration from config.yaml file."""
-    try:
-        with open("../config.yaml", "r") as config_file:
-            return yaml.safe_load(config_file)
-    except FileNotFoundError:
-        print("Error: config.yaml file not found in the parent directory.")
-        sys.exit(1)
-    except yaml.YAMLError as e:
-        print(f"Error parsing config.yaml: {e}")
-        sys.exit(1)
+from confluence_processor.stack_config import load_config
 
 def check_create_opensearch_index(config):
     """Check/create OpenSearch index using the function from os_index_creator."""
@@ -33,10 +21,6 @@ def check_create_opensearch_index(config):
 
 def reset_dynamodb_cache(config):
     """Reset the DynamoDB cache by deleting all items in the table."""
-    if 'processed_files_table' not in config:
-        print("Error: 'processed_files_table' not found in config.yaml")
-        return False
-    
     table_name = config['processed_files_table']
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
@@ -74,14 +58,17 @@ def run_step_function(step_function_arn, input_data):
 
 def main():
     parser = argparse.ArgumentParser(description='Run a Step Function execution with automatic OpenSearch index creation.')
-    parser.add_argument('--arn', type=str, help='Step Function ARN (optional, otherwise uses config)')
+    parser.add_argument('--arn', type=str, help='Step Function ARN (optional, otherwise read from the stack outputs)')
     parser.add_argument('--reset-cache', action='store_true', help='Reset the DynamoDB cache of processed files')
     parser.add_argument('--input', '-i', type=str, help='Custom JSON input string')
     parser.add_argument('--skip-index-check', action='store_true', help='Skip OpenSearch index check/creation')
     args = parser.parse_args()
     
     # Load configuration
-    config = load_config()
+    # Only resolve the stack values this invocation uses
+    needs = ((() if args.arn else ("step_function_arn",))
+             + (("processed_files_table",) if args.reset_cache else ()))
+    config = load_config(needs=needs)
     
     # Check/create OpenSearch index unless skipped
     if not args.skip_index_check:
@@ -90,9 +77,6 @@ def main():
     # Determine step function ARN
     step_function_arn = args.arn
     if not step_function_arn:
-        if 'step_function_arn' not in config:
-            print("Error: 'step_function_arn' not found in config.yaml and no ARN provided")
-            sys.exit(1)
         step_function_arn = config['step_function_arn']
     
     # Determine input data
