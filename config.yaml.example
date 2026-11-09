@@ -37,7 +37,6 @@ cognito_domain_prefix: <globally-unique-prefix-eg-chatbot-yourorg> # used in the
 # Chat history configuration
 conversation_history_turns: 4 # Max chat turns for history
 max_history_characters: 100000 # In number of characters
-top_p: 0.999 # Top-p for chat model (0.0-1.0)
 max_tokens: 4096 # Maximum tokens for chat response
 
 # Ingest

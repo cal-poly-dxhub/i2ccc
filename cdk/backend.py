@@ -50,7 +50,6 @@ class RagBackend(Construct):
         user_pool: cognito.IUserPool,
         conversation_history_turns: int = 4,
         max_history_characters: int = 100000,
-        top_p: float = 0.999,
         max_tokens: int = 4096,
         frontend_distribution_domain: str = None,
         **kwargs,
@@ -126,7 +125,6 @@ class RagBackend(Construct):
                 "DOCS_AFTER_FALLOFF": str(docs_after_falloff),
                 "CONVERSATION_HISTORY_TURNS": str(conversation_history_turns),
                 "MAX_HISTORY_CHARACTERS": str(max_history_characters),
-                "TOP_P": str(top_p),
                 "MAX_TOKENS": str(max_tokens),
             },
         )

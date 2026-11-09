@@ -174,7 +174,6 @@ def invoke_model(
     try:
         inference_config = {
             "maxTokens": int(os.environ.get("MAX_TOKENS", "4096")),
-            "topP": float(os.environ.get("TOP_P", "0.999")),
         }
         messages = [{"role": "user", "content": [{"text": prompt}]}]
 
@@ -185,7 +184,9 @@ def invoke_model(
             inferenceConfig=inference_config,
         )
 
-        return response["output"]["message"]["content"][0]["text"]
+        content = response["output"]["message"]["content"]
+        text = next(block["text"] for block in content if "text" in block)
+        return text or None
 
     except Exception:
         logger.exception("Error invoking the model")
