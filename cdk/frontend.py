@@ -25,9 +25,21 @@ class RagFrontend(Construct):
         web_acl_id: str = None,
         domain_name: str = None,
         certificate_arn: str = None,
+        comment: str = "RAG Chatbot Frontend Distribution",
+        # Output IDs. A second site (the admin UI) must use names that do not
+        # contain the chat site's names, because scripts/deploy-frontend.sh
+        # finds outputs by substring.
+        output_ids: dict = None,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        ids = {
+            "url": "CloudFrontURL",
+            "bucket": "FrontendBucketName",
+            "distribution": "DistributionId",
+            **(output_ids or {}),
+        }
 
         # Create S3 bucket for hosting the frontend
         frontend_bucket = s3.Bucket(
@@ -95,7 +107,7 @@ class RagFrontend(Construct):
                 ),
             ],
             "price_class": cloudfront.PriceClass.PRICE_CLASS_100,
-            "comment": "RAG Chatbot Frontend Distribution",
+            "comment": comment,
         }
 
         if domain_name and certificate_arn:
@@ -121,7 +133,7 @@ class RagFrontend(Construct):
 
         CfnOutput(
             self,
-            "CloudFrontURL",
+            ids["url"],
             value=f"https://{distribution.distribution_domain_name}",
             description="CloudFront URL for the frontend application",
         )
@@ -136,14 +148,14 @@ class RagFrontend(Construct):
 
         CfnOutput(
             self,
-            "FrontendBucketName",
+            ids["bucket"],
             value=frontend_bucket.bucket_name,
             description="S3 bucket name for frontend hosting",
         )
 
         CfnOutput(
             self,
-            "DistributionId",
+            ids["distribution"],
             value=distribution.distribution_id,
             description="CloudFront distribution ID",
         )

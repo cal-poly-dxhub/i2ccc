@@ -21,6 +21,7 @@ class CognitoSamlAuth(Construct):
 
     Optional:
         cloudfront_url          - CloudFront distribution URL (auto-derived from frontend stack)
+        admin_url               - Admin UI URL, registered on the same app client
     """
 
     def __init__(
@@ -33,24 +34,17 @@ class CognitoSamlAuth(Construct):
         saml_attribute_mapping: dict = None,
         dev_user_email: str = None,
         cloudfront_url: str = None,
+        admin_url: str = None,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Callback and logout URLs for the Cognito App Client.
-        # Cognito redirects here after a successful login / logout.
-        # Only the frontend's public URL (custom domain if set, else CloudFront)
-        # is registered. localhost is added in dev mode only, so a production
-        # pool never accepts logins from a locally-run frontend.
-        callback_urls = []
-        logout_urls = []
-        if cloudfront_url:
-            base = cloudfront_url.rstrip("/")
-            callback_urls.append(base)
-            logout_urls.append(base)
+        # Callback and URLs for the Cognito App Client.
+        redirect_urls = [u.rstrip("/") for u in (cloudfront_url, admin_url) if u]
         if dev_user_email:
-            callback_urls.append("http://localhost:5173")
-            logout_urls.append("http://localhost:5173")
+            redirect_urls.append("http://localhost:5173")
+            if admin_url:
+                redirect_urls.append("http://localhost:5174")
 
         # ------------------------------------------------------------------
         # User Pool
@@ -130,8 +124,8 @@ class CognitoSamlAuth(Construct):
                     cognito.OAuthScope.EMAIL,
                     cognito.OAuthScope.PROFILE,
                 ],
-                callback_urls=callback_urls,
-                logout_urls=logout_urls,
+                callback_urls=redirect_urls,
+                logout_urls=redirect_urls,
             ),
             supported_identity_providers=identity_providers,
             # Do not generate a client secret (SPA/Lambda@Edge can't store it securely)

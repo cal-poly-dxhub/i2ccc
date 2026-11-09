@@ -88,6 +88,20 @@ class RagChatbotStack(Stack):
             certificate_arn=frontend_certificate_arn,
         )
 
+        # Admin UI (source ingest status). Separate bucket and distribution, same
+        # WAF and same Cognito app client. Output IDs avoid the chat site's names.
+        admin_stack = RagFrontend(
+            self,
+            "RagAdmin",
+            web_acl_id=waf.web_acl_arn,
+            comment="CAI Content Admin Distribution",
+            output_ids={
+                "url": "AdminURL",
+                "bucket": "AdminBucket",
+                "distribution": "AdminDistribution",
+            },
+        )
+
         auth = CognitoSamlAuth(
             self,
             "CognitoSamlAuth",
@@ -97,6 +111,7 @@ class RagChatbotStack(Stack):
             saml_attribute_mapping=saml_attribute_mapping,
             dev_user_email=dev_user_email,
             cloudfront_url=frontend_stack.public_url,
+            admin_url=admin_stack.public_url,
         )
 
         # Create backend stack with frontend domain for CORS configuration
