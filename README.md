@@ -40,8 +40,8 @@ All infrastructure is defined with AWS CDK (Python) in [cdk/](cdk/) and deployed
 - A **RAG** Lambda performs classification, retrieval, filtering, and generation against Bedrock.
 
 **Retrieval & generation** — Bedrock models (configurable in `config.yaml`):
-- Chat: `moonshotai.kimi-k2.5`
-- Classification & document filtering: `anthropic.claude-3-haiku-20240307-v1:0`
+- Chat: `anthropic.claude-haiku-5-5`
+- Classification & document filtering: `anthropic.claude-haiku-5-5`
 - Embeddings: `amazon.titan-embed-text-v2:0`
 
 OpenSearch Serverless holds the vector index. Step Functions orchestrate ingestion with configurable concurrency.
