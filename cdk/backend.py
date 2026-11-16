@@ -52,6 +52,7 @@ class RagBackend(Construct):
         max_history_characters: int = 100000,
         max_tokens: int = 4096,
         frontend_distribution_domain: str = None,
+        admin_distribution_domain: str = None,
         **kwargs,
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
@@ -380,12 +381,14 @@ class RagBackend(Construct):
         api_key_param.grant_read(proxy_lambda)
 
         # Create proxy API Gateway (no API key required)
-        # Configure CORS to only allow requests from CloudFront distribution
+        # Configure CORS to only allow requests from the chat and admin sites
+        site_domains = [d for d in (frontend_distribution_domain, admin_distribution_domain) if d]
         allowed_origins = (
-            [f"https://{frontend_distribution_domain}"]
+            [f"https://{d}" for d in site_domains]
             if frontend_distribution_domain
             else apigw.Cors.ALL_ORIGINS
         )
+        self.allowed_origins = allowed_origins
 
         proxy_api = apigw.RestApi(
             self,
@@ -404,6 +407,20 @@ class RagBackend(Construct):
                 allow_headers=["Content-Type", "Authorization"],
             ),
         )
+
+        # Add CORS to API Gateway errors, since Lambda typically returns CORS itself
+        for response_id, response_type in (
+            ("Default4xxCors", apigw.ResponseType.DEFAULT_4_XX),
+            ("Default5xxCors", apigw.ResponseType.DEFAULT_5_XX),
+        ):
+            proxy_api.add_gateway_response(
+                response_id,
+                type=response_type,
+                response_headers={
+                    "Access-Control-Allow-Origin": "'*'",
+                    "Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+                },
+            )
 
         # Create /api resource
         api_resource = proxy_api.root.add_resource("api")
@@ -434,6 +451,8 @@ class RagBackend(Construct):
 
         # Store proxy API URL for output
         self.proxy_api_url = proxy_api.url
+        self.proxy_api_resource = api_resource
+        self.proxy_authorizer = authorizer
 
         CfnOutput(
             self,

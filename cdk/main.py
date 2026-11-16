@@ -2,12 +2,15 @@
 
 
 from aws_cdk import Stack
+from aws_cdk import aws_lambda as _lambda
 from constructs import Construct
 
+from .admin_api import AdminApi
 from .auth import CognitoSamlAuth
 from .backend import RagBackend
 from .content_sync import ContentSync
 from .conversation_export import ConversationExport
+from .crawler import CRAWLER_TIMEOUT, SourceCrawler
 from .frontend import RagFrontend
 from .ingest import RagIngest
 from .model_lifecycle import ModelLifecycleMonitor
@@ -135,8 +138,43 @@ class RagChatbotStack(Stack):
             max_history_characters=max_history_characters,
             max_tokens=max_tokens,
             frontend_distribution_domain=frontend_stack.public_domain_name,
+            admin_distribution_domain=admin_stack.public_domain_name,
             user_pool=auth.user_pool,
         )
+
+        # Create fixed names to avoid circular dependency at deployment
+        admin_function_name = f"{self.stack_name}-admin-api"
+        crawler_function_name = f"{self.stack_name}-source-crawler"
+
+        # Admin UI backend: sources, crawl/ingest status, rerun and delete
+        admin_api = AdminApi(
+            self,
+            "AdminApi",
+            api_resource=rag_api_stack.proxy_api_resource,
+            authorizer=rag_api_stack.proxy_authorizer,
+            allowed_origins=rag_api_stack.allowed_origins,
+            input_assets_bucket=ingest_stack.input_assets_bucket,
+            processed_files_table=ingest_stack.processed_files_table,
+            ingestion_state_machine=ingest_stack.state_machine,
+            opensearch_endpoint=ingest_stack.opensearch_endpoint,
+            opensearch_index_name=opensearch_index_name,
+            opensearch_collection_arn=ingest_stack.collection_arn,
+            function_name=admin_function_name,
+            crawler_function=_lambda.Function.from_function_name(
+                self, "ImportedCrawler", crawler_function_name
+            ),
+            crawler_worker_timeout=CRAWLER_TIMEOUT,
+        )
+
+        # Fetches a source's page and reports back to the admin API
+        crawler = SourceCrawler(
+            self,
+            "SourceCrawler",
+            function_name=crawler_function_name,
+            admin_api_function_name=admin_function_name,
+            input_assets_bucket=ingest_stack.input_assets_bucket,
+        )
+        admin_api.function.grant_invoke(crawler.function)
 
         # One-command content collection: collector Fargate task -> data
         # ingestion state machine -> email notification
