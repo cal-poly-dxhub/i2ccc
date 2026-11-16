@@ -1,0 +1,48 @@
+# The URLs an admin may add as a source. Read by
+# src/admin_api/url_check.py and admin-frontend/src/urlPatterns.ts.
+#
+# URLs are matched against their lowercase forms.
+sources:
+  - label: Internet2 PDF
+    type: pdf
+    pattern: '^https?://([a-z0-9-]+\.)*internet2\.edu/[^?]*\.pdf(\?.*)?$'
+    examples:
+      - https://internet2.edu/wp-content/uploads/2024/01/cloud-report.pdf
+
+  - label: Internet2 website
+    type: page
+    pattern: '^https?://([a-z0-9-]+\.)*internet2\.edu([/?].*)?$'
+    examples:
+      - https://internet2.edu/cloud/
+      - https://internet2.edu/community/working-groups/
+
+  - label: YouTube
+    type: youtube
+    pattern: '^https?://([a-z0-9-]+\.)*youtube\.com/(watch|playlist|live/|shorts/)'
+    examples:
+      - https://www.youtube.com/watch?v=abcDEF12345
+      - https://www.youtube.com/playlist?list=PLabcdef123456
+
+  - label: YouTube short link
+    type: youtube
+    pattern: '^https?://([a-z0-9-]+\.)*youtu\.be([/?].*)?$'
+    examples:
+      - https://youtu.be/abcDEF12345
+
+  - label: Panopto
+    type: panopto
+    pattern: '^https?://([a-z0-9-]+\.)*hosted\.panopto\.com/panopto/pages/(viewer|embed)\.aspx'
+    examples:
+      - https://internet2.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=0f1e2d3c-4b5a-6978-8796-a5b4c3d2e1f0
+
+  - label: Google Drive
+    type: gdrive
+    pattern: '^https?://([a-z0-9-]+\.)*drive\.google\.com/file/d/'
+    examples:
+      - https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/view
+
+  - label: Google Docs, Sheets and Slides
+    type: gdrive
+    pattern: '^https?://([a-z0-9-]+\.)*docs\.google\.com/(document|spreadsheets|presentation)/d/'
+    examples:
+      - https://docs.google.com/presentation/d/1AbCdEfGhIjKlMnOpQrStUvWxYz012345/edit
