@@ -12,6 +12,8 @@ config.yaml
 
 # Ignore service account credentials and environment variable files
 **/service-credentials.json
+**/credentials.json
+*.key.json
 **/names.env
 .env
 

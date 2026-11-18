@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "i2cc-scraper"
+version = "0.2.0"
+description = "Crawl Internet2 pages and download their content (pages, Drive decks, recordings) with metadata, for RAG ingestion."
+readme = "README.md"
+requires-python = ">=3.11"
+# Ranges here; exact pins for deployment are in requirements.txt (see README).
+dependencies = [
+    "requests>=2.32,<3",
+    "urllib3>=2.2,<3",
+    "beautifulsoup4>=4.12,<5",
+    "google-auth>=2.30,<3",
+]
+
+[project.optional-dependencies]
+# YouTube downloads. yt-dlp must be kept current -- YouTube changes break old versions -- so
+# it is a range with no upper bound. It also wants a JavaScript runtime (deno or node) on PATH.
+youtube = ["yt-dlp>=2025.10"]
+tui = ["textual>=1.0"]
+# Running in AWS (i2cc_scraper.aws): S3 conditional writes need boto3 1.36+.
+aws = ["boto3>=1.36,<2", "opensearch-py>=2.6,<4"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+i2cc-scrape = "i2cc_scraper.scraper:main"
+i2cc-download = "i2cc_scraper.downloader:main"
+
+[tool.setuptools.packages.find]
+include = ["i2cc_scraper*"]

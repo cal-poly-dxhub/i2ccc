@@ -1,0 +1,29 @@
+# Exact versions for deployment: pip install -r requirements.txt && pip install --no-deps .
+# Regenerate: python -m venv /tmp/v && /tmp/v/bin/pip install '.[youtube,aws]' && /tmp/v/bin/pip freeze --exclude i2cc-scraper
+# Python 3.14.9, 2026-11-12 (aws extra added 2026-11-17). yt-dlp: bump this pin often (YouTube changes break old versions).
+beautifulsoup4==4.15.0
+boto3==1.44.5
+botocore==1.44.5
+certifi==2026.10.23
+cffi==2.1.1
+charset-normalizer==3.5.2
+cryptography==50.0.2
+Events==0.5
+google-auth==2.62.2
+grpcio==1.85.1
+idna==3.20
+jmespath==1.1.0
+opensearch-protobufs==1.2.0
+opensearch-py==3.2.0
+protobuf==7.36.2
+pyasn1==0.6.5
+pyasn1_modules==0.4.2
+pycparser==3.12
+python-dateutil==2.9.0.post0
+requests==2.34.2
+s3transfer==0.19.3
+six==1.17.0
+soupsieve==4.1
+typing_extensions==4.16.0
+urllib3==2.8.0
+yt-dlp==2026.10.26

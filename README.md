@@ -153,6 +153,26 @@ Use this when source material lives in a Confluence space with linked Google Dri
    python confluence_event_descriptions_to_s3.py        # pull page descriptions → S3
    ```
 
+### Option C — page scraper (staff-submitted URL)
+
+Use this to pull in a web page and everything it links to: the page text, Google Drive/Slides files, website files, and YouTube and Panopto recordings. A Step Functions state machine (`ScraperStateMachineArn` in the CDK outputs, code in [src/scraper/](src/scraper/)) crawls the page and downloads each item with its own Lambda, streaming straight into the bucket under `i2cc-scraper/`. It does not start ingestion; run the next step afterwards.
+
+```bash
+aws stepfunctions start-execution --state-machine-arn <ScraperStateMachineArn> \
+    --input '{"url": "https://internet2.edu/...", "depth": 1}'
+```
+
+The run's output lists counts and failures; `i2cc-scraper/.runs/<execution name>/report.json` in the bucket has every item's result. Only `internet2.edu` URLs are accepted (`allowed_start_domains` in [cdk/scraper.py](cdk/scraper.py)). Re-running skips what hasn't changed; a file that changed is replaced and its old vectors and processed-files entry are removed, so the next ingestion run re-ingests it.
+
+**Google Drive credentials.** Without them the scraper only reads Drive files that are public. It uses the same service account as the collector, so there is one secret to set and rotate: `content-sync/google-service-credentials`. Load it once from your machine; the key never goes in the repository, an image or an environment variable (the Lambdas receive only the secret's ARN, and only the plan and ingest functions may read it):
+
+```bash
+aws secretsmanager put-secret-value --secret-id content-sync/google-service-credentials \
+    --secret-string file://credentials.json
+```
+
+`credentials.json` and `*.key.json` are git-ignored. Share the Drive folders with the service account's email (Viewer). Lambdas pick up a replaced key when they next start cold.
+
 ### Start processing
 
 ```bash

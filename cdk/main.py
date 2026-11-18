@@ -11,6 +11,7 @@ from .conversation_export import ConversationExport
 from .frontend import RagFrontend
 from .ingest import RagIngest
 from .model_lifecycle import ModelLifecycleMonitor
+from .scraper import ScraperPipeline
 from .waf import Waf
 
 
@@ -127,7 +128,7 @@ class RagChatbotStack(Stack):
 
         # One-command content collection: collector Fargate task -> data
         # ingestion state machine -> email notification
-        ContentSync(
+        content_sync = ContentSync(
             self,
             "ContentSync",
             cluster=ingest_stack.cluster,
@@ -136,6 +137,20 @@ class RagChatbotStack(Stack):
             ingestion_state_machine=ingest_stack.state_machine,
             processed_files_table=ingest_stack.processed_files_table,
             notification_email=notification_email,
+        )
+
+        # Staff-submitted URL -> crawl it and download what it links to into the
+        # ingest bucket (the next ingestion run picks the files up). The Google
+        # service account key is the content-sync secret, read from Secrets Manager.
+        ScraperPipeline(
+            self,
+            "Scraper",
+            input_assets_bucket=ingest_stack.input_assets_bucket,
+            processed_files_table=ingest_stack.processed_files_table,
+            opensearch_endpoint=ingest_stack.opensearch_endpoint,
+            opensearch_index_name=opensearch_index_name,
+            opensearch_collection_arn=ingest_stack.collection_arn,
+            google_credentials_secret=content_sync.google_secret,
         )
 
         # Weekly Excel export of conversations, emailed as a download link so

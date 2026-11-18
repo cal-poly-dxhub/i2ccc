@@ -1,0 +1,8 @@
+# The image needs only the package and its pins (Dockerfile). Allow-list, so secrets
+# (credentials.json, .env, .codex/) and local runs can never end up in it.
+*
+!i2cc_scraper/
+!pyproject.toml
+!README.md
+!requirements.txt
+**/__pycache__

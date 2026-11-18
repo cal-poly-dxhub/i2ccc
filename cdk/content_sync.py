@@ -89,8 +89,10 @@ class ContentSync(Construct):
             self,
             "GoogleServiceAccountJson",
             secret_name="content-sync/google-service-credentials",
-            description="Google service account JSON for the content-sync collector",
+            description="Google service account JSON for the content-sync collector and the scraper",
         )
+        # Also read by the scraper's Lambdas (cdk/scraper.py): one key, one place to rotate it
+        self.google_secret = google_secret
         # Optional: only used as the Drive API developerKey. The collector
         # ignores values that don't look like a real key (AIza...), so this
         # can safely stay unset.

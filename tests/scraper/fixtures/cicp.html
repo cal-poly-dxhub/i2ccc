@@ -1,0 +1,1522 @@
+<!doctype html>
+<html lang="en-US">
+  <head> <script>
+var gform;gform||(document.addEventListener("gform_main_scripts_loaded",function(){gform.scriptsLoaded=!0}),document.addEventListener("gform/theme/scripts_loaded",function(){gform.themeScriptsLoaded=!0}),window.addEventListener("DOMContentLoaded",function(){gform.domLoaded=!0}),gform={domLoaded:!1,scriptsLoaded:!1,themeScriptsLoaded:!1,isFormEditor:()=>"function"==typeof InitializeEditor,callIfLoaded:function(o){return!(!gform.domLoaded||!gform.scriptsLoaded||!gform.themeScriptsLoaded&&!gform.isFormEditor()||(gform.isFormEditor()&&console.warn("The use of gform.initializeOnLoaded() is deprecated in the form editor context and will be removed in Gravity Forms 3.1."),o(),0))},initializeOnLoaded:function(o){gform.callIfLoaded(o)||(document.addEventListener("gform_main_scripts_loaded",()=>{gform.scriptsLoaded=!0,gform.callIfLoaded(o)}),document.addEventListener("gform/theme/scripts_loaded",()=>{gform.themeScriptsLoaded=!0,gform.callIfLoaded(o)}),window.addEventListener("DOMContentLoaded",()=>{gform.domLoaded=!0,gform.callIfLoaded(o)}))},hooks:{action:{},filter:{}},addAction:function(o,r,e,t){gform.addHook("action",o,r,e,t)},addFilter:function(o,r,e,t){gform.addHook("filter",o,r,e,t)},doAction:function(o){gform.doHook("action",o,arguments)},applyFilters:function(o){return gform.doHook("filter",o,arguments)},removeAction:function(o,r){gform.removeHook("action",o,r)},removeFilter:function(o,r,e){gform.removeHook("filter",o,r,e)},addHook:function(o,r,e,t,n){null==gform.hooks[o][r]&&(gform.hooks[o][r]=[]);var d=gform.hooks[o][r];null==n&&(n=r+"_"+d.length),gform.hooks[o][r].push({tag:n,callable:e,priority:t=null==t?10:t})},doHook:function(r,o,e){var t;if(e=Array.prototype.slice.call(e,1),null!=gform.hooks[r][o]&&((o=gform.hooks[r][o]).sort(function(o,r){return o.priority-r.priority}),o.forEach(function(o){"function"!=typeof(t=o.callable)&&(t=window[t]),"action"==r?t.apply(null,e):e[0]=t.apply(null,e)})),"filter"==r)return e[0]},removeHook:function(o,r,t,n){var e;null!=gform.hooks[o][r]&&(e=(e=gform.hooks[o][r]).filter(function(o,r,e){return!!(null!=n&&n!=o.tag||null!=t&&t!=o.priority)}),gform.hooks[o][r]=e)}});
+</script>
+<meta charset="UTF-8"><script>if(navigator.userAgent.match(/MSIE|Internet Explorer/i)||navigator.userAgent.match(/Trident\/7\..*?rv:11/i)){var href=document.location.href;if(!href.match(/[?&]nowprocket/)){if(href.indexOf("?")==-1){if(href.indexOf("#")==-1){document.location.href=href+"?nowprocket=1"}else{document.location.href=href.replace("#","?nowprocket=1#")}}else{if(href.indexOf("#")==-1){document.location.href=href+"&nowprocket=1"}else{document.location.href=href.replace("#","&nowprocket=1#")}}}}</script><script>(()=>{class RocketLazyLoadScripts{constructor(){this.v="2.0.5",this.userEvents=["keydown","keyup","mousedown","mouseup","mousemove","mouseover","mouseout","touchmove","touchstart","touchend","touchcancel","wheel","click","dblclick","input"],this.attributeEvents=["onblur","onclick","oncontextmenu","ondblclick","onfocus","onmousedown","onmouseenter","onmouseleave","onmousemove","onmouseout","onmouseover","onmouseup","onmousewheel","onscroll","onsubmit"]}async t(){this.i(),this.o(),/iP(ad|hone)/.test(navigator.userAgent)&&this.h(),this.u(),this.l(this),this.m(),this.k(this),this.p(this),this._(),await Promise.all([this.R(),this.L()]),this.lastBreath=Date.now(),this.S(this),this.P(),this.D(),this.O(),this.M(),await this.C(this.delayedScripts.normal),await this.C(this.delayedScripts.defer),await this.C(this.delayedScripts.async),await this.T(),await this.F(),await this.j(),await this.A(),window.dispatchEvent(new Event("rocket-allScriptsLoaded")),this.everythingLoaded=!0,this.lastTouchEnd&&await new Promise(t=>setTimeout(t,500-Date.now()+this.lastTouchEnd)),this.I(),this.H(),this.U(),this.W()}i(){this.CSPIssue=sessionStorage.getItem("rocketCSPIssue"),document.addEventListener("securitypolicyviolation",t=>{this.CSPIssue||"script-src-elem"!==t.violatedDirective||"data"!==t.blockedURI||(this.CSPIssue=!0,sessionStorage.setItem("rocketCSPIssue",!0))},{isRocket:!0})}o(){window.addEventListener("pageshow",t=>{this.persisted=t.persisted,this.realWindowLoadedFired=!0},{isRocket:!0}),window.addEventListener("pagehide",()=>{this.onFirstUserAction=null},{isRocket:!0})}h(){let t;function e(e){t=e}window.addEventListener("touchstart",e,{isRocket:!0}),window.addEventListener("touchend",function i(o){o.changedTouches[0]&&t.changedTouches[0]&&Math.abs(o.changedTouches[0].pageX-t.changedTouches[0].pageX)<10&&Math.abs(o.changedTouches[0].pageY-t.changedTouches[0].pageY)<10&&o.timeStamp-t.timeStamp<200&&(window.removeEventListener("touchstart",e,{isRocket:!0}),window.removeEventListener("touchend",i,{isRocket:!0}),"INPUT"===o.target.tagName&&"text"===o.target.type||(o.target.dispatchEvent(new TouchEvent("touchend",{target:o.target,bubbles:!0})),o.target.dispatchEvent(new MouseEvent("mouseover",{target:o.target,bubbles:!0})),o.target.dispatchEvent(new PointerEvent("click",{target:o.target,bubbles:!0,cancelable:!0,detail:1,clientX:o.changedTouches[0].clientX,clientY:o.changedTouches[0].clientY})),event.preventDefault()))},{isRocket:!0})}q(t){this.userActionTriggered||("mousemove"!==t.type||this.firstMousemoveIgnored?"keyup"===t.type||"mouseover"===t.type||"mouseout"===t.type||(this.userActionTriggered=!0,this.onFirstUserAction&&this.onFirstUserAction()):this.firstMousemoveIgnored=!0),"click"===t.type&&t.preventDefault(),t.stopPropagation(),t.stopImmediatePropagation(),"touchstart"===this.lastEvent&&"touchend"===t.type&&(this.lastTouchEnd=Date.now()),"click"===t.type&&(this.lastTouchEnd=0),this.lastEvent=t.type,t.composedPath&&t.composedPath()[0].getRootNode()instanceof ShadowRoot&&(t.rocketTarget=t.composedPath()[0]),this.savedUserEvents.push(t)}u(){this.savedUserEvents=[],this.userEventHandler=this.q.bind(this),this.userEvents.forEach(t=>window.addEventListener(t,this.userEventHandler,{passive:!1,isRocket:!0})),document.addEventListener("visibilitychange",this.userEventHandler,{isRocket:!0})}U(){this.userEvents.forEach(t=>window.removeEventListener(t,this.userEventHandler,{passive:!1,isRocket:!0})),document.removeEventListener("visibilitychange",this.userEventHandler,{isRocket:!0}),this.savedUserEvents.forEach(t=>{(t.rocketTarget||t.target).dispatchEvent(new window[t.constructor.name](t.type,t))})}m(){const t="return false",e=Array.from(this.attributeEvents,t=>"data-rocket-"+t),i="["+this.attributeEvents.join("],[")+"]",o="[data-rocket-"+this.attributeEvents.join("],[data-rocket-")+"]",s=(e,i,o)=>{o&&o!==t&&(e.setAttribute("data-rocket-"+i,o),e["rocket"+i]=new Function("event",o),e.setAttribute(i,t))};new MutationObserver(t=>{for(const n of t)"attributes"===n.type&&(n.attributeName.startsWith("data-rocket-")||this.everythingLoaded?n.attributeName.startsWith("data-rocket-")&&this.everythingLoaded&&this.N(n.target,n.attributeName.substring(12)):s(n.target,n.attributeName,n.target.getAttribute(n.attributeName))),"childList"===n.type&&n.addedNodes.forEach(t=>{if(t.nodeType===Node.ELEMENT_NODE)if(this.everythingLoaded)for(const i of[t,...t.querySelectorAll(o)])for(const t of i.getAttributeNames())e.includes(t)&&this.N(i,t.substring(12));else for(const e of[t,...t.querySelectorAll(i)])for(const t of e.getAttributeNames())this.attributeEvents.includes(t)&&s(e,t,e.getAttribute(t))})}).observe(document,{subtree:!0,childList:!0,attributeFilter:[...this.attributeEvents,...e]})}I(){this.attributeEvents.forEach(t=>{document.querySelectorAll("[data-rocket-"+t+"]").forEach(e=>{this.N(e,t)})})}N(t,e){const i=t.getAttribute("data-rocket-"+e);i&&(t.setAttribute(e,i),t.removeAttribute("data-rocket-"+e))}k(t){Object.defineProperty(HTMLElement.prototype,"onclick",{get(){return this.rocketonclick||null},set(e){this.rocketonclick=e,this.setAttribute(t.everythingLoaded?"onclick":"data-rocket-onclick","this.rocketonclick(event)")}})}S(t){function e(e,i){let o=e[i];e[i]=null,Object.defineProperty(e,i,{get:()=>o,set(s){t.everythingLoaded?o=s:e["rocket"+i]=o=s}})}e(document,"onreadystatechange"),e(window,"onload"),e(window,"onpageshow");try{Object.defineProperty(document,"readyState",{get:()=>t.rocketReadyState,set(e){t.rocketReadyState=e},configurable:!0}),document.readyState="loading"}catch(t){console.log("WPRocket DJE readyState conflict, bypassing")}}l(t){this.originalAddEventListener=EventTarget.prototype.addEventListener,this.originalRemoveEventListener=EventTarget.prototype.removeEventListener,this.savedEventListeners=[],EventTarget.prototype.addEventListener=function(e,i,o){o&&o.isRocket||!t.B(e,this)&&!t.userEvents.includes(e)||t.B(e,this)&&!t.userActionTriggered||e.startsWith("rocket-")||t.everythingLoaded?t.originalAddEventListener.call(this,e,i,o):(t.savedEventListeners.push({target:this,remove:!1,type:e,func:i,options:o}),"mouseenter"!==e&&"mouseleave"!==e||t.originalAddEventListener.call(this,e,t.savedUserEvents.push,o))},EventTarget.prototype.removeEventListener=function(e,i,o){o&&o.isRocket||!t.B(e,this)&&!t.userEvents.includes(e)||t.B(e,this)&&!t.userActionTriggered||e.startsWith("rocket-")||t.everythingLoaded?t.originalRemoveEventListener.call(this,e,i,o):t.savedEventListeners.push({target:this,remove:!0,type:e,func:i,options:o})}}J(t,e){this.savedEventListeners=this.savedEventListeners.filter(i=>{let o=i.type,s=i.target||window;return e!==o||t!==s||(this.B(o,s)&&(i.type="rocket-"+o),this.$(i),!1)})}H(){EventTarget.prototype.addEventListener=this.originalAddEventListener,EventTarget.prototype.removeEventListener=this.originalRemoveEventListener,this.savedEventListeners.forEach(t=>this.$(t))}$(t){t.remove?this.originalRemoveEventListener.call(t.target,t.type,t.func,t.options):this.originalAddEventListener.call(t.target,t.type,t.func,t.options)}p(t){let e;function i(e){return t.everythingLoaded?e:e.split(" ").map(t=>"load"===t||t.startsWith("load.")?"rocket-jquery-load":t).join(" ")}function o(o){function s(e){const s=o.fn[e];o.fn[e]=o.fn.init.prototype[e]=function(){return this[0]===window&&t.userActionTriggered&&("string"==typeof arguments[0]||arguments[0]instanceof String?arguments[0]=i(arguments[0]):"object"==typeof arguments[0]&&Object.keys(arguments[0]).forEach(t=>{const e=arguments[0][t];delete arguments[0][t],arguments[0][i(t)]=e})),s.apply(this,arguments),this}}if(o&&o.fn&&!t.allJQueries.includes(o)){const e={DOMContentLoaded:[],"rocket-DOMContentLoaded":[]};for(const t in e)document.addEventListener(t,()=>{e[t].forEach(t=>t())},{isRocket:!0});o.fn.ready=o.fn.init.prototype.ready=function(i){function s(){parseInt(o.fn.jquery)>2?setTimeout(()=>i.bind(document)(o)):i.bind(document)(o)}return"function"==typeof i&&(t.realDomReadyFired?!t.userActionTriggered||t.fauxDomReadyFired?s():e["rocket-DOMContentLoaded"].push(s):e.DOMContentLoaded.push(s)),this},s("on"),s("one"),s("off"),t.allJQueries.push(o)}e=o}t.allJQueries=[],o(window.jQuery),Object.defineProperty(window,"jQuery",{get:()=>e,set(t){o(t)}})}P(){const t=new Map;document.write=document.writeln=function(e){const i=document.currentScript,o=document.createRange(),s=i.parentElement;let n=t.get(i);void 0===n&&(n=i.nextSibling,t.set(i,n));const c=document.createDocumentFragment();o.setStart(c,0),c.appendChild(o.createContextualFragment(e)),s.insertBefore(c,n)}}async R(){return new Promise(t=>{this.userActionTriggered?t():this.onFirstUserAction=t})}async L(){return new Promise(t=>{document.addEventListener("DOMContentLoaded",()=>{this.realDomReadyFired=!0,t()},{isRocket:!0})})}async j(){return this.realWindowLoadedFired?Promise.resolve():new Promise(t=>{window.addEventListener("load",t,{isRocket:!0})})}M(){this.pendingScripts=[];this.scriptsMutationObserver=new MutationObserver(t=>{for(const e of t)e.addedNodes.forEach(t=>{"SCRIPT"!==t.tagName||!t.src||t.noModule||t.isWPRocket||this.pendingScripts.push({script:t,promise:new Promise(e=>{const i=()=>{const i=this.pendingScripts.findIndex(e=>e.script===t);i>=0&&this.pendingScripts.splice(i,1),e()};t.addEventListener("load",i,{isRocket:!0}),t.addEventListener("error",i,{isRocket:!0}),setTimeout(i,1e3)})})})}),this.scriptsMutationObserver.observe(document,{childList:!0,subtree:!0})}async F(){await this.X(),this.pendingScripts.length?(await this.pendingScripts[0].promise,await this.F()):this.scriptsMutationObserver.disconnect()}D(){this.delayedScripts={normal:[],async:[],defer:[]},document.querySelectorAll("script[type$=rocketlazyloadscript]").forEach(t=>{t.hasAttribute("data-rocket-src")?t.hasAttribute("async")&&!1!==t.async?this.delayedScripts.async.push(t):t.hasAttribute("defer")&&!1!==t.defer||"module"===t.getAttribute("data-rocket-type")?this.delayedScripts.defer.push(t):this.delayedScripts.normal.push(t):this.delayedScripts.normal.push(t)})}async _(){await this.L();let t=[];document.querySelectorAll("script[type$=rocketlazyloadscript][data-rocket-src]").forEach(e=>{let i=e.getAttribute("data-rocket-src");if(i&&!i.startsWith("data:")){i.startsWith("//")&&(i=location.protocol+i);try{const o=new URL(i).origin;o!==location.origin&&t.push({src:o,crossOrigin:e.crossOrigin||"module"===e.getAttribute("data-rocket-type")})}catch(t){}}}),t=[...new Map(t.map(t=>[JSON.stringify(t),t])).values()],this.Y(t,"preconnect")}async G(t){if(await this.K(),!0!==t.noModule||!("noModule"in HTMLScriptElement.prototype))return new Promise(e=>{let i;function o(){(i||t).setAttribute("data-rocket-status","executed"),e()}try{if(navigator.userAgent.includes("Firefox/")||""===navigator.vendor||this.CSPIssue)i=document.createElement("script"),[...t.attributes].forEach(t=>{let e=t.nodeName;"type"!==e&&("data-rocket-type"===e&&(e="type"),"data-rocket-src"===e&&(e="src"),i.setAttribute(e,t.nodeValue))}),t.text&&(i.text=t.text),t.nonce&&(i.nonce=t.nonce),i.hasAttribute("src")?(i.addEventListener("load",o,{isRocket:!0}),i.addEventListener("error",()=>{i.setAttribute("data-rocket-status","failed-network"),e()},{isRocket:!0}),setTimeout(()=>{i.isConnected||e()},1)):(i.text=t.text,o()),i.isWPRocket=!0,t.parentNode.replaceChild(i,t);else{const i=t.getAttribute("data-rocket-type"),s=t.getAttribute("data-rocket-src");i?(t.type=i,t.removeAttribute("data-rocket-type")):t.removeAttribute("type"),t.addEventListener("load",o,{isRocket:!0}),t.addEventListener("error",i=>{this.CSPIssue&&i.target.src.startsWith("data:")?(console.log("WPRocket: CSP fallback activated"),t.removeAttribute("src"),this.G(t).then(e)):(t.setAttribute("data-rocket-status","failed-network"),e())},{isRocket:!0}),s?(t.fetchPriority="high",t.removeAttribute("data-rocket-src"),t.src=s):t.src="data:text/javascript;base64,"+window.btoa(unescape(encodeURIComponent(t.text)))}}catch(i){t.setAttribute("data-rocket-status","failed-transform"),e()}});t.setAttribute("data-rocket-status","skipped")}async C(t){const e=t.shift();return e?(e.isConnected&&await this.G(e),this.C(t)):Promise.resolve()}O(){this.Y([...this.delayedScripts.normal,...this.delayedScripts.defer,...this.delayedScripts.async],"preload")}Y(t,e){this.trash=this.trash||[];let i=!0;var o=document.createDocumentFragment();t.forEach(t=>{const s=t.getAttribute&&t.getAttribute("data-rocket-src")||t.src;if(s&&!s.startsWith("data:")){const n=document.createElement("link");n.href=s,n.rel=e,"preconnect"!==e&&(n.as="script",n.fetchPriority=i?"high":"low"),t.getAttribute&&"module"===t.getAttribute("data-rocket-type")&&(n.crossOrigin=!0),t.crossOrigin&&(n.crossOrigin=t.crossOrigin),t.integrity&&(n.integrity=t.integrity),t.nonce&&(n.nonce=t.nonce),o.appendChild(n),this.trash.push(n),i=!1}}),document.head.appendChild(o)}W(){this.trash.forEach(t=>t.remove())}async T(){try{document.readyState="interactive"}catch(t){}this.fauxDomReadyFired=!0;try{await this.K(),this.J(document,"readystatechange"),document.dispatchEvent(new Event("rocket-readystatechange")),await this.K(),document.rocketonreadystatechange&&document.rocketonreadystatechange(),await this.K(),this.J(document,"DOMContentLoaded"),document.dispatchEvent(new Event("rocket-DOMContentLoaded")),await this.K(),this.J(window,"DOMContentLoaded"),window.dispatchEvent(new Event("rocket-DOMContentLoaded"))}catch(t){console.error(t)}}async A(){try{document.readyState="complete"}catch(t){}try{await this.K(),this.J(document,"readystatechange"),document.dispatchEvent(new Event("rocket-readystatechange")),await this.K(),document.rocketonreadystatechange&&document.rocketonreadystatechange(),await this.K(),this.J(window,"load"),window.dispatchEvent(new Event("rocket-load")),await this.K(),window.rocketonload&&window.rocketonload(),await this.K(),this.allJQueries.forEach(t=>t(window).trigger("rocket-jquery-load")),await this.K(),this.J(window,"pageshow");const t=new Event("rocket-pageshow");t.persisted=this.persisted,window.dispatchEvent(t),await this.K(),window.rocketonpageshow&&window.rocketonpageshow({persisted:this.persisted})}catch(t){console.error(t)}}async K(){Date.now()-this.lastBreath>45&&(await this.X(),this.lastBreath=Date.now())}async X(){return document.hidden?new Promise(t=>setTimeout(t)):new Promise(t=>requestAnimationFrame(t))}B(t,e=window){return e===document&&"readystatechange"===t||(e===document&&"DOMContentLoaded"===t||(e===window&&"DOMContentLoaded"===t||(e===window&&"load"===t||e===window&&"pageshow"===t)))}static run(){(new RocketLazyLoadScripts).t()}}RocketLazyLoadScripts.run()})();
+</script>
+    
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Cloud Infrastructure Community Program (CICP) | Internet2</title><link rel="preload" data-rocket-preload as="image" href="https://internet2.edu/wp-content/themes/fas-base/assets/images/int2_background_light_opt.jpg" fetchpriority="high">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="https://internet2.edu/wp-content/uploads/2020/10/fav-icon180.png" />
+            <link rel="icon" sizes="32x32" type="image/png" href="https://internet2.edu/wp-content/uploads/2020/10/fav-icon32-1.png" />
+            <link rel="icon" sizes="16x16" type="image/png" href="https://internet2.edu/wp-content/uploads/2020/10/fav-icon16.png" />
+    
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WVDKZS9');</script>
+<!-- End Google Tag Manager -->
+
+    
+	<link rel="alternate" type="application/rss+xml" title="Internet2 Feed" href="https://internet2.edu/feed/">
+<meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' />
+
+	<!-- This site is optimized with the Yoast SEO Premium plugin v28.0 (Yoast SEO v28.7) - https://yoast.com/product/yoast-seo-premium-wordpress/ -->
+	<meta name="description" content="The Cloud Infrastructure Community Program (CICP) provides solutions for managing the public cloud in the research and education community." />
+	<link rel="canonical" href="https://internet2.edu/services/cloud-infrastructure-community-program/" />
+	<meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="Cloud Infrastructure Community Program (CICP)" />
+	<meta property="og:description" content="The Cloud Infrastructure Community Program (CICP) provides solutions for managing the public cloud in the research and education community." />
+	<meta property="og:url" content="https://internet2.edu/services/cloud-infrastructure-community-program/" />
+	<meta property="og:site_name" content="Internet2" />
+	<meta property="article:publisher" content="https://www.facebook.com/Internet2social" />
+	<meta property="article:modified_time" content="2026-11-04T19:54:09+00:00" />
+	<meta property="og:image" content="https://internet2.edu/wp-content/uploads/2020/12/comm-internet2-logo-250x190-4.png" />
+	<meta property="og:image:width" content="250" />
+	<meta property="og:image:height" content="190" />
+	<meta property="og:image:type" content="image/png" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:site" content="@Internet2" />
+	<script type="application/ld+json" class="yoast-schema-graph">{"@context":"https:\/\/schema.org","@graph":[{"@type":"WebPage","@id":"https:\/\/internet2.edu\/services\/cloud-infrastructure-community-program\/","url":"https:\/\/internet2.edu\/services\/cloud-infrastructure-community-program\/","name":"Cloud Infrastructure Community Program (CICP) | Internet2","isPartOf":{"@id":"https:\/\/internet2.edu\/#website"},"datePublished":"2024-10-01T20:52:20+00:00","dateModified":"2026-11-04T19:54:09+00:00","description":"The Cloud Infrastructure Community Program (CICP) provides solutions for managing the public cloud in the research and education community.","inLanguage":"en-US","potentialAction":[{"@type":"ReadAction","target":["https:\/\/internet2.edu\/services\/cloud-infrastructure-community-program\/"]}]},{"@type":"WebSite","@id":"https:\/\/internet2.edu\/#website","url":"https:\/\/internet2.edu\/","name":"Internet2","description":"","publisher":{"@id":"https:\/\/internet2.edu\/#organization"},"potentialAction":[{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https:\/\/internet2.edu\/?s={search_term_string}"},"query-input":{"@type":"PropertyValueSpecification","valueRequired":true,"valueName":"search_term_string"}}],"inLanguage":"en-US"},{"@type":"Organization","@id":"https:\/\/internet2.edu\/#organization","name":"Internet2","url":"https:\/\/internet2.edu\/","logo":{"@type":"ImageObject","inLanguage":"en-US","@id":"https:\/\/internet2.edu\/#\/schema\/logo\/image\/","url":"https:\/\/internet2.edu\/wp-content\/uploads\/2020\/08\/internet2_logo_200px.gif","contentUrl":"https:\/\/internet2.edu\/wp-content\/uploads\/2020\/08\/internet2_logo_200px.gif","width":200,"height":200,"caption":"Internet2"},"image":{"@id":"https:\/\/internet2.edu\/#\/schema\/logo\/image\/"},"sameAs":["https:\/\/www.facebook.com\/Internet2social","https:\/\/x.com\/Internet2","https:\/\/www.instagram.com\/internet2social\/","https:\/\/www.youtube.com\/channel\/UC6gxuEGpxW07lUFD0IEpRQA"]}]}</script>
+	<!-- / Yoast SEO Premium plugin. -->
+
+
+<link rel='dns-prefetch' href='//cdn.jsdelivr.net' />
+
+<link rel="alternate" title="oEmbed (JSON)" type="application/json+oembed" href="https://internet2.edu/wp-json/oembed/1.0/embed?url=https%3A%2F%2Finternet2.edu%2Fservices%2Fcloud-infrastructure-community-program%2F" />
+<link rel="alternate" title="oEmbed (XML)" type="text/xml+oembed" href="https://internet2.edu/wp-json/oembed/1.0/embed?url=https%3A%2F%2Finternet2.edu%2Fservices%2Fcloud-infrastructure-community-program%2F&#038;format=xml" />
+<style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-block-library-inline-css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}:root .has-text-align-center{text-align:center}:root .has-text-align-left{text-align:left}:root .has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{word-wrap:normal!important;border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-break:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style^=border-color],[style*=";border-color"],[style*="; border-color"]){border-style:solid}html :where([style^=border-top-color],[style*=";border-top-color"],[style*="; border-top-color"]){border-top-style:solid}html :where([style^=border-right-color],[style*=";border-right-color"],[style*="; border-right-color"]){border-right-style:solid}html :where([style^=border-bottom-color],[style*=";border-bottom-color"],[style*="; border-bottom-color"]){border-bottom-style:solid}html :where([style^=border-left-color],[style*=";border-left-color"],[style*="; border-left-color"]){border-left-style:solid}html :where([style^=border-width],[style*=";border-width"],[style*="; border-width"]){border-style:solid}html :where([style^=border-top-width],[style*=";border-top-width"],[style*="; border-top-width"]){border-top-style:solid}html :where([style^=border-right-width],[style*=";border-right-width"],[style*="; border-right-width"]){border-right-style:solid}html :where([style^=border-bottom-width],[style*=";border-bottom-width"],[style*="; border-bottom-width"]){border-bottom-style:solid}html :where([style^=border-left-width],[style*=";border-left-width"],[style*="; border-left-width"]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=/wp-includes/css/dist/block-library/common.min.css */
+</style>
+<style id="wp-block-paragraph-inline-css">
+.is-small-text{font-size:.875em}.is-regular-text{font-size:1em}.is-large-text{font-size:2.25em}.is-larger-text{font-size:3em}.has-drop-cap:not(:focus):first-letter{float:left;font-size:8.4em;font-style:normal;font-weight:100;line-height:.68;margin:.05em .1em 0 0;text-transform:uppercase}body.rtl .has-drop-cap:not(:focus):first-letter{float:none;margin-left:.1em}p.has-drop-cap.has-background{overflow:hidden}:root :where(p.has-background){padding:1.25em 2.375em}:where(p.has-text-color:not(.has-link-color)) a{color:inherit}p.has-text-align-left[style*="writing-mode:vertical-lr"],p.has-text-align-right[style*="writing-mode:vertical-rl"]{rotate:180deg}
+/*# sourceURL=https://internet2.edu/wp-includes/blocks/paragraph/style.min.css */
+</style>
+
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel='preload' as='font' crossorigin='anonymous' id='custom-font-bold-css' href='https://internet2.edu/wp-content/themes/fas-base/assets/fonts/artegrasans-bold-webfont.woff2' media='all' />
+<link rel='preload' as='font' crossorigin='anonymous' id='custom-font-regular-css' href='https://internet2.edu/wp-content/themes/fas-base/assets/fonts/artegrasans-regular-webfont.woff2' media='all' />
+<link data-minify="1" rel='stylesheet' id='main-css' href='https://internet2.edu/wp-content/cache/background-css/1/internet2.edu/wp-content/cache/min/1/wp-content/themes/fas-base/assets/css/main.min.css?ver=1792780723&wpr_t=1794222617' media='all' />
+<script id="jquery-core-js" src="https://internet2.edu/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
+<script id="jquery-migrate-js" src="https://internet2.edu/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"></script>
+<style>.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>	<link rel="canonical" href="https://internet2.edu/services/cloud-infrastructure-community-program/">
+<link rel="icon" href="https://internet2.edu/wp-content/uploads/2020/10/fav-icon180-150x150.png" sizes="32x32" />
+<link rel="icon" href="https://internet2.edu/wp-content/uploads/2020/10/fav-icon180.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://internet2.edu/wp-content/uploads/2020/10/fav-icon180.png" />
+<meta name="msapplication-TileImage" content="https://internet2.edu/wp-content/uploads/2020/10/fav-icon180.png" />
+<noscript><style id="rocket-lazyload-nojs-css">.rll-youtube-player, [data-lazy-src]{display:none !important;}</style></noscript>
+
+    <script type="text/rocketlazyloadscript" data-rocket-type="text/javascript">
+piAId = '67332';
+piCId = '33600';
+piHostname = 'pi.pardot.com';
+(function() {
+	function async_load(){
+		var s = document.createElement('script'); s.type = 'text/javascript';
+		s.src = ('https:' == document.location.protocol ? 'https://pi' : 'http://cdn') + '.pardot.com/pd.js';
+		var c = document.getElementsByTagName('script')[0]; c.parentNode.insertBefore(s, c);
+	}
+	if(window.attachEvent) { window.attachEvent('onload', async_load); }
+	else { window.addEventListener('load', async_load, false); }
+})();
+</script>
+
+      <link rel='stylesheet' id='gp-populate-anything-css' href='https://internet2.edu/wp-content/plugins/gp-populate-anything/styles/gp-populate-anything.min.css?ver=2.1.79' media='all' />
+
+<style id="wpr-lazyload-bg-container"></style><style id="wpr-lazyload-bg-exclusion">.single-services .hero{--wpr-bg-ec6b8723-0ba1-42eb-b0d0-cdb4adcc8b1c: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/int2_background_light_opt.jpg');}</style>
+<noscript>
+<style id="wpr-lazyload-bg-nostyle">.gform_wrapper .form-btn,.gform_wrapper input[type='submit']{--wpr-bg-6008931d-f3ef-4b9f-96bb-ff4ccdb4fbb4: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrow_right.svg');}.newsletter__form .gform_footer input[type="submit"]{--wpr-bg-7fc83630-8577-454f-9966-2229ec595d2c: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrow_right.svg');}.posts__filter-item{--wpr-bg-9b2462ae-8cb8-47dd-b29d-893d66045479: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrow_down.svg');}.tease--has-image .tease__content-authors:before{--wpr-bg-8f385593-adb5-4a84-a382-358bb396084f: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-user.svg');}.post--password input[type="submit"]{--wpr-bg-9a063f7a-f850-4421-9341-efb8d354c168: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrow_right.svg');}.accordion__item-toggle:after{--wpr-bg-4f7ded88-12e1-482a-8a68-c9f52913a465: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrow_down_teal.svg');}.accordion-extended__item-toggle:after{--wpr-bg-aec8f8e0-fc6e-448b-9179-35b3a771631b: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrow_down_red.svg');}.custom-table.primary th::after{--wpr-bg-a9094d13-d3e3-4526-8aa5-606b66ecfd2e: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrows-up-down-black.svg');}.custom-table.secondary th::after{--wpr-bg-c6b2b11a-e995-4ad9-a918-394635195330: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-arrows-up-down-white.svg');}.two-column-title__content-description:after{--wpr-bg-d9c34155-ce36-47f4-89f0-fb4aba7a73ed: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/dotted--2px.svg');}.alert-banner.multi{--wpr-bg-af2ee373-89f2-49f5-8e3e-82729f6e209f: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/int2-alert-bg.webp');}.page-template-services .services__background-image{--wpr-bg-28c8d5ae-6340-4498-bbc0-d001ef9abdf2: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/int2_background_small_opt.jpeg');}.feature-quote__quote-text::before{--wpr-bg-028bb855-a715-40ee-bd09-ebe98d15f9ec: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-quote-open.svg');}.feature-quote__quote-text::after{--wpr-bg-00383616-3f0d-424b-a893-167342ef154f: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/icon-quote-close.svg');}.hero--no-image{--wpr-bg-ad358a10-c6e4-40e3-812b-43ec0d8395f2: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/int2_background_small_opt.jpeg');}.hero--no-image.hero--pattern{--wpr-bg-02f7813c-7e2a-4731-8f63-7f97de13a173: url('https://internet2.edu/wp-content/themes/fas-base/assets/images/int2_background_opt.jpeg');}</style>
+</noscript>
+<script type="application/javascript">const rocket_pairs = [{"selector":".gform_wrapper .form-btn,.gform_wrapper input[type='submit']","style":".gform_wrapper .form-btn,.gform_wrapper input[type='submit']{--wpr-bg-6008931d-f3ef-4b9f-96bb-ff4ccdb4fbb4: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_right.svg');}","hash":"6008931d-f3ef-4b9f-96bb-ff4ccdb4fbb4","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_right.svg"},{"selector":".newsletter__form .gform_footer input[type=\"submit\"]","style":".newsletter__form .gform_footer input[type=\"submit\"]{--wpr-bg-7fc83630-8577-454f-9966-2229ec595d2c: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_right.svg');}","hash":"7fc83630-8577-454f-9966-2229ec595d2c","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_right.svg"},{"selector":".posts__filter-item","style":".posts__filter-item{--wpr-bg-9b2462ae-8cb8-47dd-b29d-893d66045479: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_down.svg');}","hash":"9b2462ae-8cb8-47dd-b29d-893d66045479","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_down.svg"},{"selector":".tease--has-image .tease__content-authors","style":".tease--has-image .tease__content-authors:before{--wpr-bg-8f385593-adb5-4a84-a382-358bb396084f: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-user.svg');}","hash":"8f385593-adb5-4a84-a382-358bb396084f","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-user.svg"},{"selector":".post--password input[type=\"submit\"]","style":".post--password input[type=\"submit\"]{--wpr-bg-9a063f7a-f850-4421-9341-efb8d354c168: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_right.svg');}","hash":"9a063f7a-f850-4421-9341-efb8d354c168","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_right.svg"},{"selector":".accordion__item-toggle","style":".accordion__item-toggle:after{--wpr-bg-4f7ded88-12e1-482a-8a68-c9f52913a465: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_down_teal.svg');}","hash":"4f7ded88-12e1-482a-8a68-c9f52913a465","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_down_teal.svg"},{"selector":".accordion-extended__item-toggle","style":".accordion-extended__item-toggle:after{--wpr-bg-aec8f8e0-fc6e-448b-9179-35b3a771631b: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_down_red.svg');}","hash":"aec8f8e0-fc6e-448b-9179-35b3a771631b","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrow_down_red.svg"},{"selector":".custom-table.primary th","style":".custom-table.primary th::after{--wpr-bg-a9094d13-d3e3-4526-8aa5-606b66ecfd2e: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrows-up-down-black.svg');}","hash":"a9094d13-d3e3-4526-8aa5-606b66ecfd2e","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrows-up-down-black.svg"},{"selector":".custom-table.secondary th","style":".custom-table.secondary th::after{--wpr-bg-c6b2b11a-e995-4ad9-a918-394635195330: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrows-up-down-white.svg');}","hash":"c6b2b11a-e995-4ad9-a918-394635195330","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-arrows-up-down-white.svg"},{"selector":".two-column-title__content-description","style":".two-column-title__content-description:after{--wpr-bg-d9c34155-ce36-47f4-89f0-fb4aba7a73ed: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/dotted--2px.svg');}","hash":"d9c34155-ce36-47f4-89f0-fb4aba7a73ed","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/dotted--2px.svg"},{"selector":".alert-banner.multi","style":".alert-banner.multi{--wpr-bg-af2ee373-89f2-49f5-8e3e-82729f6e209f: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2-alert-bg.webp');}","hash":"af2ee373-89f2-49f5-8e3e-82729f6e209f","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2-alert-bg.webp"},{"selector":".page-template-services .services__background-image","style":".page-template-services .services__background-image{--wpr-bg-28c8d5ae-6340-4498-bbc0-d001ef9abdf2: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_small_opt.jpeg');}","hash":"28c8d5ae-6340-4498-bbc0-d001ef9abdf2","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_small_opt.jpeg"},{"selector":".feature-quote__quote-text","style":".feature-quote__quote-text::before{--wpr-bg-028bb855-a715-40ee-bd09-ebe98d15f9ec: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-quote-open.svg');}","hash":"028bb855-a715-40ee-bd09-ebe98d15f9ec","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-quote-open.svg"},{"selector":".feature-quote__quote-text","style":".feature-quote__quote-text::after{--wpr-bg-00383616-3f0d-424b-a893-167342ef154f: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-quote-close.svg');}","hash":"00383616-3f0d-424b-a893-167342ef154f","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/icon-quote-close.svg"},{"selector":".hero--no-image","style":".hero--no-image{--wpr-bg-ad358a10-c6e4-40e3-812b-43ec0d8395f2: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_small_opt.jpeg');}","hash":"ad358a10-c6e4-40e3-812b-43ec0d8395f2","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_small_opt.jpeg"},{"selector":".hero--no-image.hero--pattern","style":".hero--no-image.hero--pattern{--wpr-bg-02f7813c-7e2a-4731-8f63-7f97de13a173: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_opt.jpeg');}","hash":"02f7813c-7e2a-4731-8f63-7f97de13a173","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_opt.jpeg"}]; const rocket_excluded_pairs = [{"selector":".single-services .hero","style":".single-services .hero{--wpr-bg-ec6b8723-0ba1-42eb-b0d0-cdb4adcc8b1c: url('https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_light_opt.jpg');}","hash":"ec6b8723-0ba1-42eb-b0d0-cdb4adcc8b1c","url":"https:\/\/internet2.edu\/wp-content\/themes\/fas-base\/assets\/images\/int2_background_light_opt.jpg"}];</script><meta name="generator" content="WP Rocket 3.22.0.2" data-wpr-features="wpr_lazyload_css_bg_img wpr_delay_js wpr_minify_js wpr_lazyload_iframes wpr_oci wpr_image_dimensions wpr_minify_css wpr_preload_links wpr_desktop" /></head>
+
+  <body class="wp-singular services-template-default single single-services postid-80369 wp-custom-logo wp-theme-fas-base cloud-infrastructure-community-program">
+        <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WVDKZS9"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    
+    <!--<a href="#mainContent" class="skip" tabindex="0">Skip to content</a>-->
+
+    <nav class="skip-navigation" aria-label="Skip Navigation">
+      <button class="skip" tabindex="0" aria-label="Skip Navigation Link">Skip to content</button>
+    </nav>
+
+              
+
+
+
+        
+
+        
+    
+<nav class="main-nav">
+  <div class="main-nav__container">
+    <a class="main-nav__logo" href="https://internet2.edu" role="button" tabindex="0">
+      <span class="sr-only">Return Home</span>
+      <img width="1004" height="764" src="https://internet2.edu/wp-content/uploads/2024/06/I2-clr.svg" alt="Internet2 logo">
+    </a>
+
+    <button class="main-nav__menu-button" role="button"> 
+      <span class="visually-hidden">Open Menu</span>
+      <img width="128" height="128" src="/wp-content/themes/fas-base/assets/images/icon-menu.svg" alt="" aria-hidden="true" aria-label="Open Menu">
+    </button>
+    
+    <div class="main-nav__nav">
+      <button class="main-nav__nav-close" role="button">
+        <span class="visually-hidden">Close Menu</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" aria-hidden="true" aria-label="Close Menu"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
+      </button>
+      <ul class="main-nav__nav-list">
+
+                        
+        <li class="main-nav__item">
+          <button id="button--1" class="main-nav__item-link main-nav__item-button" role="button">
+            Explore
+            <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 7.3 4">
+              <path fill="#343434" d="m6.7 0-3 2.9L.6 0 0 .6 3.7 4 7.3.6 6.7 0z"/>
+            </svg>  
+          </button>
+
+        <div class="main-nav__dropdown main-nav__dropdown--2" >
+          <div class="main-nav__dropdown-container">
+            <div class="main-nav__dropdown-left">
+              <h4 class="heading-4-update medium">Connecting Research and Education</h4>
+              <div class="text-body-update"><p>Internet2 provides:</p>
+<ul><li><a href="/network"> a secure high-speed network</a></li>
+<li><a href="/cloud">cloud solutions</a></li>
+<li> <a href="/community/research-engagement/">research support</a></li>
+<li> <a href="/security/">security</a></li>
+<li><a href="/services">services</a> for the research and education <a href="/community">community</a></li></ul></div>
+                            <a class="" href="https://internet2.edu/community/about-us/"><b>Learn more about Internet2</b></a>
+                          </div>
+            <div class="main-nav__dropdown-right">
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/about-us/">About Internet2</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Get to know our history, our commitment, our community. </p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/membership/">Our Members</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Internet2 members work together to advance our research and education needs. </p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/events/">Our Events</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Join us for community events, webinars, workshops, and training sessions. </p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/services/">Our Services</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Services, software, and applications you can trust.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/network/">Our Network</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">The nation’s largest and fastest research and education network.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/careers/">Internet2 Careers</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">View current career opportunities. Thank you for your interest in Internet2!</p>
+                                  </div>
+                          </div>
+          </div>
+        </div>
+        </li>
+
+
+                                
+        <li class="main-nav__item">
+          
+          <button id="button--2" class="main-nav__item-link main-nav__item-button" role="button">
+            Our Services
+            <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 7.3 4">
+              <path fill="#343434" d="m6.7 0-3 2.9L.6 0 0 .6 3.7 4 7.3.6 6.7 0z"/>
+            </svg>
+          </button>
+
+          <div class="main-nav__dropdown main-nav__dropdown--3">
+            <div class="main-nav__dropdown-container">
+                            <div class="main-nav__dropdown-left">
+                <ul class="main-nav__dropdown-left-submenu">
+                                  <li class="1"><button class="main-nav__dropdown-left-button" id="submenu-button-1" role="button" data-title="Featured Services">Featured Services</button></li>
+                                  <li class="2"><button class="main-nav__dropdown-left-button" id="submenu-button-2" role="button" data-title="NET+ Cloud Services">NET+ Cloud Services</button></li>
+                                  <li class="3"><button class="main-nav__dropdown-left-button" id="submenu-button-3" role="button" data-title="Network Services">Network Services</button></li>
+                                  <li class="4"><button class="main-nav__dropdown-left-button" id="submenu-button-4" role="button" data-title="InCommon Services">InCommon Services</button></li>
+                                </ul>
+                               
+                  <a class="main-nav__view-all" href="https://internet2.edu/services/"><h5><b>View All Internet2 Services</b></h5></a>
+                              </div>
+                            <div class="main-nav__dropdown-right">
+                                <div id="submenu-1" class="main-nav__dropdown-right-submenu 1">
+                  <div class="main-nav__dropdown-right-submenu-upper">
+                    <h4 class="main-nav__dropdown-right-submenu-title heading-4 medium">Featured Services</h4>
+                                          <a class="main-nav__view-all main-nav__view-all-2" href="https://internet2.edu/services/#featured"><h5><b>View All Featured Services</b></h5></a>
+                              
+                  </div>
+                  <div class="main-nav__dropdown-right-grid">
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/amazon-web-services/">Amazon Web Services (AWS)</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">The Internet2 NET+ AWS program features both a full-featured contract with a partner focused on customer success and a community of practice.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/cloud-connect/">Cloud Connect</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">The Internet2 Cloud Connect service makes it easier for researchers to access and use cloud resources.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/persona/">Persona</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">NET+ Persona helps with identity proofing and verification services purpose-built for modern institutions.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/eduroam/">eduroam</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">eduroam is the secure, global wireless service developed for and by the international research and education community.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/upguard/">UpGuard</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">NET+ UpGuard helps institutions strengthen cyber risk visibility across vendors, attack surfaces, and the workforce.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://incommon.org/trusted-access/" target="_blank">InCommon Trusted Access Platform</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">The InCommon Trusted Access Platform is an identity and access management suite of software designed to integrate with existing systems.</p>
+                    </div>
+                                      </div>
+                </div>
+                                <div id="submenu-2" class="main-nav__dropdown-right-submenu 2">
+                  <div class="main-nav__dropdown-right-submenu-upper">
+                    <h4 class="main-nav__dropdown-right-submenu-title heading-4 medium">NET+ Cloud Services</h4>
+                                          <a class="main-nav__view-all main-nav__view-all-2" href="https://internet2.edu/services/#net-plus-cloud-services"><h4>View All NET+ Cloud Services</h4></a>
+                              
+                  </div>
+                  <div class="main-nav__dropdown-right-grid">
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/amazon-web-services/">Amazon Web Services</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">The Internet2 NET+ AWS program features both a full-featured contract with a partner focused on customer success and a community of practice that will effectively expand your cloud team. </p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/persona/">Persona</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">NET+ Persona helps with identity proofing and verification services purpose-built for modern institutions.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/google-cloud-platform/">Google Cloud</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Cloud solutions developed with the Internet2 member community.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/labarchives/">LabArchives</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Store, organize, share, and publish laboratory data.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/servicenow/">ServiceNow</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Provides end‑to‑end visibility into processes and infrastructure. </p>
+                    </div>
+                                      </div>
+                </div>
+                                <div id="submenu-3" class="main-nav__dropdown-right-submenu 3">
+                  <div class="main-nav__dropdown-right-submenu-upper">
+                    <h4 class="main-nav__dropdown-right-submenu-title heading-4 medium">Network Services</h4>
+                                          <a class="main-nav__view-all main-nav__view-all-2" href="https://internet2.edu/services/#network-solutions"><h5>View All Network Services</h5></a>
+                              
+                  </div>
+                  <div class="main-nav__dropdown-right-grid">
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/amazon-web-services-aws-direct-connect/">Amazon Web Services Direct Connect</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Reach AWS Direct Connect using Cloud Connect, leveraging Internet2 and your regional’s infrastructure.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/cloud-connect/">Cloud Connect</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Use Internet2 and your regional network’s infrastructure to access and use cloud resources.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/ddos-volumetric-mitigation-service/">DDoS Volumetric Mitigation Service</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Cloud-based volumetric service is procured on behalf of the community from Radware.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/layer-1/">Layer 1 Service</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Offers the most specialized and cost-effective way to build a custom, high-capacity network.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/layer-2-service/">Layer 2 Service</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Delivers a strategic advantage  providing effective and efficient 100 gigabit Ethernet technology.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/rapid-private-interconnect-rpi/">Rapid Private Interconnect (RPI)</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Provides dedicated access to any vendor-provided service at four national peering locations.</p>
+                    </div>
+                                      </div>
+                </div>
+                                <div id="submenu-4" class="main-nav__dropdown-right-submenu 4">
+                  <div class="main-nav__dropdown-right-submenu-upper">
+                    <h4 class="main-nav__dropdown-right-submenu-title heading-4 medium">InCommon Services</h4>
+                                          <a class="main-nav__view-all main-nav__view-all-2" href="https://internet2.edu/services/#incommon-solutions"><b>View all InCommon Services</b></a>
+                              
+                  </div>
+                  <div class="main-nav__dropdown-right-grid">
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/eduroam/">eduroam</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Get seamless access to global roaming Wi-Fi.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/incommon-federation/">InCommon Federation</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Provides secure single sign-on access to cloud and local services, and global collaboration tools. </p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://incommon.org/trusted-access/" target="_blank">InCommon Trusted Access Platform</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">An identity and access management suite of software designed to integrate with existing systems. </p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://incommon.org/community/catalyst/" target="_blank">InCommon Catalyst Program</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">The InCommon Catalysts can fill the gaps in your IAM program.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/incommon-academy/">InCommon Academy</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">From expert-led component training to implementation support, we provide the resources you need.</p>
+                    </div>
+                                        <div class="main-nav__dropdown-right-item">
+                      <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                        <a class="main-nav__dropdown-right-item-link" href="https://internet2.edu/services/incommon-certificate-service/">InCommon Certificate Service</a>
+                      </h5>
+                        <p class="main-nav__dropdown-right-item-description text-small">Unlimited server and user certificates for one annual fee, covering all of your domains.</p>
+                    </div>
+                                      </div>
+                </div>
+                              </div>
+            </div>
+          </div>
+          
+        </li>
+                                
+        <li class="main-nav__item">
+          <button id="button--3" class="main-nav__item-link main-nav__item-button" role="button">
+            Our Community
+            <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 7.3 4">
+              <path fill="#343434" d="m6.7 0-3 2.9L.6 0 0 .6 3.7 4 7.3.6 6.7 0z"/>
+            </svg>  
+          </button>
+
+        <div class="main-nav__dropdown main-nav__dropdown--2" >
+          <div class="main-nav__dropdown-container">
+            <div class="main-nav__dropdown-left">
+              <h4 class="heading-4-update medium">Connect, Share, Grow</h4>
+              <div class="text-body-update">Our community includes collaborators from across the street and around the globe.
+</div>
+                            <a class="" href="https://internet2.edu/community/"><b>Get to Know Our Community</b></a>
+                          </div>
+            <div class="main-nav__dropdown-right">
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/about-us/">About Us</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">We work with our community to solve technology challenges and develop solutions to advance research. </p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/membership/">Membership</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small"> Our membership opens the door to an active community that accelerates research and discovery.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/careers/">Careers</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Join our team! View career opportunities at Internet2.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/solutions/solutions-landing/">Solutions</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Let us help you with with network connections, cloud services, and identity and access management.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/research-engagement/">Research Engagement</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small"> We help researchers connect with a full spectrum of support services and technology. </p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/community-leadership-and-culture-initiative/">The Internet2 Community Leadership and Culture (I2CLC) Initiative</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">The I2CLC Initiative nurtures emerging talent and creates safe, welcoming spaces for collaboration and innovation.</p>
+                                  </div>
+                          </div>
+          </div>
+        </div>
+        </li>
+
+
+                                
+        <li class="main-nav__item">
+          <button id="button--4" class="main-nav__item-link main-nav__item-button" role="button">
+            News 
+            <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 7.3 4">
+              <path fill="#343434" d="m6.7 0-3 2.9L.6 0 0 .6 3.7 4 7.3.6 6.7 0z"/>
+            </svg>  
+          </button>
+
+        <div class="main-nav__dropdown main-nav__dropdown--2" >
+          <div class="main-nav__dropdown-container">
+            <div class="main-nav__dropdown-left">
+              <h4 class="heading-4-update medium">Get the Latest</h4>
+              <div class="text-body-update">Don't miss out on the latest Internet2 blog posts, videos, event highlights, and more.</div>
+                            <a class="" href="https://internet2.edu/news/"><b>Internet2 News and Videos</b></a>
+                          </div>
+            <div class="main-nav__dropdown-right">
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/tripti-sinha-on-leading-the-next-era-of-internet2/">In the Media: Tripti Sinha on Leading the Next Era of Internet2</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">In a recent Campus Technology interview, Tripti Sinha reflects on her first year as Internet2 president and CEO. </p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/new-net-plus-persona-service-for-identity-proofing-solutions/">Internet2 Announces New NET+ Persona Service</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">To help institutions safeguard access to their systems and satisfy impending federal compliance mandates, Internet2 is excited to announce the launch of NET+ Persona.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/focus-on-federal-internet2-responds-to-nations-call-to-action-for-post-quantum-cryptography-solutions/">Focus on Federal: Internet2 Responds to Need for Post-Quantum Cryptography Solutions</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">This issue of Focus on Federal looks at a refresh of the Internet2 Packet Platform enabling native 800 Gbps backbone circuits, a new precision timing initiative, and continued quantum-readiness work.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://incommon.org/resources/blogs/ai-in-iam-operations" target="_blank">AI is Already in IAM Operations</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Artificial intelligence use is moving faster than institutional policy. That doesn’t mean campuses should operate without guardrails.</p>
+                                  </div>
+                          </div>
+          </div>
+        </div>
+        </li>
+
+
+                                
+        <li class="main-nav__item">
+          <button id="button--5" class="main-nav__item-link main-nav__item-button" role="button">
+            Events
+            <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 7.3 4">
+              <path fill="#343434" d="m6.7 0-3 2.9L.6 0 0 .6 3.7 4 7.3.6 6.7 0z"/>
+            </svg>  
+          </button>
+
+        <div class="main-nav__dropdown main-nav__dropdown--2" >
+          <div class="main-nav__dropdown-container">
+            <div class="main-nav__dropdown-left">
+              <h4 class="heading-4-update medium">Convening the Community</h4>
+              <div class="text-body-update">Join us for community events, webinars, workshops, and training sessions.<p>
+
+
+
+</div>
+                            <a class="" href="https://internet2.edu/events/"><b>See All Internet2 Events</b></a>
+                          </div>
+            <div class="main-nav__dropdown-right">
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/cloud/cloud-learning-and-skills-sessions/traffic-inspection-in-aws/">Traffic Inspection in AWS</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Has your security team asked you to inspect cloud traffic the same way you do on-prem — and you’re not quite sure how that works in AWS? Join us Nov. 11-12 for this workshop that covers the right way to do it using AWS Gateway Load Balancer.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/connect-with-internet2-at-sc26/">Connect with Internet2 at SC26</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Visit us in Chicago from November 15-20 at SC26. Engage with the Internet2 team and explore the national network, trust fabric, and cloud access that power U.S. research and higher education.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://incommon.org/academy/federation-eduroam/eduroam-101-workshop-november-2026" target="_blank">InCommon Workshop: eduroam 101</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Join us for this workshop on Nov. 11 at 12 p.m. ET to learn how to plan and deploy eduroam and get practical guidance for troubleshooting common problems.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://events.internet2.edu/website/96909/" target="_blank">Mark Your Calendars for the 2027 Internet2 Global Summit</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">We hope to see you at the 2027 Internet2 Global Summit, to be held April 5-8 2027,  in Philadelphia, Penn. Learn more about the event!</p>
+                                  </div>
+                          </div>
+          </div>
+        </div>
+        </li>
+
+
+                                
+        <li class="main-nav__item">
+          <button id="button--6" class="main-nav__item-link main-nav__item-button" role="button">
+            Contact
+            <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 7.3 4">
+              <path fill="#343434" d="m6.7 0-3 2.9L.6 0 0 .6 3.7 4 7.3.6 6.7 0z"/>
+            </svg>  
+          </button>
+
+        <div class="main-nav__dropdown main-nav__dropdown--2" >
+          <div class="main-nav__dropdown-container">
+            <div class="main-nav__dropdown-left">
+              <h4 class="heading-4-update medium"> Get in Touch</h4>
+              <div class="text-body-update">Have a question? Need help? Reach out! <p></div>
+                            <a class="" href="https://internet2.edu/contact-us/"><b>Contact Us</b></a>
+                          </div>
+            <div class="main-nav__dropdown-right">
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://sn-tools.grnoc.iu.edu/internet2-request/" target="_blank">Network Support</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Fill out a form for non-urgent network support.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://noc.net.internet2.edu/help/index.html" target="_blank">Network Operations Center</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">For urgent requests, reach the Global Network Operations Center 24 hours a day, 365 days a year.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/contact-us/">Other Internet2 Support</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Please use our form if you need support for other Internet2 services.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/contact-us/internet2-offices/">Internet2 Offices </a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Internet2 has offices in three locations throughout the United States.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/about-us/media-resources/internet2-communications-management/">Sign Up for Communications</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Sign up for a newsletter and stay current on the latest community news.</p>
+                                  </div>
+                              <div class="main-nav__dropdown-right-item">
+                                        <h5 class="main-nav__dropdown-right-item-title text-body-update semi-bold">
+                      <a class="main-nav__dropdown-right-item-link text-small" href="https://internet2.edu/community/about-us/media-resources/">Media Resources</a>
+                    </h5>
+                                      <p class="main-nav__dropdown-right-item-description text-small">Access Internet2 fact sheets, network maps, logos, and more.</p>
+                                  </div>
+                          </div>
+          </div>
+        </div>
+        </li>
+
+
+                        <li class="main-nav__item">
+          <button class="main-nav__link--search" role="button"><span class="sr-only">Search</span> 
+            <svg role="presentation" tabindex="-1" version="1.1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 128 128" xml:space="preserve"><path d="M91.43 80.46h-5.85l-2.19-2.19c7.31-8.05 11.7-19.02 11.7-30.72C95.09 21.21 73.87 0 47.54 0S0 21.21 0 47.54s21.21 47.54 47.54 47.54c11.7 0 22.67-4.39 30.72-11.7l2.19 2.19v5.85L117.03 128 128 117.03 91.43 80.46zm-43.89 0c-18.29 0-32.91-14.63-32.91-32.91s14.63-32.91 32.91-32.91 32.91 14.63 32.91 32.91-14.62 32.91-32.91 32.91z" fill-rule="evenodd" clip-rule="evenodd" fill="#000"/></svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-bar__container">
+        <button class="search-bar__close" tabindex="0" role="button">Close</button>
+
+        <form action="https://internet2.edu" class="search-form" method="GET">
+          <span class="search-form__icon"><svg tabindex="-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path d="M91.43 80.46h-5.85l-2.19-2.19c7.31-8.05 11.7-19.02 11.7-30.72C95.09 21.21 73.87 0 47.54 0S0 21.21 0 47.54s21.21 47.54 47.54 47.54c11.7 0 22.67-4.39 30.72-11.7l2.19 2.19v5.85L117.03 128 128 117.03 91.43 80.46zm-43.89 0c-18.29 0-32.91-14.63-32.91-32.91s14.63-32.91 32.91-32.91 32.91 14.63 32.91 32.91-14.62 32.91-32.91 32.91z" fill-rule="evenodd" clip-rule="evenodd" fill="#fff"/></svg></span>
+          <label for="s">Search</label>
+          <input id="s" name="s" placeholder="Search for topics, services, support" type="text" value="" autocomplete="on" />
+          <button type="submit" tabindex="0" role="button">Search <svg tabindex="-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path fill-rule="evenodd" clip-rule="evenodd" fill="#da4027" d="M0 56h97.6L52.8 11.2 64 0l64 64-64 64-11.2-11.2L97.6 72H0z"/></svg></button>
+        </form>
+
+      </div>
+    </div>
+</nav>    
+    <main class="main">
+    <div class="page-wrapper" data-id="80369">
+  
+<div  class="hero">
+  
+
+  <div class="hero__background">
+    
+        </div>
+
+
+  <div class="hero__container">
+        
+        
+    <section class="bread-crumbs">
+      <div class="bread-crumbs__container">
+        <a class="bread-crumbs__icon" href="https://internet2.edu" aria-label="Link to Home Page">
+          <svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 20 17">
+            <path d="M10 11.1h2.1V17h5V9.1h3L10 0 0 9.1h3V17h5v-5.9h2.1Z"/>
+          </svg>
+        </a>
+
+                        <span class="bread-crumbs__separator">/</span>
+        <span><a href="/services">services</a></span>
+        
+        <span class="bread-crumbs__separator">/</span>
+          <nav id="breadcrumbs" class="breadcrumbs__container" aria-label="Breadcrumb"><span><span class="breadcrumb_last" aria-current="page">Cloud Infrastructure Community Program (CICP)</span></span></nav>
+      </div>
+    </section>
+    
+    
+    <div class="hero__content">
+                  <h1 class="hero__content-title heading-1 bold">Cloud Infrastructure Community Program (CICP)</h1>
+            <div class="hero__content-body">
+                <p class="text-lead">Working together to find creative solutions for managing the public cloud in the research and education community.</p>
+                        <div class="hero__content-links">
+          
+            <a class="button button--primary" href="#cispform">
+              <span>Sign Up</span>
+            </a>
+
+          
+            <a class="button button--tertiary" href="#cicpsub">
+              <span>Subscribers</span>
+            </a>
+
+                  </div>
+              </div>
+    </div>
+        <div class="hero__image hero__image--">
+      <img width="500" height="300" decoding="async" alt="Cloud Infrastructure Community Program logo" src="https://internet2.edu/wp-content/uploads/2024/09/s-cicp-service-logo.png" />
+              <p class="hero__image-caption">s-cicp-service-logo</p>
+          </div>
+    
+  </div>
+</div>
+<span id="mainContent"></span>
+
+
+<div class="service-intro-form"  id="cispform" >
+    
+<nav class="skip-content" aria-label="Farther, Faster, Higher: CICP Helps You and Your Institution Become Cloud Superheroes">
+  <button class="button skip" tabindex="0" type="button" aria-label="Skip Farther, Faster, Higher: CICP Helps You and Your Institution Become Cloud Superheroes Content">
+   Skip Farther, Faster, Higher: CICP Helps You and Your Institution Become Cloud Superheroes Content
+  </button>
+</nav>  <div class="service-intro-form__container">
+    <div class="service-intro-form__content">
+      
+              <div class="service-intro-form__subscriber">
+          <div class="service-intro-form__subscriber-number">
+                          <div class="dsl-subscriber">
+    <h3 class="dsl-subscriber__subtitle heading-3-update bold">85</h3>
+  <p class="dsl-subscriber__description text-small">Subscribers</p>
+    </div>
+                      </div>
+          <div class="service-intro-form__subscriber-summary">
+            <p class="semi-bold">Eligible Subscribers Include:</p>
+            <p>U.S. Higher Education institutions; or Internet2 Higher Education Members, Affiliates, or Federal Affiliates, regardless of how or if you contract public cloud services. All other research and education organizations in the United States may be eligible at Internet2’s sole discretion.</p>
+          
+          </div>
+        </div>
+      
+              <h2 class="heading-1 bold service-intro-form__content-title">Farther, Faster, Higher: CICP Helps You and Your Institution Become Cloud Superheroes</h2>
+                    <div class="text-lead service-intro-form__content-description"><p><span style="font-weight: 400;">The Internet2 Cloud Infrastructure Community Program (CICP) is more than just a forum for higher education and research organizations to work together to maximize the value of their investments in public cloud platforms. It is a framework where your team and your entire institution can share, grow, learn, and master public cloud technologies to serve the research and academic mission of your organization.</span></p>
+<p><span style="font-weight: 400;">As part of CICP you will:</span></p>
+<p><em><span style="font-weight: 400;"><strong>Accelerate </strong></span></em><span style="font-weight: 400;">cloud adoption</span><em><span style="font-weight: 400;"><br />
+</span><span style="font-weight: 400;"><strong>Master </strong></span></em><span style="font-weight: 400;">cloud technology</span><em><span style="font-weight: 400;"><br />
+</span><span style="font-weight: 400;"><strong>Influence </strong></span></em><span style="font-weight: 400;">cloud providers</span><em><span style="font-weight: 400;"><br />
+</span><span style="font-weight: 400;"><strong>Expand </strong></span></em><span style="font-weight: 400;">your knowledge network</span></p>
+<p><span style="font-weight: 400;">CICP is your Cloudforce Multiplier.</span></p>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+</div>
+                </div>
+
+    <div class="service-intro-form__form">
+      <div class="service-intro-form__form-title">
+              <h3 class="heading-4">Send Me More Info About CICP</h3>
+            </div>
+      <div class="service-intro-form__form-wrapper">
+        
+                <div class='gf_browser_unknown gform_wrapper gravity-theme gform-theme--no-framework' data-form-theme='gravity-theme' data-form-index='0' id='gform_wrapper_66' >
+                        <div class='gform_heading'>
+							<p class='gform_required_legend'></p>
+                        </div><form method='post' enctype='multipart/form-data'  id='gform_66'  action='/services/cloud-infrastructure-community-program/' data-formid='66' novalidate>
+                        <div class='gform-body gform_body'><div id='gform_fields_66' class='gform_fields top_label form_sublabel_below description_below validation_below' data-column-layout='fill'><fieldset id="field_66_1" class="gfield gfield--type-name gfield--input-type-name gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="048f90cd" data-field-span="12"><legend id='gfield_label_66_1' class='gfield_label gform-field-label gfield_label_before_complex' ><span class='gform-field-label__text'>Name</span><span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></legend><div class='ginput_complex ginput_container ginput_container--name no_prefix has_first_name no_middle_name has_last_name no_suffix gf_name_has_2 ginput_container_name gform-grid-row' id='input_66_1'>
+                            
+                            <span id='input_66_1_3_container' class='name_first gform-grid-col gform-grid-col--size-auto' >
+                                                    <input type='text' name='input_1.3' id='input_66_1_3' value=''   aria-required='true'     aria-labelledby="input_66_1_3_label gfield_label_66_1"/>
+                                                    <label for='input_66_1_3' id='input_66_1_3_label' class='gform-field-label gform-field-label--type-sub '>First</label>
+                                                </span>
+                            
+                            <span id='input_66_1_6_container' class='name_last gform-grid-col gform-grid-col--size-auto' >
+                                                    <input type='text' name='input_1.6' id='input_66_1_6' value=''   aria-required='true'     />
+                                                    <label for='input_66_1_6' id='input_66_1_6_label' class='gform-field-label gform-field-label--type-sub '>Last</label>
+                                                </span>
+                            
+                        </div></fieldset><div id="field_66_9" class="gfield gfield--type-text gfield--input-type-text gfield--width-full gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="c4b8b188" data-field-span="12"><label id='gfield_label_66_9' class='gfield_label gform-field-label' for='input_66_9'><span class='gform-field-label__text'>Your Organization</span><span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label><div class='ginput_container ginput_container_text'><input name='input_9' id='input_66_9' type='text' value='' class='large'     aria-required="true" aria-invalid="false"   /></div></div><div id="field_66_4" class="gfield gfield--type-email gfield--input-type-email gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="f5b03ee5" data-field-span="12"><label id='gfield_label_66_4' class='gfield_label gform-field-label' for='input_66_4'><span class='gform-field-label__text'>Email</span><span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label><div class='ginput_container ginput_container_email'>
+                            <input name='input_4' id='input_66_4' type='email' value='' class='large'    aria-required="true" aria-invalid="false"  />
+                        </div></div><div id="field_66_10" class="gfield gfield--type-html gfield--input-type-html gfield--width-full gfield_html gfield_html_formatted gfield_no_follows_desc field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_hidden" data-group-id="8d9c6976" data-field-span="12"><label class="gfield" style="margin-bottom: 0;">Selected Service</label>
+<p class="large-red">Cloud Infrastructure Community Program (CICP)</p></div><div id="field_66_13" class="gfield gfield--type-text gfield--input-type-text gfield--width-full field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_hidden" data-group-id="d249b486" data-field-span="12"><label id='gfield_label_66_13' class='gfield_label gform-field-label' for='input_66_13'><span class='gform-field-label__text'>Selected Service</span></label><div class='ginput_container ginput_container_text'><input name='input_13' id='input_66_13' type='text' value='Cloud Infrastructure Community Program (CICP)' class='large'      aria-invalid="false"   /></div></div><div id="field_66_7" class="gfield gfield--type-textarea gfield--input-type-textarea field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="420436dc" data-field-span="12"><label id='gfield_label_66_7' class='gfield_label gform-field-label' for='input_66_7'><span class='gform-field-label__text'>Comments</span></label><div class='ginput_container ginput_container_textarea'><textarea name='input_7' id='input_66_7' class='textarea large'      aria-invalid="false"   rows='10' cols='50'></textarea></div></div><div id="field_66_14" class="gfield gfield--type-html gfield--input-type-html gfield--width-full gfield_html gfield_html_formatted gfield_no_follows_desc field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="9beeeb01" data-field-span="12">* required fields</div></div></div>
+        <div class='gform-footer gform_footer top_label'> <button type='submit' value='Submit' class='button button--primary' id='gform_submit_button_66'><span>Submit</span></button> 
+            <input type='hidden' class='gform_hidden' name='gform_submission_method' data-js='gform_submission_method_66' value='postback' />
+            <input type='hidden' class='gform_hidden' name='gform_theme' data-js='gform_theme_66' id='gform_theme_66' value='gravity-theme' />
+            <input type='hidden' class='gform_hidden' name='gform_style_settings' data-js='gform_style_settings_66' id='gform_style_settings_66' value='' />
+            <input type='hidden' class='gform_hidden' name='is_submit_66' value='1' />
+            <input type='hidden' class='gform_hidden' name='gform_submit' value='66' />
+            
+            <input type='hidden' class='gform_hidden' name='gform_currency' data-currency='USD' value='uo5uLW7Yp76auxKsCgfVD6OEBdufX6c3ckqbKU1v3YUyLRkxdiCEwJuDr6FDWcs2RjEbWHTNKERDLNDygu8XhL+7mH9tKQBQnBJzj3AU6+6mzW0=' />
+            <input type='hidden' class='gform_hidden' name='gform_unique_id' value='' />
+            <input type='hidden' class='gform_hidden' name='state_66' value='WyJ7XCJnZm9ybV9zdWJtaXNzaW9uX21ldGhvZFwiOltcIjliMGE2YzYzNzk3MDFkMDZlNzY0ZjI1MzJjZDUyZmE4XCIsXCIzNWEzZWJhNDNkNGI3MzBiYjc5YTc5ZTNiMzMyMThjOVwiXSxcImdmb3JtX3RoZW1lXCI6XCI4MDJiMDg2MzgyNTA3OTE3YzZmMjg4OTliNzRiZjAyYVwiLFwiZ2Zvcm1fc3R5bGVfc2V0dGluZ3NcIjpcImU0YWE5NTNiMzBhZjdmODRlM2I4YWM0ODQwZWYzZTdlXCIsXCJmb3JtX2lkXCI6XCI0MjU2NzEzMjM5ODlkNTFhZjg0ZmMzZDNjNGE4NWRkZFwiLFwidXJsXCI6XCIyYmRmYjhiMTQyMjVmZjEyMjE3Y2YzMmI1N2JlYzA1ZFwiLFwic3RhdGVfdGltZXN0YW1wXCI6XCI4MDY5ZGI1YTU3YTQ4Y2I1NzMwMzU0ODViMjhkZWIxOFwifSIsIjZhZTcyMWZlNmRkMzM5N2M0MDYxNWQxY2ZhYWMxMzEyIiwxNzk0MjQwNjE1XQ==' />
+            <input type='hidden' autocomplete='off' class='gform_hidden' name='gform_target_page_number_66' id='gform_target_page_number_66' value='0' />
+            <input type='hidden' autocomplete='off' class='gform_hidden' name='gform_source_page_number_66' id='gform_source_page_number_66' value='1' />
+            <input type='hidden' name='gform_field_values' value='' />
+            
+        </div>
+                        <p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_1" name="ak_js" value="79"/><script type="text/rocketlazyloadscript">
+document.getElementById( "ak_js_1" ).setAttribute( "value", ( new Date() ).getTime() );
+</script>
+</p></form>
+                        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+
+
+<div   class="testimonial testimonial-option-1">
+  <div class="testimonial__container">
+    <div class="testimonial__upper">
+      
+          </div>
+
+    <div class="testimonial__content">
+            
+      <div class="testimonial__content--description text-lead wysiwyg">
+        <p>By working together with other members of the community we can achieve results faster with less trial and error.</p>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+<div id="awebChromeHelper" data-version="1.24.3"></div>
+<div id="awebChromeHelper" data-version="1.24.3"></div>
+
+        <span class="testimonial__content--byline-name bold text-small">Shlomo Balass,</span><span class="testimonial__content--byline-title text-small"> Director of Cloud Engineering, Carnegie Mellon University</span>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<div  class="solutions-detail">
+    
+<nav class="skip-content" aria-label="Section">
+  <button class="button skip" tabindex="0" type="button" aria-label="Skip Section Content">
+   Skip Section Content
+  </button>
+</nav>  <div class="solutions-detail__container">
+              <div class="solutions-detail__row solutions-detail__row--3">
+              <h2 class="solutions-detail__content-title heading-5-update bold">CICP is a Cloudforce Multiplier</h2>
+              <div class="solutions-detail__content-body">
+          <p><em>What does “Cloudforce Multiplier” mean?</em></p>
+<p>The CICP is a community of peers which meets regularly to expand its members’ cloud expertise, capabilities, <i>and</i> capacities.  The CICP benefits IT leaders and their teams through:</p>
+<ul>
+<li class="fa-h5dkeg">
+<div class="fa927i2w"><b>Developing new skills</b>: The CICP community, Internet2 facilitators, and experts from cloud service providers are available to answer questions – big and small – about what your institution wants to do in the cloud.</div>
+</li>
+<li class="fa-h5dkeg"><b>Accelerating cloud adoption</b>: Leaders and their teams can offer more to their institution, more quickly thanks to knowledge from the experiences of community peers.</li>
+<li class="fa-h5dkeg"><b>Sharing technical substance</b>: Deep dives into AWS and GCP cloud services, problem solving, and sharing lessons learned within the community accelerates adoption, increases security, and can save money.</li>
+<li class="fa-h5dkeg"><b>Amplify your voice</b>: Collective and direct input to AWS and GCP can affect changes with cloud vendors.</li>
+<li class="fa-h5dkeg"><b>Stronger cloud partner relationships</b>: CICP engagement can drive stronger, more direct and more productive relationships between institutions and their cloud vendors</li>
+</ul>
+<div id="awebChromeHelper">
+<p>Community activities like <b>peer discussions</b>, <b>working groups</b>, <b>expert presentations, joint training</b> on timely topics are foundational to the <a href="https://internet2.edu/services/amazon-web-services/" target="_blank" rel="noopener noreferrer">NET+ Amazon Web Services (AWS</a>) and <a href="https://internet2.edu/services/google-cloud-platform/" target="_blank" rel="noopener noreferrer">NET+ Google Cloud Platform (GCP)</a> programs and core to the CICP.</p>
+<p>Our meetings include:</p>
+<ul>
+<li>Regular and curated strategy discussions</li>
+<li>Bi-weekly &#8220;open-mic&#8221; technology calls</li>
+<li>Topical webinars</li>
+<li>Deep-dives on challenges identified by members</li>
+</ul>
+<p>CICP members work together to focus our voice with cloud service providers. Together, small teams and individual institutions now have an opportunity for stronger, more direct, and more productive relationships with cloud vendors.</p>
+</div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+
+        </div>
+                        <div class="solutions-detail__content-image">
+          <img width="800" height="800" decoding="async" alt="CICP illustration" src="https://internet2.edu/wp-content/uploads/2024/10/cicp-illustration.png" />
+        </div>
+              </div>
+      </div>
+</div>
+
+
+<div   class="testimonial testimonial-option-2">
+  <div class="testimonial__container">
+    <div class="testimonial__upper">
+      
+          </div>
+
+    <div class="testimonial__content">
+            
+      <div class="testimonial__content--description text-lead wysiwyg">
+        <p><strong>CICP subscribers</strong> can now receive an annual voucher to use toward <a href="/cloud/cloud-learning-and-skills-sessions/class-events-schedule/" target="_blank" rel="noopener">CLASS training</a>. Voucher values vary by subscription tier and help reduce participation costs. To check your institution&#8217;s voucher balance or redeem it, please contact <a href="mailto:class@internet2.edu" target="_blank" rel="noopener">class@internet2.edu</a>.</p>
+<div id="awebChromeHelper" data-version="1.24.3"></div>
+
+        <span class="testimonial__content--byline-name bold text-small"></span><span class="testimonial__content--byline-title text-small"> </span>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<div  class="solutions-detail">
+    
+<nav class="skip-content" aria-label="Section">
+  <button class="button skip" tabindex="0" type="button" aria-label="Skip Section Content">
+   Skip Section Content
+  </button>
+</nav>  <div class="solutions-detail__container">
+              <div class="solutions-detail__row solutions-detail__row--1">
+              <h2 class="solutions-detail__content-title heading-5-update bold">CICP Benefits &#038; Fees</h2>
+              <div class="solutions-detail__content-body">
+          <p><strong>Benefits Include: </strong></p>
+<ul>
+<li><strong>Apply CICP</strong> <strong>training vouchers and discounts</strong> to participate in<strong> peer training cohorts</strong> for cloud certifications, or other skills through Internet2’s <a href="https://internet2.edu/class">Internet2 CLASS program</a>.</li>
+<li><strong>Gain insights</strong> into your institution’s cloud deployment <strong>by participating in Internet2’s <a href="https://spaces.at.internet2.edu/display/cicp/Cloud+Data+Benchmarking+Service" target="_blank" rel="noopener">Data Benchmarking Service</a></strong>. Compare usage data with peers, find data-driven ways to refine cloud efficiency, and identify leaders in specific cloud services to benefit from their expertise.</li>
+<li><b>Leverage Internet2 technical consulting</b>. CICP members can receive advice, a second opinion, pointers to resources, introductions to knowledgeable members, and other assistance to ideate on a solution, better understand an approach, or streamline an implementation from Internet2 staff.</li>
+<li><strong>Learn with and from peers and cloud experts</strong> through a variety of <a href="https://spaces.at.internet2.edu/x/AYc7EQ" target="_blank" rel="noopener">regularly scheduled calls and activities</a> on topics driven by community interest.</li>
+<li><strong>Confer with AWS and GCP technical experts</strong> who actively participate in CICP calls and who are available to share insights, and call upon experts from other parts of their organizations to benefit CICP members.</li>
+<li><b>Invite your community to participate</b> to maximize your institution’s CICP membership – IT professionals, engineers, researchers, IT leadership, educators and students.</li>
+</ul>
+<p><strong>CICP Dependent Services:</strong></p>
+<p>While any eligible organization may join the Cloud Infrastructure Community Program (CICP), institutional subscription to CICP is a requirement for all organizations participating in:</p>
+<ul>
+<li><a href="https://internet2.edu/services/amazon-web-services/" target="_blank" rel="noopener noreferrer" data-outlook-id="9ed013bd-fde0-4219-9bc0-83648b20db6c">NET+ AWS Service</a></li>
+</ul>
+<p><strong>Annual Fees:</strong></p>
+<figure class="wp-block-table" style="margin-bottom: 24px;">
+<table class="csvtohtml">
+<thead style="border-bottom: none; height: 72px;">
+<tr>
+<th style="background: #01616e; color: #fff; border-right: 1px solid #FFF; font-size: 1rem; font-weight: bold; text-align: center;">Carnegie Classification*</th>
+<th style="background: #01616e; color: #fff; border-right: 1px solid #FFF; font-size: 1rem; font-weight: bold; text-align: center;">Organizations without Carnegie Classification: Revenue Categories</th>
+<th style="background: #01616e; color: #fff; border-right: 1px solid #FFF; font-size: 1rem; font-weight: bold; text-align: center;">Internet2 Member Rate</th>
+<th style="background: #01616e; color: #fff; font-size: 1rem; font-weight: bold; text-align: center;">Non-Member Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background: #fafafa;">
+<td style="font-weight: 400; border: none; padding: 14px 0px; text-align: left;">Very High</td>
+<td style="border: none; text-align: center; padding: 14px 0;">≥$1B</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$7,000</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$8,400</td>
+</tr>
+<tr style="background: #fafafa;">
+<td style="font-weight: 400; border: none; padding: 14px 0px; text-align: left;">High</td>
+<td style="border: none; text-align: center; padding: 14px 0;">≥$500M-$1B</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$5,250</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$6,300</td>
+</tr>
+<tr style="background: #fafafa;">
+<td style="font-weight: 400; border: none; padding: 14px 0px; text-align: left;">Specialized Medical, Doctoral Research, Research, or Masters Large Program</td>
+<td style="border: none; text-align: center; padding: 14px 0;">≥$100M-$500M</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$2,800</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$3,100</td>
+</tr>
+<tr style="background: #fafafa;">
+<td style="font-weight: 400; border: none; padding: 14px 0px; text-align: left;">All Other Classifications, All Internet2 Affiliates, Federal Affiliates, or stand-alone System Offices</td>
+<td style="border: none; text-align: center; padding: 14px 0;">&lt;$100M</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$1,750</td>
+<td style="border: none; text-align: center; padding: 14px 0;">$2,100</td>
+</tr>
+</tbody>
+</table>
+</figure>
+<ul>
+<li>There is a <strong>one-time</strong> $1,000 registration fee for joining the program. If your organization signs the agreement without additional modifications, we will waive this registration fee in recognition of lowering our administrative and legal costs.</li>
+<li>Internet2 may consider a grant award for organizations based on need.</li>
+<li>The Cloud Infrastructure Community Program was previously known as Infrastructure and Platform Services (IPS) program, which featured a Participation Agreement (PA) and Participation Schedule (PS). Those still using the IPS are full subscribers to CICP as long as they have a valid PA and PS in place.</li>
+</ul>
+<p><em><strong>*Multi-Campus Institutions</strong>: If your organization comprises institutions with separate Carnegie Classifications, your Annual CICP Fees will be determined by the institution with the highest classification.</em></p>
+<p><!-- <sub>*Multi-Campus Institutions: If your organization comprises institutions with separate Carnegie Classifications, your Annual CICP Fees will be determined by the institution with the highest classification.</sub> --></p>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+
+        </div>
+                      </div>
+      </div>
+</div>
+
+
+<div   class="testimonial testimonial-option-1">
+  <div class="testimonial__container">
+    <div class="testimonial__upper">
+      
+          </div>
+
+    <div class="testimonial__content">
+            
+      <div class="testimonial__content--description text-lead wysiwyg">
+        <p>Regular networking with other participants and subject matter experts has accelerated knowledge transfer and cloud adoption for us &#8211; and we&#8217;d like to think other schools have learned from us at the same time.</p>
+<div id="awebChromeHelper" data-version="1.24.3"></div>
+<div id="awebChromeHelper" data-version="1.24.3"></div>
+<div id="awebChromeHelper" data-version="1.24.3"></div>
+
+        <span class="testimonial__content--byline-name bold text-small">Kevin Willey,</span><span class="testimonial__content--byline-title text-small">  Executive Director, Enterprise Technologies, Bucknell University</span>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<div  class="solutions-detail-extended">
+    
+<nav class="skip-content" aria-label="Learn More and Engage">
+  <button class="button skip" tabindex="0" type="button" aria-label="Skip Learn More and Engage Content">
+   Skip Learn More and Engage Content
+  </button>
+</nav>  <div class="solutions-detail-extended__container">
+    <div class="solutions-detail-extended__header">
+          <h2 class="heading-6-update bold">Learn More and Engage</h2>
+              </div>
+    <div class="solutions-detail-extended__rows">
+            <div class="solutions-detail-extended__row solutions-detail-extended__row--1">
+                        <div class="solutions-detail-extended__row-item">        
+          <div class="solutions-detail-extended__content-body">
+            <div class="x_elementToProof">Join fellow developers, researchers, educators, architects, engineers, and IT leaders as<br />
+    we work together to tackle common research and education challenges.</div>
+<p></p>
+<div class="x_elementToProof">Visit the <a id="OWA69d5dcf7-18c8-2656-d461-f5390debe762" class="x_OWAAutoLink"
+        title="https://spaces.at.internet2.edu/pages/viewpage.action?pageId=315130589"
+        href="https://spaces.at.internet2.edu/x/o4AfEw" target="_blank" rel="noopener"
+        data-outlook-id="ab8cf9e4-4025-4a6b-a081-a75555745bee">CICP program page</a> — a central location for the latest<br />
+    activities, blog posts, and benefits. You can see previous and upcoming community meetings and events and access the<br />
+    library of meeting recordings and associated assets on the <a id="OWA57006e11-a72c-3646-d719-411076effc1c"
+        class="x_OWAAutoLink"
+        title="https://spaces.at.internet2.edu/display/NPC/Cloud+Infrastructure+Community+Program+Calendar"
+        href="https://spaces.at.internet2.edu/x/AYc7EQ" target="_blank" rel="noopener"
+        data-outlook-id="a5c6fa47-c24f-4b3c-a94f-3e8eb739fc01">CICP Calendar</a>.</div>
+<p></p>
+<div class="x_elementToProof">To get started, email <a class="ms-outlook-linkify"
+        href="mailto:help@internet2.edu">help@internet2.edu</a> and ask for CICP or fill out the contact form below.
+</div>
+<p>&nbsp;</p>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+<div id="awebChromeHelper" data-version="1.23.2"></div>
+
+          </div>
+                  </div>
+              </div>
+        </div>
+  </div>
+</div>
+
+
+<div   class="testimonial testimonial-option-1">
+  <div class="testimonial__container">
+    <div class="testimonial__upper">
+      
+          </div>
+
+    <div class="testimonial__content">
+            
+      <div class="testimonial__content--description text-lead wysiwyg">
+        <p>We have a long tradition of community in higher education by collaborating and sharing our collective knowledge. It makes working in this industry so much more interesting and rewarding. The Cloud Infrastructure Community Program completely embodies that culture. When we look to implement a new approach or want to learn more about new offerings in the cloud space, there are always people ready to offer sound advice or tell us about their lessons learned.</p>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+<div id="awebChromeHelper"></div>
+
+        <span class="testimonial__content--byline-name bold text-small">Jim Thomas,</span><span class="testimonial__content--byline-title text-small"> Director of Enterprise Systems, Indiana University </span>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+
+<div  id="cicpsub"  aria-label="dsl label" class="dynamic-subscribers-list">
+    
+<nav class="skip-content" aria-label="dsl label">
+  <button class="button skip" tabindex="0" type="button" aria-label="Skip dsl label Content">
+   Skip dsl label Content
+  </button>
+</nav>  <div class="dynamic-subscribers-list__container">
+    <div class="dynamic-subscribers-list__upper">
+      <div class="dynamic-subscribers-list__upper--title-area">
+                      <h2 class="dynamic-subscribers-list__upper--title heading-3-update bold">Subscribers</h2>
+            </div>
+            <button class="dynamic-subscribers-list__expand" aria-expanded="false" aria-controls="dynamic-subscribers-list__lower">Open<span></span></button>
+    </div>
+
+    <div class="dynamic-subscribers-list__lower wysiwyg" aria-hidden="true">
+            <div class="dsl-subscriber">
+      <ul class="dsl-subscriber__list">
+        <li>Ball State University</li>
+        <li>Baylor College of Medicine</li>
+        <li>Baylor University</li>
+        <li>Bentley University</li>
+        <li>Boston University</li>
+        <li>Brandeis University</li>
+        <li>Bucknell University</li>
+        <li>Carnegie Mellon University</li>
+        <li>Case Western Reserve University</li>
+        <li>Chadron State College</li>
+        <li>Clemson University</li>
+        <li>College of the Ozarks</li>
+        <li>Cornell University</li>
+        <li>Drexel University</li>
+        <li>Fordham University</li>
+        <li>Franklin &#038; Marshall College</li>
+        <li>Georgetown University</li>
+        <li>Hamilton College</li>
+        <li>Idaho State University</li>
+        <li>Indiana University</li>
+        <li>Iowa State University</li>
+        <li>Kennesaw State University</li>
+        <li>Lawrence Berkeley National Laboratory (LBNL)</li>
+        <li>Lehigh University</li>
+        <li>Loyola Marymount University</li>
+        <li>Michigan State University</li>
+        <li>Michigan Technological University</li>
+        <li>Missouri University of Science and Technology</li>
+        <li>Montana State University &#8211; Bozeman</li>
+        <li>Moody Bible Institute of Chicago, The</li>
+        <li>National Institutes of Health (NIH)</li>
+        <li>Nebraska State College System Office</li>
+        <li>Northwestern University</li>
+        <li>Oakland University</li>
+        <li>Oklahoma State University &#8211; Main Campus</li>
+        <li>Old Dominion University</li>
+        <li>Parkland College</li>
+        <li>Penn State (Pennsylvania State University, The)</li>
+        <li>Peru State College</li>
+        <li>Portland State University</li>
+        <li>Soka University of America</li>
+        <li>South Dakota State University</li>
+        <li>Stanford University</li>
+        <li>Texas A&#038;M University</li>
+        <li>The J. Paul Getty Trust</li>
+        <li>Tufts University</li>
+        <li>Tulane University</li>
+        <li>UCAR / NCAR (University Corporation for Atmospheric Research)</li>
+        <li>University of Chicago</li>
+        <li>University of Colorado &#8211; Anschutz Medical Campus</li>
+        <li>University of Colorado &#8211; Boulder</li>
+        <li>University of Colorado &#8211; Colorado Springs</li>
+        <li>University of Colorado &#8211; Denver</li>
+        <li>University of Hawaii</li>
+        <li>University of Kansas</li>
+        <li>University of Kentucky</li>
+        <li>University of Louisville</li>
+        <li>University of Maryland &#8211; Baltimore</li>
+        <li>University of Maryland &#8211; Baltimore County</li>
+        <li>University of Minnesota &#8211; Twin Cities</li>
+        <li>University of Missouri &#8211; Columbia</li>
+        <li>University of Missouri &#8211; Kansas City</li>
+        <li>University of Missouri &#8211; Saint Louis</li>
+        <li>University of Missouri System</li>
+        <li>University of Nebraska &#8211; Kearney</li>
+        <li>University of Nebraska &#8211; Lincoln</li>
+        <li>University of Nebraska &#8211; Omaha</li>
+        <li>University of Nebraska Medical Center</li>
+        <li>University of Nebraska System</li>
+        <li>University of Nevada &#8211; Las Vegas</li>
+        <li>University of Oklahoma &#8211; Norman Campus</li>
+        <li>University of Rhode Island</li>
+        <li>University of South Florida</li>
+        <li>University of Southern California</li>
+        <li>University of Utah</li>
+        <li>University of Virginia</li>
+        <li>University of Washington</li>
+        <li>University of Wisconsin &#8211; Madison</li>
+        <li>Villanova University</li>
+        <li>Washington and Lee University</li>
+        <li>Washington University in Saint Louis</li>
+        <li>Wayne State College</li>
+        <li>Weill Cornell Medicine</li>
+        <li>West Virginia University</li>
+        <li>William and Mary</li>
+      </ul>
+  </div>
+          </div>
+  </div>
+</div>
+
+
+<div   class="dynamic-subscriber-information">
+    
+<nav class="skip-content" aria-label="Program Information">
+  <button class="button skip" tabindex="0" type="button" aria-label="Skip Program Information Content">
+   Skip Program Information Content
+  </button>
+</nav>  <div class="dynamic-subscriber-information__container">
+    <div class="dynamic-subscriber-information__upper">
+      <div class="dynamic-subscriber-information__upper--title-area">
+                
+              <h2 class="dynamic-subscriber-information__upper--title heading-3-update bold">Program Information</h2>
+            </div>
+    </div>
+
+    <div class="dynamic-subscriber-information__lower wysiwyg">
+            <div class="dsi-subscriber">
+  <table class="dsi-subscriber__table">
+    <tr>
+      <th>Eligible Subscribers:</th>
+      <td>U.S. Higher Education institutions; or Internet2 Higher Education Members, Affiliates, or Federal Affiliates, regardless of how or if you contract public cloud services. All other research and education organizations in the United States may be eligible at Internet2’s sole discretion.</td>
+    </tr>
+    <tr>
+      <th>Sponsors:</th>
+      <td>Internet2</td>
+    </tr>
+    <tr>
+      <th>Email:</th>
+      <td>help@internet2.edu</td>
+    </tr>
+    <tr>
+      <th>Contact:</th>
+      <td>Bob Flynn</td>
+    </tr>
+  </table>
+</div>
+          </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="mini-form"  >
+  <div class="mini-form__container">
+    <div class="mini-form__content">
+            <h2 class="heading-4-update mini-form__content-title">Getting Started With CICP</h2>
+                </div>
+    <div class="mini-form__form">
+      
+                <div class='gf_browser_unknown gform_wrapper gravity-theme gform-theme--no-framework' data-form-theme='gravity-theme' data-form-index='0' id='gform_wrapper_68' >
+                        <div class='gform_heading'>
+							<p class='gform_required_legend'></p>
+                        </div><form method='post' enctype='multipart/form-data'  id='gform_68'  action='/services/cloud-infrastructure-community-program/' data-formid='68' novalidate>
+                        <div class='gform-body gform_body'><div id='gform_fields_68' class='gform_fields top_label form_sublabel_below description_below validation_below' data-column-layout='fill'><fieldset id="field_68_1" class="gfield gfield--type-name gfield--input-type-name gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="5aa29ae3" data-field-span="12"><legend id='gfield_label_68_1' class='gfield_label gform-field-label gfield_label_before_complex' ><span class='gform-field-label__text'>Name</span><span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></legend><div class='ginput_complex ginput_container ginput_container--name no_prefix has_first_name no_middle_name has_last_name no_suffix gf_name_has_2 ginput_container_name gform-grid-row' id='input_68_1'>
+                            
+                            <span id='input_68_1_3_container' class='name_first gform-grid-col gform-grid-col--size-auto' >
+                                                    <input type='text' name='input_1.3' id='input_68_1_3' value=''   aria-required='true'     aria-labelledby="input_68_1_3_label gfield_label_68_1"/>
+                                                    <label for='input_68_1_3' id='input_68_1_3_label' class='gform-field-label gform-field-label--type-sub '>First</label>
+                                                </span>
+                            
+                            <span id='input_68_1_6_container' class='name_last gform-grid-col gform-grid-col--size-auto' >
+                                                    <input type='text' name='input_1.6' id='input_68_1_6' value=''   aria-required='true'     />
+                                                    <label for='input_68_1_6' id='input_68_1_6_label' class='gform-field-label gform-field-label--type-sub '>Last</label>
+                                                </span>
+                            
+                        </div></fieldset><div id="field_68_4" class="gfield gfield--type-text gfield--input-type-text gfield--width-full gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="f182553d" data-field-span="12"><label id='gfield_label_68_4' class='gfield_label gform-field-label' for='input_68_4'><span class='gform-field-label__text'>Your Organization</span><span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label><div class='ginput_container ginput_container_text'><input name='input_4' id='input_68_4' type='text' value='' class='large'     aria-required="true" aria-invalid="false"   /></div></div><div id="field_68_6" class="gfield gfield--type-html gfield--input-type-html gfield--width-full gfield_html gfield_html_formatted gfield_no_follows_desc field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_hidden" data-group-id="215f5025" data-field-span="12"><label class="gfield" style="margin-bottom: 0;">Selected Service</label>
+<p class="large-red">Cloud Infrastructure Community Program (CICP)</p></div><div id="field_68_5" class="gfield gfield--type-text gfield--input-type-text gfield--width-full field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_hidden" data-group-id="cc5a9135" data-field-span="12"><label id='gfield_label_68_5' class='gfield_label gform-field-label' for='input_68_5'><span class='gform-field-label__text'>Selected Service</span></label><div class='ginput_container ginput_container_text'><input name='input_5' id='input_68_5' type='text' value='Cloud Infrastructure Community Program (CICP)' class='large'      aria-invalid="false"   /></div></div><div id="field_68_3" class="gfield gfield--type-email gfield--input-type-email gfield_contains_required field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="adf49eb5" data-field-span="12"><label id='gfield_label_68_3' class='gfield_label gform-field-label' for='input_68_3'><span class='gform-field-label__text'>Email</span><span class="gfield_required"><span class="gfield_required gfield_required_asterisk">*</span></span></label><div class='ginput_container ginput_container_email'>
+                            <input name='input_3' id='input_68_3' type='email' value='' class='large'    aria-required="true" aria-invalid="false"  />
+                        </div></div><div id="field_68_7" class="gfield gfield--type-html gfield--input-type-html FAS-required gfield_html gfield_html_formatted gfield_no_follows_desc field_sublabel_below gfield--no-description field_description_below field_validation_below gfield_visibility_visible" data-group-id="e5d56306" data-field-span="12">* required fields</div></div></div>
+        <div class='gform-footer gform_footer top_label'> <div class='gform-btn-wrapper'><button type='submit' class='button button--primary' id='gform_submit_button_68'><span>Submit</span><?xml version='1.0' encoding='UTF-8'?></button></div> 
+            <input type='hidden' class='gform_hidden' name='gform_submission_method' data-js='gform_submission_method_68' value='postback' />
+            <input type='hidden' class='gform_hidden' name='gform_theme' data-js='gform_theme_68' id='gform_theme_68' value='gravity-theme' />
+            <input type='hidden' class='gform_hidden' name='gform_style_settings' data-js='gform_style_settings_68' id='gform_style_settings_68' value='' />
+            <input type='hidden' class='gform_hidden' name='is_submit_68' value='1' />
+            <input type='hidden' class='gform_hidden' name='gform_submit' value='68' />
+            
+            <input type='hidden' class='gform_hidden' name='gform_currency' data-currency='USD' value='LERnhXb2rYgsavIPWlDX76E6N9j2p6aae6BpHDsabiMBOt8dwD6Z5oo5aMLIEIFvLt/Vp/HLwfHZgrQGy17vueKyiU39x/zoLWZHBDlOWXejjEo=' />
+            <input type='hidden' class='gform_hidden' name='gform_unique_id' value='' />
+            <input type='hidden' class='gform_hidden' name='state_68' value='WyJ7XCJnZm9ybV9zdWJtaXNzaW9uX21ldGhvZFwiOltcIjliMGE2YzYzNzk3MDFkMDZlNzY0ZjI1MzJjZDUyZmE4XCIsXCIzNWEzZWJhNDNkNGI3MzBiYjc5YTc5ZTNiMzMyMThjOVwiXSxcImdmb3JtX3RoZW1lXCI6XCI4MDJiMDg2MzgyNTA3OTE3YzZmMjg4OTliNzRiZjAyYVwiLFwiZ2Zvcm1fc3R5bGVfc2V0dGluZ3NcIjpcImU0YWE5NTNiMzBhZjdmODRlM2I4YWM0ODQwZWYzZTdlXCIsXCJmb3JtX2lkXCI6XCI1M2ZkNzY5Nzc0YmE3ZGU4NzgwNDEyODU2YzgzMTljNlwiLFwidXJsXCI6XCIyYmRmYjhiMTQyMjVmZjEyMjE3Y2YzMmI1N2JlYzA1ZFwiLFwic3RhdGVfdGltZXN0YW1wXCI6XCI4ZjBmOWU0MDhmNjM1YmQ3MTNiNWRkMzhlOTA4YzE2NVwifSIsIjNmYTU4ZGY1MTBjOWUzNWNjNGY3MmZhYjI1OWZmMDQ0IiwxNzk0MjQwNjE3XQ==' />
+            <input type='hidden' autocomplete='off' class='gform_hidden' name='gform_target_page_number_68' id='gform_target_page_number_68' value='0' />
+            <input type='hidden' autocomplete='off' class='gform_hidden' name='gform_source_page_number_68' id='gform_source_page_number_68' value='1' />
+            <input type='hidden' name='gform_field_values' value='' />
+            
+        </div>
+                        <p style="display: none !important;" class="akismet-fields-container" data-prefix="ak_"><label>&#916;<textarea name="ak_hp_textarea" cols="45" rows="8" maxlength="100"></textarea></label><input type="hidden" id="ak_js_2" name="ak_js" value="193"/><script type="text/rocketlazyloadscript">
+document.getElementById( "ak_js_2" ).setAttribute( "value", ( new Date() ).getTime() );
+</script>
+</p></form>
+                        </div>
+    </div>
+  </div>
+</div>
+
+
+
+<p class="wp-block-paragraph"></p>
+
+</div>
+    </main>
+
+        
+<footer class="footer">
+  <div class="footer__top">
+    <div class="footer__top-container">
+      <a href="https://internet2.edu" class="footer__logo">
+        <img width="302" height="230" src="https://internet2.edu/wp-content/uploads/2020/01/internet2-white.png"  alt="Internet2 logo">
+      </a>
+
+      <div class="footer__social">
+        <h2 class="p bold footer__social-title">Follow Us:</h2>
+        <div class="footer__social-links">
+          <ul class="social">
+    <li class="social__item"><a class="social__link" rel="noreferrer" target="_blank" href="https://www.facebook.com/Internet2social"><span class="visually-hidden">Facebook</span><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path id="path-1_5_" d="M73.71 117.33v-48h14.57L90.67 48H73.71V37.61c0-5.49.14-10.94 7.82-10.94h7.77V11.41c0-.23-6.68-.75-13.43-.75-14.11 0-22.95 8.84-22.95 25.07V48H37.33v21.33h15.59v48h20.79z" fill-rule="evenodd" clip-rule="evenodd"/></svg></span></a></li>
+      <li class="social__item"><a class="social__link" rel="noreferrer" target="_blank" href="https://www.instagram.com/internet2social/"><span class="visually-hidden">Instagram</span><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path id="path-1_4_" d="M41.97 11.32c-8.68.39-16.21 2.51-22.28 8.57-6.1 6.08-8.19 13.64-8.59 22.23-.24 5.36-1.67 45.88 2.47 56.5 2.79 7.17 8.29 12.68 15.52 15.48 3.38 1.31 7.23 2.2 12.88 2.46 47.26 2.14 64.78.97 72.16-17.94 1.31-3.37 2.21-7.22 2.46-12.85 2.16-47.38-.35-57.65-8.59-65.88-6.52-6.52-14.21-10.96-66.03-8.57m.44 95.71c-5.17-.23-7.98-1.1-9.85-1.82-4.71-1.83-8.25-5.36-10.07-10.04-3.15-8.07-2.11-46.42-1.83-52.62.28-6.08 1.51-11.63 5.8-15.92 5.31-5.29 12.16-7.89 58.85-5.78 6.09.28 11.66 1.5 15.96 5.78 5.31 5.29 7.94 12.2 5.8 58.71-.23 5.16-1.1 7.96-1.83 9.83-4.82 12.3-15.87 14.01-62.83 11.86m43.4-71.35c0 3.5 2.85 6.35 6.37 6.35s6.37-2.85 6.37-6.35c0-3.5-2.86-6.35-6.37-6.35-3.52 0-6.37 2.84-6.37 6.35M36.6 63.94c0 15.01 12.2 27.18 27.25 27.18S91.1 78.95 91.1 63.94 78.9 36.76 63.85 36.76 36.6 48.92 36.6 63.94m9.56 0c0-9.74 7.92-17.64 17.69-17.64 9.77 0 17.69 7.9 17.69 17.64 0 9.75-7.92 17.65-17.69 17.65s-17.69-7.91-17.69-17.65" fill-rule="evenodd" clip-rule="evenodd"/></svg></span></a></li>
+      <li class="social__item"><a class="social__link" rel="noreferrer" target="_blank" href="https://www.linkedin.com/company/internet2/?viewAsMember=true"><span class="visually-hidden">LinkedIn</span><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><g id="Symbols_2_"><g id="footer_x2F_option_x5F_02_2_" transform="translate(-1099 -315)"><g id="Icon_x2F_Social_x2F_LinkedIn" transform="translate(1096 312)"><g id="Fill_2_"><path id="path-1_3_" d="M120.33 120.33H99V83.01c0-10.24-4.52-15.95-12.62-15.95-8.82 0-14.05 5.95-14.05 15.95v37.33H51V51h21.33v7.8s6.69-11.74 21.78-11.74 26.22 9.21 26.22 28.26v45.01zM26.69 39.91c-7.19 0-13.02-5.88-13.02-13.13 0-7.24 5.83-13.12 13.02-13.12 7.19 0 13.02 5.88 13.02 13.12 0 7.25-5.83 13.13-13.02 13.13zm-13.02 80.42h26.67V51H13.67v69.33z" fill-rule="evenodd" clip-rule="evenodd"/></g></g></g></g></svg></span></a></li>
+        <li class="social__item"><a class="social__link" rel="noreferrer" target="_blank" href="https://www.youtube.com/channel/UC6gxuEGpxW07lUFD0IEpRQA"><span class="visually-hidden">YouTube</span><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path id="path-1_1_" d="M53.27 77.79V47.86c10.63 5 18.85 9.83 28.59 15.04-8.03 4.45-17.96 9.44-28.59 14.89m59.22-44.81c-1.83-2.41-4.96-4.29-8.28-4.91-9.78-1.86-70.76-1.86-80.53 0-2.67.5-5.04 1.71-7.08 3.58-8.6 7.98-5.9 50.76-3.83 57.69.87 3 2 5.16 3.42 6.58 1.83 1.88 4.33 3.17 7.2 3.75 8.05 1.66 49.51 2.6 80.65.25 2.87-.5 5.41-1.83 7.41-3.79 7.94-7.95 7.4-53.13 1.04-63.15" fill-rule="evenodd" clip-rule="evenodd"/></svg></span></a></li>
+  </ul>        </div>
+      </div>
+
+      <div class="footer__nav">
+                <ul class="footer__nav-container">
+                    <li class="footer__nav-item  menu-item menu-item-type-custom menu-item-object-custom menu-item-72 menu-item-has-children">
+            <a class="heading-5 footer__nav-link"  href="/community/about-us/">About Us</a>
+                        <ul class="footer__nav-subnav">
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/about-us/membership/">Membership</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/news">News</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/about-us/executive-leadership">Executive Leadership</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/about-us/media-resources/">Media Resources</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/careers/">Careers</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/about-us/policies/">Policies</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/contact-us/">Help</a>
+              </li>
+                          </ul>
+                      </li>
+                    <li class="footer__nav-item  menu-item menu-item-type-custom menu-item-object-custom menu-item-73 menu-item-has-children">
+            <a class="heading-5 footer__nav-link"  href="/network/">Network</a>
+                        <ul class="footer__nav-subnav">
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/network/networking-cloud/">Networking for Cloud</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/network/operations-and-support">Operations and Support</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/network/state-and-regional-r-e-networks/">State and Regional R&E Networks</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="https://internet2.edu/network/initiatives-partnerships/insight-console/">Insight Console</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/security/performance-analytics/">Performance & Analytics Tools</a>
+              </li>
+                          </ul>
+                      </li>
+                    <li class="footer__nav-item  menu-item menu-item-type-custom menu-item-object-custom menu-item-74 menu-item-has-children">
+            <a class="heading-5 footer__nav-link"  href="/security/">Security</a>
+                        <ul class="footer__nav-subnav">
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/security/security-cloud-services/">Security Cloud Services</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="https://internet2.edu/security/identity-and-access-management/">Identity and Access Management</a>
+              </li>
+                          </ul>
+                      </li>
+                    <li class="footer__nav-item  menu-item menu-item-type-custom menu-item-object-custom menu-item-75 menu-item-has-children">
+            <a class="heading-5 footer__nav-link"  href="/cloud/">Cloud</a>
+                        <ul class="footer__nav-subnav">
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/cloud/internet2-net-plus-services/">NET+ Cloud Services</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/services/cloud-connect/">Cloud Connect</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/cloud/internet2-net-plus-services/cloud-scorecard/">Cloud Scorecard</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/cloud/cloud-learning-and-skills-sessions/">Cloud Learning and Skills Sessions (CLASS)</a>
+              </li>
+                          </ul>
+                      </li>
+                    <li class="footer__nav-item  menu-item menu-item-type-custom menu-item-object-custom menu-item-76 menu-item-has-children">
+            <a class="heading-5 footer__nav-link"  href="/community/">Community</a>
+                        <ul class="footer__nav-subnav">
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/research-engagement/">Research Engagement</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/community-group-list/">Community Groups</a>
+              </li>
+                            <li class="footer__nav-subnav-item">
+                <a class="text-small footer__nav-subnav-link"  href="/community/community-anchor-program/">Community Anchor Program</a>
+              </li>
+                          </ul>
+                      </li>
+                  </ul>
+              </div>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="footer__bottom-container">
+      <ul class="footer__copyright">
+        <li>&copy; 2026 Internet2</li>
+                <li><a  href="/community/about-us/policies/privacy/">Privacy Statement</a></li>
+                <li><a  href="/community/about-us/policies/terms-of-use/">Terms of Use</a></li>
+                <li><a  target="_blank" href="https://internet2.edu/sitemap_index.xml">Sitemap</a></li>
+                <li><a target="_blank" rel="noreferrer" href="https://fireantstudio.com/">Site Design by FIREANT STUDIO</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>    
+    
+    
+        <script type="text/rocketlazyloadscript">
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-349565-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    
+    <script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/fas-base/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<script type="text/rocketlazyloadscript" id="bodhi-dompurify-library-js" data-rocket-src="https://internet2.edu/wp-content/plugins/svg-support/vendor/DOMPurify/DOMPurify.min.js?ver=2.5.9"></script>
+<script id="bodhi_svg_inline-js-extra">
+var svgSettings = {"skipNested":""};
+//# sourceURL=bodhi_svg_inline-js-extra
+</script>
+<script type="text/rocketlazyloadscript" id="bodhi_svg_inline-js" data-rocket-src="https://internet2.edu/wp-content/plugins/svg-support/js/min/svgs-inline-min.js?ver=2.6.1"></script>
+<script type="text/rocketlazyloadscript" id="bodhi_svg_inline-js-after">
+cssTarget={"Bodhi":"img.style-svg","ForceInlineSVG":"style-svg"};ForceInlineSVGActive="false";frontSanitizationEnabled="on";
+//# sourceURL=bodhi_svg_inline-js-after
+</script>
+<script type="text/rocketlazyloadscript" id="rocket-browser-checker-js-after">
+"use strict";var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||!1,descriptor.configurable=!0,"value"in descriptor&&(descriptor.writable=!0),Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){return protoProps&&defineProperties(Constructor.prototype,protoProps),staticProps&&defineProperties(Constructor,staticProps),Constructor}}();function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor))throw new TypeError("Cannot call a class as a function")}var RocketBrowserCompatibilityChecker=function(){function RocketBrowserCompatibilityChecker(options){_classCallCheck(this,RocketBrowserCompatibilityChecker),this.passiveSupported=!1,this._checkPassiveOption(this),this.options=!!this.passiveSupported&&options}return _createClass(RocketBrowserCompatibilityChecker,[{key:"_checkPassiveOption",value:function(self){try{var options={get passive(){return!(self.passiveSupported=!0)}};window.addEventListener("test",null,options),window.removeEventListener("test",null,options)}catch(err){self.passiveSupported=!1}}},{key:"initRequestIdleCallback",value:function(){!1 in window&&(window.requestIdleCallback=function(cb){var start=Date.now();return setTimeout(function(){cb({didTimeout:!1,timeRemaining:function(){return Math.max(0,50-(Date.now()-start))}})},1)}),!1 in window&&(window.cancelIdleCallback=function(id){return clearTimeout(id)})}},{key:"isDataSaverModeOn",value:function(){return"connection"in navigator&&!0===navigator.connection.saveData}},{key:"supportsLinkPrefetch",value:function(){var elem=document.createElement("link");return elem.relList&&elem.relList.supports&&elem.relList.supports("prefetch")&&window.IntersectionObserver&&"isIntersecting"in IntersectionObserverEntry.prototype}},{key:"isSlowConnection",value:function(){return"connection"in navigator&&"effectiveType"in navigator.connection&&("2g"===navigator.connection.effectiveType||"slow-2g"===navigator.connection.effectiveType)}}]),RocketBrowserCompatibilityChecker}();
+//# sourceURL=rocket-browser-checker-js-after
+</script>
+<script id="rocket-preload-links-js-extra">
+var RocketPreloadLinksConfig = {"excludeUris":"/(?:.+/)?feed(?:/(?:.+/?)?)?$|/(?:.+/)?embed/|/(index.php/)?(.*)wp-json(/.*|$)|/refer/|/go/|/recommend/|/recommends/","usesTrailingSlash":"1","imageExt":"jpg|jpeg|gif|png|tiff|bmp|webp|avif|pdf|doc|docx|xls|xlsx|php","fileExt":"jpg|jpeg|gif|png|tiff|bmp|webp|avif|pdf|doc|docx|xls|xlsx|php|html|htm","siteUrl":"https://internet2.edu","onHoverDelay":"100","rateThrottle":"3"};
+//# sourceURL=rocket-preload-links-js-extra
+</script>
+<script type="text/rocketlazyloadscript" id="rocket-preload-links-js-after">
+(function() {
+"use strict";var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},e=function(){function i(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(e,t,n){return t&&i(e.prototype,t),n&&i(e,n),e}}();function i(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var t=function(){function n(e,t){i(this,n),this.browser=e,this.config=t,this.options=this.browser.options,this.prefetched=new Set,this.eventTime=null,this.threshold=1111,this.numOnHover=0}return e(n,[{key:"init",value:function(){!this.browser.supportsLinkPrefetch()||this.browser.isDataSaverModeOn()||this.browser.isSlowConnection()||(this.regex={excludeUris:RegExp(this.config.excludeUris,"i"),images:RegExp(".("+this.config.imageExt+")$","i"),fileExt:RegExp(".("+this.config.fileExt+")$","i")},this._initListeners(this))}},{key:"_initListeners",value:function(e){-1<this.config.onHoverDelay&&document.addEventListener("mouseover",e.listener.bind(e),e.listenerOptions),document.addEventListener("mousedown",e.listener.bind(e),e.listenerOptions),document.addEventListener("touchstart",e.listener.bind(e),e.listenerOptions)}},{key:"listener",value:function(e){var t=e.target.closest("a"),n=this._prepareUrl(t);if(null!==n)switch(e.type){case"mousedown":case"touchstart":this._addPrefetchLink(n);break;case"mouseover":this._earlyPrefetch(t,n,"mouseout")}}},{key:"_earlyPrefetch",value:function(t,e,n){var i=this,r=setTimeout(function(){if(r=null,0===i.numOnHover)setTimeout(function(){return i.numOnHover=0},1e3);else if(i.numOnHover>i.config.rateThrottle)return;i.numOnHover++,i._addPrefetchLink(e)},this.config.onHoverDelay);t.addEventListener(n,function e(){t.removeEventListener(n,e,{passive:!0}),null!==r&&(clearTimeout(r),r=null)},{passive:!0})}},{key:"_addPrefetchLink",value:function(i){return this.prefetched.add(i.href),new Promise(function(e,t){var n=document.createElement("link");n.rel="prefetch",n.href=i.href,n.onload=e,n.onerror=t,document.head.appendChild(n)}).catch(function(){})}},{key:"_prepareUrl",value:function(e){if(null===e||"object"!==(void 0===e?"undefined":r(e))||!1 in e||-1===["http:","https:"].indexOf(e.protocol))return null;var t=e.href.substring(0,this.config.siteUrl.length),n=this._getPathname(e.href,t),i={original:e.href,protocol:e.protocol,origin:t,pathname:n,href:t+n};return this._isLinkOk(i)?i:null}},{key:"_getPathname",value:function(e,t){var n=t?e.substring(this.config.siteUrl.length):e;return n.startsWith("/")||(n="/"+n),this._shouldAddTrailingSlash(n)?n+"/":n}},{key:"_shouldAddTrailingSlash",value:function(e){return this.config.usesTrailingSlash&&!e.endsWith("/")&&!this.regex.fileExt.test(e)}},{key:"_isLinkOk",value:function(e){return null!==e&&"object"===(void 0===e?"undefined":r(e))&&(!this.prefetched.has(e.href)&&e.origin===this.config.siteUrl&&-1===e.href.indexOf("?")&&-1===e.href.indexOf("#")&&!this.regex.excludeUris.test(e.href)&&!this.regex.images.test(e.href))}}],[{key:"run",value:function(){"undefined"!=typeof RocketPreloadLinksConfig&&new n(new RocketBrowserCompatibilityChecker({capture:!0,passive:!0}),RocketPreloadLinksConfig).init()}}]),n}();t.run();
+}());
+
+//# sourceURL=rocket-preload-links-js-after
+</script>
+<script id="rocket_lazyload_css-js-extra">
+var rocket_lazyload_css_data = {"threshold":"300"};
+//# sourceURL=rocket_lazyload_css-js-extra
+</script>
+<script id="rocket_lazyload_css-js-after">
+!function o(n,a,c){function l(t,e){if(!a[t]){if(!n[t]){var r="function"==typeof require&&require;if(!e&&r)return r(t,!0);if(u)return u(t,!0);throw(e=new Error("Cannot find module '"+t+"'")).code="MODULE_NOT_FOUND",e}r=a[t]={exports:{}},n[t][0].call(r.exports,function(e){return l(n[t][1][e]||e)},r,r.exports,o,n,a,c)}return a[t].exports}for(var u="function"==typeof require&&require,e=0;e<c.length;e++)l(c[e]);return l}({1:[function(e,t,r){{let r="undefined"==typeof rocket_pairs?[]:rocket_pairs,o=(("undefined"==typeof rocket_excluded_pairs?[]:rocket_excluded_pairs).map(t=>{var e=t.selector;document.querySelectorAll(e).forEach(e=>{e.setAttribute("data-rocket-lazy-bg-"+t.hash,"excluded")})}),document.querySelector("#wpr-lazyload-bg-container"));var a=rocket_lazyload_css_data.threshold||300;let n=new IntersectionObserver(e=>{e.forEach(t=>{t.isIntersecting&&r.filter(e=>t.target.matches(e.selector)).map(t=>{var e;t&&((e=document.createElement("style")).textContent=t.style,o.insertAdjacentElement("afterend",e),t.elements.forEach(e=>{n.unobserve(e),e.setAttribute("data-rocket-lazy-bg-"+t.hash,"loaded")}))})})},{rootMargin:a+"px"});function c(){0<(0<arguments.length&&void 0!==arguments[0]?arguments[0]:[]).length&&r.forEach(t=>{try{document.querySelectorAll(t.selector).forEach(e=>{"loaded"!==e.getAttribute("data-rocket-lazy-bg-"+t.hash)&&"excluded"!==e.getAttribute("data-rocket-lazy-bg-"+t.hash)&&(n.observe(e),(t.elements||=[]).push(e))})}catch(e){console.error(e)}})}c(),(()=>{let r=window.MutationObserver;return function(e,t){if(e&&1===e.nodeType)return(t=new r(t)).observe(e,{attributes:!0,childList:!0,subtree:!0}),t}})()(document.querySelector("body"),c)}},{}]},{},[1]);
+//# sourceURL=rocket_lazyload_css-js-after
+</script>
+<script type="text/rocketlazyloadscript" id="sort-table-js" data-rocket-src="https://internet2.edu/wp-content/themes/fas-base/assets/js/sort-table.min.js?ver=1784923744"></script>
+<script type="text/rocketlazyloadscript" id="vendor-js" data-rocket-src="https://internet2.edu/wp-content/themes/fas-base/assets/js/vendor.min.js?ver=1790110327"></script>
+<script type="text/rocketlazyloadscript" data-minify="1" id="scrolllock-js" data-rocket-src="https://internet2.edu/wp-content/cache/min/1/npm/body-scroll-lock@2.6.1/lib/bodyScrollLock.min.js?ver=1792780723"></script>
+<script type="text/rocketlazyloadscript" id="script-js" data-rocket-src="https://internet2.edu/wp-content/themes/fas-base/assets/js/script.min.js?ver=1792091428"></script>
+<script type="text/rocketlazyloadscript" id="wp-dom-ready-js" data-rocket-src="https://internet2.edu/wp-includes/js/dist/dom-ready.min.js?ver=3fe927cab37bf38d6a23"></script>
+<script type="text/rocketlazyloadscript" id="wp-hooks-js" data-rocket-src="https://internet2.edu/wp-includes/js/dist/hooks.min.js?ver=f0f188028580e8dc1255"></script>
+<script type="text/rocketlazyloadscript" id="wp-i18n-js" data-rocket-src="https://internet2.edu/wp-includes/js/dist/i18n.min.js?ver=1dfe7db3940c23ea9216"></script>
+<script type="text/rocketlazyloadscript" id="wp-i18n-js-after">
+wp.i18n.setLocaleData( { 'text direction\u0004ltr': [ 'ltr' ] } );
+//# sourceURL=wp-i18n-js-after
+</script>
+<script type="text/rocketlazyloadscript" id="wp-a11y-js" data-rocket-src="https://internet2.edu/wp-includes/js/dist/a11y.min.js?ver=31c6cec5a4ff7aff483d"></script>
+<script id="gform_json-js" defer='defer' src="https://internet2.edu/wp-content/plugins/gravityforms/js/jquery.json.min.js?ver=3.2.0"></script>
+<script id="gform_gravityforms-js-extra">
+var gform_i18n = {"datepicker":{"wdOffset":1,"helpTextShort":"Press F1 for help","helpText":"Press the arrow keys to navigate by day, PageUp and PageDown to navigate by month, Alt+PageUp and Alt+PageDown to navigate by year, or Escape to cancel.","openOnFocusHelpText":"Press Down arrow to browse the calendar, or Escape to close.","tooltipTxt":"Press Escape to cancel","disabledTxt":"Disabled","markedTxt":"Selected","prevTxt":"Previous","nextTxt":"Next","monthTxt":"Month","yearTxt":"Year","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"days":[{"s":"S","l":"Sunday"},{"s":"M","l":"Monday"},{"s":"T","l":"Tuesday"},{"s":"W","l":"Wednesday"},{"s":"T","l":"Thursday"},{"s":"F","l":"Friday"},{"s":"S","l":"Saturday"}]}};
+var gf_legacy_multi = [];
+var gform_gravityforms = {"strings":{"invalid_file_extension":"This type of file is not allowed. Must be one of the following:","file_uploaded":"File uploaded","delete_file":"Delete this file","in_progress":"in progress","file_exceeds_limit":"File exceeds size limit","illegal_extension":"This type of file is not allowed.","max_reached":"Maximum number of files reached","unknown_error":"There was a problem while saving the file on the server","currently_uploading":"Please wait for the uploading to complete","cancel":"Cancel","cancel_upload":"Cancel this upload","cancelled":"Cancelled","error":"Error","message":"Message"},"vars":{"images_url":"https://internet2.edu/wp-content/plugins/gravityforms/images"}};
+var gf_global = {"gf_currency_config":{"name":"U.S. Dollar","symbol_left":"$","symbol_right":"","symbol_padding":"","thousand_separator":",","decimal_separator":".","decimals":2,"code":"USD"},"base_url":"https://internet2.edu/wp-content/plugins/gravityforms","number_formats":[],"version_hash":"c270d31ceacccc30a88900da23d3edfb","countries":{"AF":"Afghanistan","AX":"\u00c5land Islands","AL":"Albania","DZ":"Algeria","AS":"American Samoa","AD":"Andorra","AO":"Angola","AI":"Anguilla","AQ":"Antarctica","AG":"Antigua and Barbuda","AR":"Argentina","AM":"Armenia","AW":"Aruba","AU":"Australia","AT":"Austria","AZ":"Azerbaijan","BS":"Bahamas","BH":"Bahrain","BD":"Bangladesh","BB":"Barbados","BY":"Belarus","BE":"Belgium","BZ":"Belize","BJ":"Benin","BM":"Bermuda","BT":"Bhutan","BO":"Bolivia","BQ":"Bonaire, Sint Eustatius and Saba","BA":"Bosnia and Herzegovina","BW":"Botswana","BV":"Bouvet Island","BR":"Brazil","IO":"British Indian Ocean Territory","BN":"Brunei Darussalam","BG":"Bulgaria","BF":"Burkina Faso","BI":"Burundi","CV":"Cabo Verde","KH":"Cambodia","CM":"Cameroon","CA":"Canada","KY":"Cayman Islands","CF":"Central African Republic","TD":"Chad","CL":"Chile","CN":"China","CX":"Christmas Island","CC":"Cocos Islands","CO":"Colombia","KM":"Comoros","CD":"Congo, Democratic Republic of the","CG":"Congo","CK":"Cook Islands","CR":"Costa Rica","CI":"C\u00f4te d'Ivoire","HR":"Croatia","CU":"Cuba","CW":"Cura\u00e7ao","CY":"Cyprus","CZ":"Czechia","DK":"Denmark","DJ":"Djibouti","DM":"Dominica","DO":"Dominican Republic","EC":"Ecuador","EG":"Egypt","SV":"El Salvador","GQ":"Equatorial Guinea","ER":"Eritrea","EE":"Estonia","SZ":"Eswatini","ET":"Ethiopia","FK":"Falkland Islands","FO":"Faroe Islands","FJ":"Fiji","FI":"Finland","FR":"France","GF":"French Guiana","PF":"French Polynesia","TF":"French Southern Territories","GA":"Gabon","GM":"Gambia","GE":"Georgia","DE":"Germany","GH":"Ghana","GI":"Gibraltar","GR":"Greece","GL":"Greenland","GD":"Grenada","GP":"Guadeloupe","GU":"Guam","GT":"Guatemala","GG":"Guernsey","GN":"Guinea","GW":"Guinea-Bissau","GY":"Guyana","HT":"Haiti","HM":"Heard Island and McDonald Islands","VA":"Holy See","HN":"Honduras","HK":"Hong Kong","HU":"Hungary","IS":"Iceland","IN":"India","ID":"Indonesia","IR":"Iran","IQ":"Iraq","IE":"Ireland","IM":"Isle of Man","IL":"Israel","IT":"Italy","JM":"Jamaica","JP":"Japan","JE":"Jersey","JO":"Jordan","KZ":"Kazakhstan","KE":"Kenya","KI":"Kiribati","KP":"Korea, Democratic People's Republic of","KR":"Korea, Republic of","KW":"Kuwait","KG":"Kyrgyzstan","LA":"Lao People's Democratic Republic","LV":"Latvia","LB":"Lebanon","LS":"Lesotho","LR":"Liberia","LY":"Libya","LI":"Liechtenstein","LT":"Lithuania","LU":"Luxembourg","MO":"Macao","MG":"Madagascar","MW":"Malawi","MY":"Malaysia","MV":"Maldives","ML":"Mali","MT":"Malta","MH":"Marshall Islands","MQ":"Martinique","MR":"Mauritania","MU":"Mauritius","YT":"Mayotte","MX":"Mexico","FM":"Micronesia","MD":"Moldova","MC":"Monaco","MN":"Mongolia","ME":"Montenegro","MS":"Montserrat","MA":"Morocco","MZ":"Mozambique","MM":"Myanmar","NA":"Namibia","NR":"Nauru","NP":"Nepal","NL":"Netherlands","NC":"New Caledonia","NZ":"New Zealand","NI":"Nicaragua","NE":"Niger","NG":"Nigeria","NU":"Niue","NF":"Norfolk Island","MK":"North Macedonia","MP":"Northern Mariana Islands","NO":"Norway","OM":"Oman","PK":"Pakistan","PW":"Palau","PS":"Palestine, State of","PA":"Panama","PG":"Papua New Guinea","PY":"Paraguay","PE":"Peru","PH":"Philippines","PN":"Pitcairn","PL":"Poland","PT":"Portugal","PR":"Puerto Rico","QA":"Qatar","RE":"R\u00e9union","RO":"Romania","RU":"Russian Federation","RW":"Rwanda","BL":"Saint Barth\u00e9lemy","SH":"Saint Helena, Ascension and Tristan da Cunha","KN":"Saint Kitts and Nevis","LC":"Saint Lucia","MF":"Saint Martin","PM":"Saint Pierre and Miquelon","VC":"Saint Vincent and the Grenadines","WS":"Samoa","SM":"San Marino","ST":"Sao Tome and Principe","SA":"Saudi Arabia","SN":"Senegal","RS":"Serbia","SC":"Seychelles","SL":"Sierra Leone","SG":"Singapore","SX":"Sint Maarten","SK":"Slovakia","SI":"Slovenia","SB":"Solomon Islands","SO":"Somalia","ZA":"South Africa","GS":"South Georgia and the South Sandwich Islands","SS":"South Sudan","ES":"Spain","LK":"Sri Lanka","SD":"Sudan","SR":"Suriname","SJ":"Svalbard and Jan Mayen","SE":"Sweden","CH":"Switzerland","SY":"Syria Arab Republic","TW":"Taiwan","TJ":"Tajikistan","TZ":"Tanzania, the United Republic of","TH":"Thailand","TL":"Timor-Leste","TG":"Togo","TK":"Tokelau","TO":"Tonga","TT":"Trinidad and Tobago","TN":"Tunisia","TR":"T\u00fcrkiye","TM":"Turkmenistan","TC":"Turks and Caicos Islands","TV":"Tuvalu","UG":"Uganda","UA":"Ukraine","AE":"United Arab Emirates","GB":"United Kingdom","US":"United States","UY":"Uruguay","UM":"US Minor Outlying Islands","UZ":"Uzbekistan","VU":"Vanuatu","VE":"Venezuela","VN":"Viet Nam","VG":"Virgin Islands, British","VI":"Virgin Islands, U.S.","WF":"Wallis and Futuna","EH":"Western Sahara","YE":"Yemen","ZM":"Zambia","ZW":"Zimbabwe"},"strings":{"newRowAdded":"New row added.","rowRemoved":"Row removed","formSaved":"The form has been saved.  The content contains the link to return and complete the form."}};
+var gf_global = {"gf_currency_config":{"name":"U.S. Dollar","symbol_left":"$","symbol_right":"","symbol_padding":"","thousand_separator":",","decimal_separator":".","decimals":2,"code":"USD"},"base_url":"https://internet2.edu/wp-content/plugins/gravityforms","number_formats":[],"version_hash":"c270d31ceacccc30a88900da23d3edfb","countries":{"AF":"Afghanistan","AX":"\u00c5land Islands","AL":"Albania","DZ":"Algeria","AS":"American Samoa","AD":"Andorra","AO":"Angola","AI":"Anguilla","AQ":"Antarctica","AG":"Antigua and Barbuda","AR":"Argentina","AM":"Armenia","AW":"Aruba","AU":"Australia","AT":"Austria","AZ":"Azerbaijan","BS":"Bahamas","BH":"Bahrain","BD":"Bangladesh","BB":"Barbados","BY":"Belarus","BE":"Belgium","BZ":"Belize","BJ":"Benin","BM":"Bermuda","BT":"Bhutan","BO":"Bolivia","BQ":"Bonaire, Sint Eustatius and Saba","BA":"Bosnia and Herzegovina","BW":"Botswana","BV":"Bouvet Island","BR":"Brazil","IO":"British Indian Ocean Territory","BN":"Brunei Darussalam","BG":"Bulgaria","BF":"Burkina Faso","BI":"Burundi","CV":"Cabo Verde","KH":"Cambodia","CM":"Cameroon","CA":"Canada","KY":"Cayman Islands","CF":"Central African Republic","TD":"Chad","CL":"Chile","CN":"China","CX":"Christmas Island","CC":"Cocos Islands","CO":"Colombia","KM":"Comoros","CD":"Congo, Democratic Republic of the","CG":"Congo","CK":"Cook Islands","CR":"Costa Rica","CI":"C\u00f4te d'Ivoire","HR":"Croatia","CU":"Cuba","CW":"Cura\u00e7ao","CY":"Cyprus","CZ":"Czechia","DK":"Denmark","DJ":"Djibouti","DM":"Dominica","DO":"Dominican Republic","EC":"Ecuador","EG":"Egypt","SV":"El Salvador","GQ":"Equatorial Guinea","ER":"Eritrea","EE":"Estonia","SZ":"Eswatini","ET":"Ethiopia","FK":"Falkland Islands","FO":"Faroe Islands","FJ":"Fiji","FI":"Finland","FR":"France","GF":"French Guiana","PF":"French Polynesia","TF":"French Southern Territories","GA":"Gabon","GM":"Gambia","GE":"Georgia","DE":"Germany","GH":"Ghana","GI":"Gibraltar","GR":"Greece","GL":"Greenland","GD":"Grenada","GP":"Guadeloupe","GU":"Guam","GT":"Guatemala","GG":"Guernsey","GN":"Guinea","GW":"Guinea-Bissau","GY":"Guyana","HT":"Haiti","HM":"Heard Island and McDonald Islands","VA":"Holy See","HN":"Honduras","HK":"Hong Kong","HU":"Hungary","IS":"Iceland","IN":"India","ID":"Indonesia","IR":"Iran","IQ":"Iraq","IE":"Ireland","IM":"Isle of Man","IL":"Israel","IT":"Italy","JM":"Jamaica","JP":"Japan","JE":"Jersey","JO":"Jordan","KZ":"Kazakhstan","KE":"Kenya","KI":"Kiribati","KP":"Korea, Democratic People's Republic of","KR":"Korea, Republic of","KW":"Kuwait","KG":"Kyrgyzstan","LA":"Lao People's Democratic Republic","LV":"Latvia","LB":"Lebanon","LS":"Lesotho","LR":"Liberia","LY":"Libya","LI":"Liechtenstein","LT":"Lithuania","LU":"Luxembourg","MO":"Macao","MG":"Madagascar","MW":"Malawi","MY":"Malaysia","MV":"Maldives","ML":"Mali","MT":"Malta","MH":"Marshall Islands","MQ":"Martinique","MR":"Mauritania","MU":"Mauritius","YT":"Mayotte","MX":"Mexico","FM":"Micronesia","MD":"Moldova","MC":"Monaco","MN":"Mongolia","ME":"Montenegro","MS":"Montserrat","MA":"Morocco","MZ":"Mozambique","MM":"Myanmar","NA":"Namibia","NR":"Nauru","NP":"Nepal","NL":"Netherlands","NC":"New Caledonia","NZ":"New Zealand","NI":"Nicaragua","NE":"Niger","NG":"Nigeria","NU":"Niue","NF":"Norfolk Island","MK":"North Macedonia","MP":"Northern Mariana Islands","NO":"Norway","OM":"Oman","PK":"Pakistan","PW":"Palau","PS":"Palestine, State of","PA":"Panama","PG":"Papua New Guinea","PY":"Paraguay","PE":"Peru","PH":"Philippines","PN":"Pitcairn","PL":"Poland","PT":"Portugal","PR":"Puerto Rico","QA":"Qatar","RE":"R\u00e9union","RO":"Romania","RU":"Russian Federation","RW":"Rwanda","BL":"Saint Barth\u00e9lemy","SH":"Saint Helena, Ascension and Tristan da Cunha","KN":"Saint Kitts and Nevis","LC":"Saint Lucia","MF":"Saint Martin","PM":"Saint Pierre and Miquelon","VC":"Saint Vincent and the Grenadines","WS":"Samoa","SM":"San Marino","ST":"Sao Tome and Principe","SA":"Saudi Arabia","SN":"Senegal","RS":"Serbia","SC":"Seychelles","SL":"Sierra Leone","SG":"Singapore","SX":"Sint Maarten","SK":"Slovakia","SI":"Slovenia","SB":"Solomon Islands","SO":"Somalia","ZA":"South Africa","GS":"South Georgia and the South Sandwich Islands","SS":"South Sudan","ES":"Spain","LK":"Sri Lanka","SD":"Sudan","SR":"Suriname","SJ":"Svalbard and Jan Mayen","SE":"Sweden","CH":"Switzerland","SY":"Syria Arab Republic","TW":"Taiwan","TJ":"Tajikistan","TZ":"Tanzania, the United Republic of","TH":"Thailand","TL":"Timor-Leste","TG":"Togo","TK":"Tokelau","TO":"Tonga","TT":"Trinidad and Tobago","TN":"Tunisia","TR":"T\u00fcrkiye","TM":"Turkmenistan","TC":"Turks and Caicos Islands","TV":"Tuvalu","UG":"Uganda","UA":"Ukraine","AE":"United Arab Emirates","GB":"United Kingdom","US":"United States","UY":"Uruguay","UM":"US Minor Outlying Islands","UZ":"Uzbekistan","VU":"Vanuatu","VE":"Venezuela","VN":"Viet Nam","VG":"Virgin Islands, British","VI":"Virgin Islands, U.S.","WF":"Wallis and Futuna","EH":"Western Sahara","YE":"Yemen","ZM":"Zambia","ZW":"Zimbabwe"},"strings":{"newRowAdded":"New row added.","rowRemoved":"Row removed","formSaved":"The form has been saved.  The content contains the link to return and complete the form."}};
+//# sourceURL=gform_gravityforms-js-extra
+</script>
+<script id="gform_gravityforms-js" defer='defer' src="https://internet2.edu/wp-content/plugins/gravityforms/js/gravityforms.min.js?ver=3.2.0"></script>
+<script id="gform_gravityforms_utils-js" defer='defer' src="https://internet2.edu/wp-content/plugins/gravityforms/assets/js/dist/utils.min.js?ver=d7e103405223e60d2719f4c330fd11cf"></script>
+<script id="gform_gravityforms_theme_vendors-js" defer='defer' src="https://internet2.edu/wp-content/plugins/gravityforms/assets/js/dist/vendor-theme.min.js?ver=ddae8d403393f0e5eaeedeb511ce46e0"></script>
+<script id="gform_gravityforms_theme-js-extra">
+var gform_theme_config = {"common":{"form":{"honeypot":{"version_hash":"c270d31ceacccc30a88900da23d3edfb"},"ajax":{"ajaxurl":"https://internet2.edu/wp-admin/admin-ajax.php","ajax_submission_nonce":"04a831e8ca","i18n":{"step_announcement":"Step %1$s of %2$s, %3$s","unknown_error":"There was an unknown error processing your request. Please try again.","error_403":"The request was blocked (403 error) for unknown security reasons. Remove any code-like text (scripts or DB queries) and try again."}}}},"fields":{"repeater":{"strings":{"item_added":"added.","item_removed":"removed.","renumbered":"and above renumbered.","max_items":"You have reached the maximum number of repeated items.","confirm_delete":"Are you sure you want to remove {label} {number}?"}}},"hmr_dev":"","public_path":"https://internet2.edu/wp-content/plugins/gravityforms/assets/js/dist/","config_nonce":"9871828ac3"};
+//# sourceURL=gform_gravityforms_theme-js-extra
+</script>
+<script id="gform_gravityforms_theme-js" defer='defer' src="https://internet2.edu/wp-content/plugins/gravityforms/assets/js/dist/scripts-theme.min.js?ver=97219a00e44efe96fe680a9fde3911cf"></script>
+<script id="gp-populate-anything-js-extra">
+var GPPA_FORM_66 = {"SHOW_ADMIN_FIELDS_IN_AJAX":""};
+var GPPA_PAGE_CONDITIONAL_LOGIC_MAP_66 = [];
+var GPPA = {"AJAXURL":"/wp-admin/admin-ajax.php","GF_BASEURL":"https://internet2.edu/wp-content/plugins/gravityforms","NONCE":"71300c6a0a","I18N":{"populateChoices":"Populate choices dynamically","populateValues":"Populate value dynamically","or":"Or","and":"And","filterAriaLabel":"Filter {0}","filterGroupAriaLabel":"Filter Group {0}","filterGroups":"Filter Groups","addFilter":"Add Filter","addFilterGroup":"Add Filter Group","removeFilter":"Remove Filter","removeFilterAriaLabel":"Remove Filter {0}","label":"Label","value":"Value","price":"Price","image":"Image","loadingEllipsis":"Loading...","defaultOrdering":"Default","addCustomValue":"\u270e Custom Value","standardValues":"Standard Values","formFieldValues":"Form Field Values","specialValues":"Special Values","valueBoolTrue":"(boolean) true","valueBoolFalse":"(boolean) false","valueNull":"(null) NULL","selectAnItem":"Select a %s","unique":"Only Show Unique Results","reset":"Reset","type":"Type","objectType":"Object Type","filters":"Filters","ordering":"Ordering","ascending":"Ascending","descending":"Descending","random":"Random","choiceTemplate":"Choice Template","valueTemplates":"Value Templates","operators":{"is":"is","isnot":"is not","\u003E":"\u003E","\u003E=":"\u003E=","\u003C":"\u003C","\u003C=":"\u003C=","contains":"contains","does_not_contain":"does not contain","starts_with":"starts with","ends_with":"ends with","like":"is LIKE","is_in":"is in","is_not_in":"is not in"},"chosen_no_results":"No results matched","restrictedObjectTypeNonPrivileged":"This field is configured to an object type for which you do not have permission to edit.","restrictedObjectTypePrivileged":"The selected Object Type is restricted. Non-super admins will not be able to edit this field's GPPA settings.","tooManyPropertyValues":"Too many values to display."}};
+var GPPA_FORM_68 = {"SHOW_ADMIN_FIELDS_IN_AJAX":""};
+var GPPA_PAGE_CONDITIONAL_LOGIC_MAP_68 = [];
+//# sourceURL=gp-populate-anything-js-extra
+</script>
+<script type="text/rocketlazyloadscript" data-minify="1" id="gp-populate-anything-js" defer='defer' data-rocket-src="https://internet2.edu/wp-content/cache/min/1/wp-content/plugins/gp-populate-anything/js/built/gp-populate-anything.js?ver=1792780939"></script>
+<script>
+gform.initializeOnLoaded( function() { jQuery(document).on('gform_post_render', function(event, formId, currentPage){if(formId == 66) {} } );jQuery(document).on('gform_post_conditional_logic', function(event, formId, fields, isInit){} ) } );
+</script>
+<script>
+gform.initializeOnLoaded( function() {jQuery(document).trigger("gform_pre_post_render", [{ formId: "66", currentPage: "1", abort: function() { this.preventDefault(); } }]);        if (event && event.defaultPrevented) {                return;        }        const gformWrapperDiv = document.getElementById( "gform_wrapper_66" );        if ( gformWrapperDiv ) {            const visibilitySpan = document.createElement( "span" );            visibilitySpan.id = "gform_visibility_test_66";            gformWrapperDiv.insertAdjacentElement( "afterend", visibilitySpan );        }        const visibilityTestDiv = document.getElementById( "gform_visibility_test_66" );        let postRenderFired = false;        function triggerPostRender() {            if ( postRenderFired ) {                return;            }            postRenderFired = true;            gform.core.triggerPostRenderEvents( 66, 1 );            if ( visibilityTestDiv ) {                visibilityTestDiv.parentNode.removeChild( visibilityTestDiv );            }        }        function debounce( func, wait, immediate ) {            var timeout;            return function() {                var context = this, args = arguments;                var later = function() {                    timeout = null;                    if ( !immediate ) func.apply( context, args );                };                var callNow = immediate && !timeout;                clearTimeout( timeout );                timeout = setTimeout( later, wait );                if ( callNow ) func.apply( context, args );            };        }        const debouncedTriggerPostRender = debounce( function() {            triggerPostRender();        }, 200 );        if ( visibilityTestDiv && visibilityTestDiv.offsetParent === null ) {            const observer = new MutationObserver( ( mutations ) => {                mutations.forEach( ( mutation ) => {                    if ( mutation.type === 'attributes' && visibilityTestDiv.offsetParent !== null ) {                        debouncedTriggerPostRender();                        observer.disconnect();                    }                });            });            observer.observe( document.body, {                attributes: true,                childList: false,                subtree: true,                attributeFilter: [ 'style', 'class' ],            });        } else {            triggerPostRender();        }    } );
+</script>
+<script>
+gform.initializeOnLoaded( function() { jQuery(document).on('gform_post_render', function(event, formId, currentPage){if(formId == 68) {} } );jQuery(document).on('gform_post_conditional_logic', function(event, formId, fields, isInit){} ) } );
+</script>
+<script>
+gform.initializeOnLoaded( function() {jQuery(document).trigger("gform_pre_post_render", [{ formId: "68", currentPage: "1", abort: function() { this.preventDefault(); } }]);        if (event && event.defaultPrevented) {                return;        }        const gformWrapperDiv = document.getElementById( "gform_wrapper_68" );        if ( gformWrapperDiv ) {            const visibilitySpan = document.createElement( "span" );            visibilitySpan.id = "gform_visibility_test_68";            gformWrapperDiv.insertAdjacentElement( "afterend", visibilitySpan );        }        const visibilityTestDiv = document.getElementById( "gform_visibility_test_68" );        let postRenderFired = false;        function triggerPostRender() {            if ( postRenderFired ) {                return;            }            postRenderFired = true;            gform.core.triggerPostRenderEvents( 68, 1 );            if ( visibilityTestDiv ) {                visibilityTestDiv.parentNode.removeChild( visibilityTestDiv );            }        }        function debounce( func, wait, immediate ) {            var timeout;            return function() {                var context = this, args = arguments;                var later = function() {                    timeout = null;                    if ( !immediate ) func.apply( context, args );                };                var callNow = immediate && !timeout;                clearTimeout( timeout );                timeout = setTimeout( later, wait );                if ( callNow ) func.apply( context, args );            };        }        const debouncedTriggerPostRender = debounce( function() {            triggerPostRender();        }, 200 );        if ( visibilityTestDiv && visibilityTestDiv.offsetParent === null ) {            const observer = new MutationObserver( ( mutations ) => {                mutations.forEach( ( mutation ) => {                    if ( mutation.type === 'attributes' && visibilityTestDiv.offsetParent !== null ) {                        debouncedTriggerPostRender();                        observer.disconnect();                    }                });            });            observer.observe( document.body, {                attributes: true,                childList: false,                subtree: true,                attributeFilter: [ 'style', 'class' ],            });        } else {            triggerPostRender();        }    } );
+</script>
+<script>window.lazyLoadOptions={elements_selector:"iframe[data-lazy-src]",data_src:"lazy-src",data_srcset:"lazy-srcset",data_sizes:"lazy-sizes",class_loading:"lazyloading",class_loaded:"lazyloaded",threshold:300,callback_loaded:function(element){if(element.tagName==="IFRAME"&&element.dataset.rocketLazyload=="fitvidscompatible"){if(element.classList.contains("lazyloaded")){if(typeof window.jQuery!="undefined"){if(jQuery.fn.fitVids){jQuery(element).parent().fitVids()}}}}}};window.addEventListener('LazyLoad::Initialized',function(e){var lazyLoadInstance=e.detail.instance;if(window.MutationObserver){var observer=new MutationObserver(function(mutations){var image_count=0;var iframe_count=0;var rocketlazy_count=0;mutations.forEach(function(mutation){for(var i=0;i<mutation.addedNodes.length;i++){if(typeof mutation.addedNodes[i].getElementsByTagName!=='function'){continue}
+if(typeof mutation.addedNodes[i].getElementsByClassName!=='function'){continue}
+images=mutation.addedNodes[i].getElementsByTagName('img');is_image=mutation.addedNodes[i].tagName=="IMG";iframes=mutation.addedNodes[i].getElementsByTagName('iframe');is_iframe=mutation.addedNodes[i].tagName=="IFRAME";rocket_lazy=mutation.addedNodes[i].getElementsByClassName('rocket-lazyload');image_count+=images.length;iframe_count+=iframes.length;rocketlazy_count+=rocket_lazy.length;if(is_image){image_count+=1}
+if(is_iframe){iframe_count+=1}}});if(image_count>0||iframe_count>0||rocketlazy_count>0){lazyLoadInstance.update()}});var b=document.getElementsByTagName("body")[0];var config={childList:!0,subtree:!0};observer.observe(b,config)}},!1)</script><script data-no-minify="1" async src="https://internet2.edu/wp-content/plugins/wp-rocket/assets/js/lazyload/17.8.3/lazyload.min.js"></script>
+
+    
+      </body>
+</html>
+
+<!-- This website is like a Rocket, isn't it? Performance optimized by WP Rocket. Learn more: https://wp-rocket.me - Debug: cached@1794240617 -->
