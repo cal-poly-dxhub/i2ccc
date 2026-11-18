@@ -4,7 +4,11 @@ See BACKEND_PLAN.md. Everything here is new; the only existing resources it
 touches are the proxy API (new routes) and, in RagBackend, its CORS origins.
 """
 
-from aws_cdk import BundlingOptions, Duration, RemovalPolicy
+import hashlib
+from pathlib import Path
+import shutil
+
+from aws_cdk import BundlingOptions, DockerVolume, Duration, RemovalPolicy
 from aws_cdk import aws_apigateway as apigw
 from aws_cdk import aws_dynamodb as dynamodb
 from aws_cdk import aws_iam as iam
@@ -21,6 +25,10 @@ ADMIN_PREFIXES = ("web/", "quarantine/web/")
 CRAWL_REPORT_MARGIN_MINUTES = 10
 CLEANUP_WORKER_TIMEOUT = Duration.minutes(15)
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+URL_FILE_NAME = "source_urls.yaml"
+SHARED_DIRECTORY = PROJECT_ROOT / "shared"
+ADMIN_API_PATH = PROJECT_ROOT / "src" / "admin_api"
 
 class AdminApi(Construct):
     def __init__(
@@ -62,6 +70,8 @@ class AdminApi(Construct):
             projection_type=dynamodb.ProjectionType.KEYS_ONLY,
         )
 
+        # Copy the shared urls file into the deployment package
+        shutil.copy(SHARED_DIRECTORY / URL_FILE_NAME, ADMIN_API_PATH / URL_FILE_NAME)
         code = _lambda.Code.from_asset(
             "src/admin_api",
             bundling=BundlingOptions(
@@ -77,6 +87,7 @@ class AdminApi(Construct):
             "DOCUMENTS_TABLE": documents_table.table_name,
             "PROCESSED_FILES_TABLE": processed_files_table.table_name,
             "BUCKET_NAME": input_assets_bucket.bucket_name,
+            "STATE_MACHINE_ARN": ingestion_state_machine.state_machine_arn,
             "CRAWLER_FUNCTION_NAME": crawler_function.function_name if crawler_function else "",
         }
 
