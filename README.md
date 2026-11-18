@@ -158,9 +158,22 @@ Use this when source material lives in a Confluence space with linked Google Dri
 Use this to pull in a web page and everything it links to: the page text, Google Drive/Slides files, website files, and YouTube and Panopto recordings. A Step Functions state machine (`ScraperStateMachineArn` in the CDK outputs, code in [src/scraper/](src/scraper/)) crawls the page and downloads each item with its own Lambda, streaming straight into the bucket under `i2cc-scraper/`. It does not start ingestion; run the next step afterwards.
 
 ```bash
-aws stepfunctions start-execution --state-machine-arn <ScraperStateMachineArn> \
-    --input '{"url": "https://internet2.edu/...", "depth": 1}'
+aws lambda invoke --region us-east-1 --function-name <ScraperStartFunctionArn> \
+    --cli-binary-format raw-in-base64-out \
+    --payload '{"url": "https://internet2.edu/...", "depth": 1}' /tmp/scraper-run.json
 ```
+
+The starter returns `source_id`, `run_id`, `execution_arn`, and `created`. Repeated submissions
+of a source while it is active return the same run, including its original depth. The
+`ScraperProgressTableName` output identifies the DynamoDB table containing live discovery and
+download progress, parent-child relationships, and failures. Detailed runs expire after 30 days;
+source records persist. `stored` means the download reached S3; downstream ingestion is separate.
+
+The scraper remains part of the existing `RagChatbotStack` and uses the same bucket,
+processed-files table, and Google secret. Deploy through the existing `app.py` / `cdk deploy`
+workflow in `us-east-1`. An admin frontend with an IAM role can be granted table reads and
+starter invocation with `stack.scraper.grant_frontend_access(admin_role)`. The public chat
+frontend/backend receives no scraper grant. No new frontend endpoints are created.
 
 The run's output lists counts and failures; `i2cc-scraper/.runs/<execution name>/report.json` in the bucket has every item's result. Only `internet2.edu` URLs are accepted (`allowed_start_domains` in [cdk/scraper.py](cdk/scraper.py)). Re-running skips what hasn't changed; a file that changed is replaced and its old vectors and processed-files entry are removed, so the next ingestion run re-ingests it.
 

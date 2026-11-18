@@ -31,6 +31,8 @@ from ..downloader import (Context, DeadlineExceeded, DownloadError, DownloadResu
                           failed_result, ingest as ingest_one)
 from ..downloader.models import FAILED
 from ..logs import setup_logging
+from ..progress import NULL_PROGRESS
+from .progress import ProgressStore, RunStarter
 from .invalidate import IngestInvalidator, opensearch_client
 from .s3store import S3Store, read_json, write_json
 
@@ -81,10 +83,18 @@ def _drive_client():
     return DriveClient(key)
 
 
-def _context(lambda_context, drive: bool = False) -> Context:
+def _progress_store():
+    name = os.environ.get('SCRAPER_PROGRESS_TABLE')
+    return ProgressStore(name) if name else None
+
+
+def _context(lambda_context, drive: bool = False, run_id: str = '') -> Context:
     store, config = _setup()
     budget = lambda_context.get_remaining_time_in_millis() / 1000 - MARGIN
+    progress_store = _progress_store()
+    progress = progress_store.reporter(run_id) if progress_store and run_id else NULL_PROGRESS
     return Context(store, config=config, drive=_drive_client() if drive else None, budget=budget,
+                   progress=progress,
                    reserve=min(60.0, budget * 0.1))
 
 
@@ -113,16 +123,61 @@ def _failure(url: str, kind: str, exc: Exception, title: str = '') -> DownloadRe
 
 # --- the steps ------------------------------------------------------------------------------------
 
-def crawl(event: dict, lambda_context) -> dict:
-    request = event.get('input') or {}
+def _request(request):
     url, depth = request.get('url'), request.get('depth', 1)
     if not isinstance(url, str) or not url.strip() or len(url) > 2048:
         raise ValueError('"url" must be the address of a page to crawl')
     if isinstance(depth, bool) or not isinstance(depth, int) or not 0 <= depth <= MAX_DEPTH:
         raise ValueError(f'"depth" must be a whole number from 0 to {MAX_DEPTH}')
+    return url.strip(), depth
+
+
+def start(event: dict, lambda_context) -> dict:
+    """Invoke from the admin frontend's role. Returns the active run on repeated submissions."""
+    url, depth = _request(event)
+    from ..netguard import validate_start_url
+    from ..url_classifier import classify_url
+    if classify_url(url) is None:
+        validate_start_url(url, Config.from_env())
+    store = _progress_store()
+    if store is None:
+        raise RuntimeError('SCRAPER_PROGRESS_TABLE is required')
+    return RunStarter(store, os.environ['SCRAPER_STATE_MACHINE_ARN']).start(url, depth)
+
+
+def _step(phase):
+    """Finalize an infrastructure failure; document failures are handled in the item task."""
+    def decorate(fn):
+        @functools.wraps(fn)
+        def invoke(event, lambda_context):
+            store = _progress_store()
+            run_id = _run_id(event)
+            if store and phase != 'crawling':
+                store.phase(run_id, phase)
+            try:
+                return fn(event, lambda_context)
+            except Exception as exc:
+                if store:
+                    store.finish(run_id, status='failed', error=str(exc), reason=phase)
+                raise
+        return invoke
+    return decorate
+
+
+@_step('crawling')
+def crawl(event: dict, lambda_context) -> dict:
+    url, depth = _request(event.get('input') or {})
     run_id = _run_id(event)
+    progress_store = _progress_store()
+    if progress_store:
+        claim = progress_store.claim(url, depth, run_id=run_id)
+        if claim.run_id != run_id:
+            raise ValueError(f'Source already has an active run: {claim.run_id}')
+        progress_store.phase(run_id, 'crawling')
+        if event.get('execution_arn'):
+            progress_store.bind_execution(run_id, event['execution_arn'])
     store = _setup()[0]
-    with _context(lambda_context) as ctx:  # all of the time is the crawl's: it has its own step
+    with _context(lambda_context, run_id=run_id) as ctx:
         report = crawl_into_store(url.strip(), ctx, depth,
                                   time_limit=max(1.0, ctx.time_left() - ctx.reserve))
     key = _run_key(store, run_id, 'crawl.json')
@@ -135,12 +190,13 @@ def crawl(event: dict, lambda_context) -> dict:
             'pages': len(report.pages), 'assets': len(report.assets)}
 
 
+@_step('planning')
 def plan(event: dict, lambda_context) -> dict:
     run_id = _run_id(event)
     store = _setup()[0]
     found = read_json(store.client, store.bucket, _run_key(store, run_id, 'crawl.json'))
     items, failures = [], []
-    with _context(lambda_context, drive=True) as ctx:
+    with _context(lambda_context, drive=True, run_id=run_id) as ctx:
         for asset in dedupe(found['assets'], ctx.options):
             try:
                 expanded = expand(asset, ctx)
@@ -150,10 +206,16 @@ def plan(event: dict, lambda_context) -> dict:
             items += expanded.items
             failures += expanded.failures
         items = dedupe(items, ctx.options)
+        for failure in failures:
+            ctx.progress.content(failure.url, 'failed', result=asdict(failure),
+                                 error=failure.error, reason=failure.reason)
     items_key = _run_key(store, run_id, 'items.json')
     write_json(store.client, store.bucket, items_key, [asdict(i) for i in items])
     write_json(store.client, store.bucket, _run_key(store, run_id, 'plan.json'),
                {'failures': [asdict(f) for f in failures]})
+    progress_store = _progress_store()
+    if progress_store:
+        progress_store.phase(run_id, 'downloading', discovery_complete=not found['truncated'])
     return {'run_id': run_id, 'url': found['url'], 'bucket': store.bucket,
             'items_key': items_key, 'items': len(items), 'failures': len(failures)}
 
@@ -162,16 +224,19 @@ def ingest(event: dict, lambda_context) -> dict:
     run_id = _run_id(event)
     store = _setup()[0]
     item = Source.of(event['item'])
-    with _context(lambda_context, drive=True) as ctx:
+    with _context(lambda_context, drive=True, run_id=run_id) as ctx:
         try:
             result = ingest_one(item, ctx)    # TransientError: raised, for the retry
         except DeadlineExceeded as exc:       # a retry would run out of time the same way
             result = failed_result(item.url, item.kind, exc, item.link_text)
+            ctx.progress.content(item.url, 'failed', result=asdict(result),
+                                 error=result.error, reason=result.reason)
     write_json(store.client, store.bucket,
                _run_key(store, run_id, 'results/' + _result_name(item.url)), asdict(result))
     return {'status': result.status}         # small: a Map collects every item's output
 
 
+@_step('reporting')
 def report(event: dict, lambda_context) -> dict:
     run_id = _run_id(event)
     store = _setup()[0]
@@ -194,6 +259,56 @@ def report(event: dict, lambda_context) -> dict:
     write_json(store.client, store.bucket, key, {'url': found['url'], 'results': rows})
     failed = [{k: r[k] for k in ('url', 'title', 'reason', 'error')}
               for r in rows if r['status'] == FAILED]
+    progress_store = _progress_store()
+    if progress_store:
+        progress_store.finish(run_id, report_key=key)
     return {'run_id': run_id, 'url': found['url'],
             'counts': dict(Counter(r['status'] for r in rows)), 'truncated': found['truncated'],
             'failed': failed[:50], 'report_key': key}
+
+
+def execution_status(event: dict, lambda_context) -> None:
+    """Reconcile terminal executions, including tasks killed before reporting a result.
+
+    EventBridge events give prompt updates. A scheduled invocation checks active sources as
+    a fallback for lost events and repairs a starter killed between claiming and starting.
+    """
+    store = _progress_store()
+    if store is None:
+        return
+    if 'failure' in event:
+        failure = event['failure']
+        store.finish(_run_id(event), status='failed', error=failure.get('Cause', ''),
+                     reason=failure.get('Error', 'workflow_error'))
+        return
+    import boto3
+    client = boto3.client('stepfunctions')
+    detail = event.get('detail')
+    if detail:
+        runs = [{'run_id': detail['name'], 'execution_arn': detail['executionArn']}]
+    else:
+        def active_runs():
+            after = None
+            while True:
+                page = store.list_sources(after=after)
+                for source in page['items']:
+                    if source.get('active_run_id'):
+                        run = store.get_run(source['active_run_id'])
+                        if run:
+                            yield run
+                after = page['next_key']
+                if not after:
+                    break
+        runs = active_runs()
+    for run in runs:
+        arn = run.get('execution_arn')
+        if not arn:
+            if run.get('status') == 'queued':
+                RunStarter(store, os.environ['SCRAPER_STATE_MACHINE_ARN'], client=client).start(
+                    run['url'], int(run['depth']))
+            continue
+        state = client.describe_execution(executionArn=arn)
+        status = state['status']
+        if status in ('FAILED', 'TIMED_OUT', 'ABORTED', 'SUCCEEDED'):
+            store.finish(run['run_id'], status=(None if status == 'SUCCEEDED' else status.lower()),
+                         error=state.get('cause', ''), reason=state.get('error', ''))

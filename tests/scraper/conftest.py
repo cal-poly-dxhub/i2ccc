@@ -163,6 +163,19 @@ def emulator():
     return types.SimpleNamespace(s3=boto3.client('s3'), dynamodb=boto3.client('dynamodb'))
 
 
+@pytest.fixture
+def progress_store(emulator):
+    from i2cc_scraper.aws.progress import ProgressStore, table_definition
+    name = 'i2cc-progress-' + uuid.uuid4().hex[:12]
+    emulator.dynamodb.create_table(**table_definition(name))
+    emulator.dynamodb.get_waiter('table_exists').wait(
+        TableName=name, WaiterConfig={'Delay': 1, 'MaxAttempts': 15})
+    emulator.dynamodb.update_time_to_live(
+        TableName=name, TimeToLiveSpecification={'Enabled': True, 'AttributeName': 'expires_at'})
+    yield ProgressStore(name)
+    emulator.dynamodb.delete_table(TableName=name)
+
+
 @pytest.fixture(scope='session')
 def bucket(emulator):
     name = f'i2cc-test-{uuid.uuid4().hex[:12]}'

@@ -142,7 +142,7 @@ class RagChatbotStack(Stack):
         # Staff-submitted URL -> crawl it and download what it links to into the
         # ingest bucket (the next ingestion run picks the files up). The Google
         # service account key is the content-sync secret, read from Secrets Manager.
-        ScraperPipeline(
+        self.scraper = ScraperPipeline(
             self,
             "Scraper",
             input_assets_bucket=ingest_stack.input_assets_bucket,

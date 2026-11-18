@@ -12,11 +12,12 @@ LAMBDA = types.SimpleNamespace(get_remaining_time_in_millis=lambda: 900_000)
 
 
 @pytest.fixture
-def env(emulator, bucket, monkeypatch, tmp_path):
+def env(emulator, bucket, progress_store, monkeypatch, tmp_path):
     prefix = f'run-{tmp_path.name[-20:]}/'
     for name, value in {'SCRAPER_BUCKET': bucket, 'SCRAPER_PREFIX': prefix,
                         'I2CC_BLOCK_PRIVATE_ADDRESSES': '0', 'I2CC_CRAWL_DELAY': '0',
-                        'I2CC_RETRY_BACKOFF': '0', 'I2CC_RETRY_JITTER': '0'}.items():
+                        'I2CC_RETRY_BACKOFF': '0', 'I2CC_RETRY_JITTER': '0',
+                        'SCRAPER_PROGRESS_TABLE': progress_store.table.name}.items():
         monkeypatch.setenv(name, value)
     for name in ('PROCESSED_FILES_TABLE', 'OPENSEARCH_ENDPOINT', 'GOOGLE_CREDENTIALS_SECRET',
                  'I2CC_GOOGLE_CREDENTIALS_JSON', 'GOOGLE_APPLICATION_CREDENTIALS'):
@@ -24,7 +25,7 @@ def env(emulator, bucket, monkeypatch, tmp_path):
     handlers._setup.cache_clear()
     handlers._drive_client.cache_clear()
     yield types.SimpleNamespace(s3=emulator.s3, dynamodb=emulator.dynamodb, bucket=bucket,
-                                prefix=prefix)
+                                prefix=prefix, progress=progress_store)
     handlers._setup.cache_clear()
     handlers._drive_client.cache_clear()
 
@@ -65,6 +66,8 @@ def test_a_submitted_url_ends_up_in_s3_ready_for_ingestion(env, forum):
     report = json.loads(env.s3.get_object(Bucket=env.bucket, Key=env.prefix + summary['report_key']
                                           [len(env.prefix):])['Body'].read())
     assert {r['status'] for r in report['results']} == {'new'}
+    assert env.progress.get_run('run-1')['status'] == 'complete'
+    assert env.progress.summarize('run-1')['content'] == {'stored': 3}
 
 
 def test_running_it_again_changes_nothing(env, forum):
@@ -106,6 +109,8 @@ def test_failures_are_reported_not_raised(env, site, fake_yt_dlp):
     assert summary['counts'] == {'new': 1, 'failed': 1}
     assert [(f['reason'], f['url']) for f in summary['failed']] == [
         ('not_found', site.url('/files/gone.pdf'))]
+    assert env.progress.get_run('run-1')['status'] == 'partial_failure'
+    assert env.progress.get_item('run-1', site.url('/files/gone.pdf'))['reason'] == 'not_found'
 
 
 def test_an_item_whose_retries_ran_out_is_reported(env, forum):
@@ -114,6 +119,109 @@ def test_an_item_whose_retries_ran_out_is_reported(env, forum):
     summary = handlers.report(planned, LAMBDA)
     assert summary['counts'] == {'new': 1, 'failed': 2}
     assert {f['reason'] for f in summary['failed']} == {'unavailable'}
+    assert env.progress.summarize('r')['content'] == {'stored': 1, 'failed': 2}
+
+
+def test_nested_pages_preserve_shared_links_before_downloads_start(env, site):
+    site.page('/events/', '<a href="/meeting/">Meeting</a><a href="/slides.pdf">Slides</a>')
+    site.page('/meeting/', '<a href="/slides.pdf">Same slides</a><a href="/events/">Back</a>')
+    handlers.crawl({'input': {'url': site.url('/events/')}, 'run_id': 'r'}, LAMBDA)
+    db = env.progress
+    assert db.summarize('r')['discovered'] == 3
+    assert db.get_item('r', site.url('/slides.pdf'))['content_status'] == 'queued'
+    assert db.get_item('r', site.url('/meeting/'))['content_status'] == 'stored'
+    for parent in ('/events/', '/meeting/'):
+        assert site.url('/slides.pdf') in {
+            e['url'] for e in db.list_children('r', site.url(parent))['items']}
+
+
+def test_drive_subfolders_empty_folders_and_cycles_are_preserved(env, site, monkeypatch):
+    from test_downloader import FakeDrive, ROOT_URL, G
+    drive = FakeDrive()
+    original = drive.list_folder
+    def listing(folder_id):
+        if folder_id == 'empty':
+            return []
+        rows = list(original(folder_id))
+        if folder_id == 'root':
+            rows.append({'id': 'empty', 'name': 'Empty folder', 'mimeType': G + 'folder'})
+        if folder_id == 'sub':
+            rows.append(drive.files['deck'])  # same file through another parent
+        return rows
+    drive.list_folder = listing
+    monkeypatch.setattr(handlers, '_drive_client', functools.cache(lambda: drive))
+    site.page('/events/', f'<a href="{ROOT_URL}">Slides folder</a>')
+    crawled = handlers.crawl({'input': {'url': site.url('/events/')}, 'run_id': 'r'}, LAMBDA)
+    handlers.plan(crawled, LAMBDA)
+    db = env.progress
+    sub = 'https://drive.google.com/drive/folders/sub'
+    empty = 'https://drive.google.com/drive/folders/empty'
+    assert db.get_item('r', empty)['discovery_status'] == 'complete'
+    assert db.get_item('r', empty)['content_status'] == 'not_applicable'
+    assert ROOT_URL in {e['url'] for e in db.list_children('r', sub)['items']}
+    root_children = {e['item_id'] for e in db.list_children('r', ROOT_URL)['items']}
+    sub_children = {e['item_id'] for e in db.list_children('r', sub)['items']}
+    assert root_children & sub_children  # the shared deck has one identity
+    assert db.get_item('r', sub)['kind'] == 'folder'
+
+
+def test_truncated_discovery_is_distinct_from_an_empty_page(env, site, monkeypatch):
+    monkeypatch.setenv('I2CC_MAX_PAGES', '1')
+    handlers._setup.cache_clear()
+    site.page('/events/', '<a href="/meeting/">Meeting</a>')
+    site.page('/meeting/', '<p>Not read</p>')
+    summary = run(site.url('/events/'))
+    assert summary['truncated']
+    assert env.progress.get_item('run-1', site.url('/meeting/'))['discovery_status'] == 'deferred'
+    assert not env.progress.get_run('run-1')['discovery_complete']
+
+
+@pytest.mark.parametrize('status', ['TIMED_OUT', 'ABORTED', 'FAILED'])
+def test_terminal_execution_events_finalize_unfinished_work(env, monkeypatch, status):
+    import boto3
+    url = 'https://internet2.edu/slides.pdf'
+    claim = env.progress.claim(url)
+    arn = 'arn:aws:states:us-east-1:000000000000:execution:scraper:' + claim.run_id
+    env.progress.bind_execution(claim.run_id, arn)
+    progress = env.progress.reporter(claim.run_id)
+    progress.discovered(url, 'file')
+    progress.content(url, 'checking')
+    original_client = boto3.client
+    class Executions:
+        def describe_execution(self, *, executionArn):
+            assert executionArn == arn
+            return {'status': status, 'cause': 'Execution stopped', 'error': 'Stopped'}
+    monkeypatch.setattr(boto3, 'client', lambda service, **kw: (
+        Executions() if service == 'stepfunctions' else original_client(service, **kw)))
+    handlers.execution_status({'detail': {'name': claim.run_id, 'executionArn': arn}}, LAMBDA)
+    assert env.progress.get_run(claim.run_id)['status'] == status.lower()
+    assert env.progress.get_item(claim.run_id, url)['content_status'] == 'failed'
+    assert 'active_run_id' not in env.progress.get_source(claim.source_id)
+
+
+def test_download_status_is_visible_while_bytes_are_being_fetched(env, monkeypatch):
+    from test_downloader import FakeDrive
+    url = 'https://drive.google.com/file/d/pdf/view'
+    drive = FakeDrive()
+    observed = []
+    original = drive.download
+    def download(file_id):
+        observed.append(env.progress.get_item('r', url)['content_status'])
+        return original(file_id)
+    drive.download = download
+    monkeypatch.setattr(handlers, '_drive_client', functools.cache(lambda: drive))
+    summary = run(url, run_id='r')
+    assert summary['counts'] == {'new': 1}
+    assert observed == ['downloading']
+    assert env.progress.get_item('r', url)['content_status'] == 'stored'
+
+
+def test_a_broken_workflow_step_releases_its_source(env):
+    claim = env.progress.claim('https://internet2.edu/events/')
+    with pytest.raises(env.s3.exceptions.NoSuchKey):
+        handlers.plan({'run_id': claim.run_id}, LAMBDA)
+    assert env.progress.get_run(claim.run_id)['status'] == 'failed'
+    assert 'active_run_id' not in env.progress.get_source(claim.source_id)
 
 
 @pytest.mark.parametrize('request_input, run_id', [

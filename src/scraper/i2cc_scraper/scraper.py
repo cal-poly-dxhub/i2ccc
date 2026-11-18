@@ -39,6 +39,7 @@ from urllib3.util.retry import Retry
 from . import config as config_module
 from .config import Config
 from .logs import setup_logging
+from .progress import NULL_PROGRESS, Progress
 from .netguard import (  # noqa: F401  (UnsafeURLError re-exported)
     GuardedAdapter, UnsafeURLError, domain_allowed, validate_start_url)
 from .url_classifier import (  # asset types re-exported for callers using scraper.YOUTUBE etc.
@@ -238,7 +239,8 @@ def crawl_for_ingest(start_url: str, max_depth: int = 1,
                      delay: Optional[float] = None,
                      config: Optional[Config] = None,
                      time_limit: Optional[float] = None,
-                     on_page: Optional[Callable[[CrawlResult], None]] = None
+                     on_page: Optional[Callable[[CrawlResult], None]] = None,
+                     progress: Progress = NULL_PROGRESS,
                      ) -> list[CrawlResult]:
     """crawl(), but returns a CrawlResult per URL saying what ingestion it needs.
 
@@ -261,14 +263,15 @@ def crawl_for_ingest(start_url: str, max_depth: int = 1,
     """
     return _crawl(start_url, max_depth, allowed_domains, found, important_only, max_pages,
                   delay, fetch_last_level=True, text_with_links=text_with_links, config=config,
-                  time_limit=time_limit, on_page=on_page)
+                  time_limit=time_limit, on_page=on_page, progress=progress)
 
 
 def _crawl(start_url: str, max_depth: int, allowed_domains: Optional[Iterable[str]],
            found: Optional[set[str]], important_only: bool, max_pages: Optional[int],
            delay: Optional[float], fetch_last_level: bool, text_with_links: bool,
            config: Optional[Config], time_limit: Optional[float] = None,
-           on_page: Optional[Callable[[CrawlResult], None]] = None) -> list[CrawlResult]:
+           on_page: Optional[Callable[[CrawlResult], None]] = None,
+           progress: Progress = NULL_PROGRESS) -> list[CrawlResult]:
     """The breadth-first crawl behind crawl() and crawl_for_ingest()."""
     config = config or config_module.default()
     max_pages = config.max_pages if max_pages is None else max_pages
@@ -285,11 +288,13 @@ def _crawl(start_url: str, max_depth: int, allowed_domains: Optional[Iterable[st
     def add(result: CrawlResult) -> None:
         """Record a newly found URL, and queue it if it's a page."""
         key = url_key(result.url)
-        if key in found:
-            return
         if result.type == PAGE and (is_youtube_host(result.url)
                                     or not _domain_allowed(result.url, allowed)):
             return  # off-site, or a YouTube page (never crawled, whatever the allowed domains)
+        progress.discovered(result.url, result.type, parent=result.found_on or '',
+                            title=result.title, context=result.context)
+        if key in found:
+            return
         found.add(key)
         results.append(result)
         if result.type == PAGE:
@@ -321,11 +326,14 @@ def _crawl(start_url: str, max_depth: int, allowed_domains: Optional[Iterable[st
                 if fetch_last_level:  # crawl_for_ingest(): say which pages weren't read
                     for p in unread:
                         p.type, p.error = NOT_FETCHED, f'Not read: {stop}'
+                        progress.discovery(p.url, 'deferred', error=p.error, reason='limit')
+                        progress.content(p.url, 'deferred', error=p.error, reason='limit')
                         found.discard(url_key(p.url))  # so a later crawl sharing `found` reads it
                 break
             if pages_fetched and delay:
                 time.sleep(delay)
             pages_fetched += 1
+            progress.discovery(page.url, 'running')
 
             try:
                 response = fetch(page.url, session, html_only=True, config=config)
@@ -333,13 +341,18 @@ def _crawl(start_url: str, max_depth: int, allowed_domains: Optional[Iterable[st
                 if extension_for_mime(exc.content_type):
                     log.info('depth %d: %s is a file (%s)', page.depth, page.url, exc.content_type)
                     page.type = FILE
+                    progress.discovery(page.url, 'not_applicable')
                 else:
                     log.warning('Skipping %s: %s', page.url, exc)
                     page.type, page.error = FAILED, str(exc)
+                    progress.discovery(page.url, 'failed', error=page.error, reason='unsupported')
+                    progress.content(page.url, 'failed', error=page.error, reason='unsupported')
                 continue
             except (requests.RequestException, RuntimeError, ValueError) as exc:
                 log.warning('Skipping %s: %s', page.url, exc)
                 page.type, page.error = FAILED, str(exc)
+                progress.discovery(page.url, 'failed', error=page.error, reason='fetch_error')
+                progress.content(page.url, 'failed', error=page.error, reason='fetch_error')
                 continue
 
             soup = _parse(response.content)
@@ -367,6 +380,7 @@ def _crawl(start_url: str, max_depth: int, allowed_domains: Optional[Iterable[st
                                 found_on=page.url,
                                 title=asset.title if asset else '',
                                 context=asset.context if asset else ''))
+            progress.discovery(page.url, 'complete')
     return results
 
 

@@ -34,6 +34,20 @@ With [AWS Emulator](https://docs.aws.amazon.com/emulator/latest/userguide/) runn
 ( . ~/.aws/emulator/9297.env && pytest )
 ```
 
+The emulator suite covers incremental discovery/download reporting, shared children and
+folder cycles, simultaneous submissions, retry ordering, interrupted finalization, pagination,
+and 30-day retention. It creates uniquely named tables with the production key/index schema
+and TTL setting, then removes them. The fixture refuses non-loopback endpoints.
+
+`tests/scraper/test_cdk_scraper.py` synthesizes the scraper construct and the existing
+`RagChatbotStack` in `us-east-1`. The full-stack test substitutes unbundled Lambda source
+assets for assertions only, so it needs no Docker builds, AWS credentials, or network access;
+the actual deployment's bundling settings remain unchanged. It checks that the scraper
+uses the existing ingestion resources and that chat roles receive no scraper permissions.
+
+Python CI runs the scraper/CDK and collector tests. Emulator tests skip when a local endpoint
+is not configured; live end-to-end tests remain opt-in.
+
 See [src/scraper/README.md](../src/scraper/README.md).
 
 ## Live end-to-end testing

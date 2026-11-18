@@ -113,13 +113,77 @@ the next ingestion run picks up the new version. The state machine doesn't start
 * `src/scraper/Dockerfile` — the Lambda image (this directory is the build context).
 * `cdk/scraper.py` — the CDK construct, `ScraperPipeline` (its docstring shows how to wire it to
   `RagIngest`). Output: the state machine's ARN.
-* Start a run with `{"url": "https://internet2.edu/...", "depth": 1}` (what the staff frontend
-  sends to `StartExecution`); the execution's output is the summary, and
+* Invoke the construct's `start_function` with `{"url": "https://internet2.edu/...", "depth": 1}`.
+  It returns `source_id`, `run_id`, `execution_arn`, and `created`. Submitting the same source
+  while active returns that run (including its original depth). The execution's output is the summary, and
   `i2cc-scraper/.runs/<execution name>/report.json` has every item's result.
+
+### Discovery and download progress
+
+`SCRAPER_PROGRESS_TABLE` enables incremental DynamoDB reporting in the Lambda handlers.
+Without it, the library, CLI, and existing S3 reporting continue to work. This tracks discovery
+and downloading only: `stored` means content reached S3, not that search ingestion completed.
+No frontend HTTP endpoints are included.
+
+The table has string `pk`/`sk` keys and a `sources` GSI (`catalog_pk`/`catalog_sk`). The schema
+used by emulator tests is `i2cc_scraper.aws.progress.table_definition(name)`:
+
+| pk | sk | Record |
+| --- | --- | --- |
+| `SOURCE#<source_id>` | `META` | Persistent source, title, latest/active run, latest phase and final counts |
+| `SOURCE#<source_id>` | `RUN#<timestamp>#<run_id>` | Run history, with final status and counts |
+| `RUN#<run_id>` | `META` | Execution ARN, phase, outcome, discovery completeness, timestamps |
+| `RUN#<run_id>` | `ITEM#<item_id>` | One discovered page, folder, or document and its progress |
+| `RUN#<run_id>` | `EDGE#<parent_id>#<child_id>` | Where an item was found, link text, and context |
+
+IDs are hashes of the existing normalized URL/provider identity, so link variants share an
+item. Every parent relationship is recorded before deduplicating work. Pages and folders can
+have multiple parents and cycles; clients traversing the graph must keep a visited set.
+Folder nodes survive expansion, including empty folders and failed listings. Run counts count
+unique items, not relationships. An edge does not mean a second download is queued.
+
+Each item has independent `discovery_status` (`queued`, `running`, `complete`, `failed`,
+`deferred`, `not_applicable`) and `content_status` (`queued`, `checking`, `downloading`,
+`retrying`, `stored`, `failed`, `deferred`, `skipped`, `not_applicable`). Stored results retain
+`new`/`updated`/`unchanged`, file references, and the store key. Errors include a reason and
+message. A page finishing discovery does not imply its children have finished downloading.
+
+Use the Python query methods on `ProgressStore(table_name)`: `get_source`, `get_run`,
+`get_item(run_id, url)`, `list_sources`, `list_runs(source_id)`, `list_items(run_id)`, and
+`list_children(run_id, parent_url)`. List methods return `items` and `next_key`; pass that key
+back as `after`, even if a filtered page was empty. `limit` defaults to 100. Child results are
+edges referencing item IDs. `summarize(run_id)` queries all item pages to calculate live
+counts; final counts are stored on the run and source when it finishes. GSI catalog reads are
+eventually consistent; run/item reads use the base table with strong consistency.
+
+Run metadata, history, items, and edges have `expires_at` set to 30 days after run creation.
+Enable DynamoDB TTL on that numeric epoch-seconds attribute. Query methods hide expired rows
+while AWS asynchronously deletes them. Source records and their latest summary persist.
+
+Source claims are transactional, so simultaneous submissions return one active run. The
+starter persists the original request and uses the run UUID as the Standard execution name;
+retrying an uncertain start uses exactly the same name and input. Each download attempt has
+a version that fences out late updates from older attempts. Finalization freezes run writes,
+marks unfinished work explicitly, records final counts, and releases the source for another run.
+EventBridge terminal execution events and a five-minute reconciliation job handle timeouts,
+stopped executions, missed events, and interrupted starts/finalizers.
+
+The CDK construct exposes `progress_table`, `start_function`, and
+`grant_frontend_access(admin_role)` (or the `frontend_role` constructor argument). The designated
+frontend role gets table reads and permission to invoke the starter; workers own progress
+writes. The construct creates no public function URL or frontend API. Integrate it into the
+existing `RagChatbotStack` through `stack.scraper.grant_frontend_access(admin_role)`
+when the admin frontend supplies its IAM role. Deployment still uses `app.py` and
+the normal `cdk deploy` flow in `us-east-1`; no separate app or stack is needed.
+CDK retains the table on stack removal and enables point-in-time recovery.
 
 Locally, against [AWS Emulator](https://github.com/aws/aws-emulator):
 `( . ~/.aws/emulator/9297.env && .venv/bin/python -m pytest )` also runs the S3 store and the
-handlers end to end (`tests/scraper/test_s3store.py`, `tests/scraper/test_handlers.py`).
+handlers end to end (`tests/scraper/test_s3store.py`, `tests/scraper/test_handlers.py`), plus
+transaction races, retry ordering, pagination, and retention (`tests/scraper/test_progress.py`).
+These tests create uniquely named tables and remove them afterward. The endpoint fixture
+only accepts loopback addresses. `tests/scraper/test_cdk_scraper.py` synthesizes the construct
+locally when `aws-cdk-lib` is installed; it does not build images or deploy resources.
 
 ## Configuration
 

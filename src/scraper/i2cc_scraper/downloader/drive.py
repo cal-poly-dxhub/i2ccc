@@ -141,12 +141,14 @@ def expand(entry: 'Source | dict | str', ctx: Context) -> Expanded:
         meta = ctx.drive.get(file_id) if ctx.drive is not None else None
         if not _is_folder(link_kind, meta):
             return Expanded(items=[source])
+        ctx.progress.discovered(source.url, 'folder', title=source.link_text)
         if meta is not None:
             expanded.title = meta.get('name', '')
             _expand_api(ctx, meta, (), set(), expanded)
         else:
             _expand_public(ctx, file_id, (), set(), expanded)
     except Exception as exc:
+        ctx.progress.discovery(source.url, 'failed', error=str(exc), reason='listing_error')
         _add_listing_failure(expanded, source.url, source.link_text, exc)
     log.info('Expanded %s: %d item(s), %d failure(s)', source.url, len(expanded.items),
              len(expanded.failures))
@@ -165,24 +167,33 @@ def _add_listing_failure(expanded: Expanded, url: str, name: str, exc: Exception
 def _expand_public(ctx: Context, folder_id: str, path: tuple[str, ...], seen: set[str],
                    expanded: Expanded) -> None:
     seen.add(folder_id)
+    folder_url = f'https://drive.google.com/drive/folders/{folder_id}'
+    ctx.progress.discovered(folder_url, 'folder')
+    ctx.progress.discovery(folder_url, 'running')
     name, entries = list_google_folder(folder_id, ctx.session)
+    ctx.progress.discovered(folder_url, 'folder', title=name)
     if not path:
         expanded.title = name
-    folder_url = f'https://drive.google.com/drive/folders/{folder_id}'
     here = path + (name,)
     for entry_name, entry_url in entries:
+        ctx.progress.discovered(entry_url, GOOGLE_DRIVE, parent=folder_url, title=entry_name)
         try:
             if _no_file_form(entry_url):
                 log.info('Ignoring "%s": a Google Form/Site has no file form', entry_name)
+                ctx.progress.content(entry_url, 'skipped', reason='not_downloadable')
                 continue
             kind, entry_id = parse_google_url(entry_url)
+            ctx.progress.discovered(entry_url, 'folder' if kind == 'folder' else GOOGLE_DRIVE,
+                                    parent=folder_url, title=entry_name)
             if kind == 'folder':
                 if entry_id not in seen:
                     _expand_public(ctx, entry_id, here, seen, expanded)
                 continue
             _add_file(expanded, seen, entry_id, entry_url, entry_name, folder_url, here)
         except Exception as exc:
+            ctx.progress.discovery(entry_url, 'failed', error=str(exc), reason='listing_error')
             _add_listing_failure(expanded, entry_url, entry_name, exc)
+    ctx.progress.discovery(folder_url, 'complete')
 
 
 def _add_file(expanded: Expanded, seen: set[str], file_id: str, url: str, name: str,
@@ -209,6 +220,8 @@ def _expand_api(ctx: Context, meta: dict, path: tuple[str, ...], seen: set[str],
 
     seen.add(meta['id'])
     folder_url = _drive_web_url(meta)
+    ctx.progress.discovered(folder_url, 'folder', title=meta.get('name', ''))
+    ctx.progress.discovery(folder_url, 'running')
     here = path + (meta['name'],)
     for child in ctx.drive.list_folder(meta['id']):
         child_url = _drive_web_url(child)
@@ -217,6 +230,8 @@ def _expand_api(ctx: Context, meta: dict, path: tuple[str, ...], seen: set[str],
                 child = ctx.drive.get(child['shortcutDetails']['targetId'], resolve_shortcut=False)
                 child_url = _drive_web_url(child)
             mime = child['mimeType']
+            ctx.progress.discovered(child_url, 'folder' if mime == FOLDER else GOOGLE_DRIVE,
+                                    parent=folder_url, title=child.get('name', ''))
             if mime == FOLDER:
                 if child['id'] not in seen:
                     _expand_api(ctx, child, here, seen, expanded)
@@ -224,11 +239,16 @@ def _expand_api(ctx: Context, meta: dict, path: tuple[str, ...], seen: set[str],
             if mime.startswith(GOOGLE_APPS_PREFIX) and mime not in NATIVE_KINDS:
                 log.info('Ignoring "%s": a Google %s has no file form', child.get('name'),
                          mime.rsplit('.', 1)[-1])
+                ctx.progress.content(child_url, 'skipped', reason='not_downloadable')
                 continue
             _add_file(expanded, seen, child['id'], child_url, child.get('name', ''), folder_url,
                       here)
         except Exception as exc:
+            ctx.progress.discovered(child_url, GOOGLE_DRIVE, parent=folder_url,
+                                    title=child.get('name', ''))
+            ctx.progress.discovery(child_url, 'failed', error=str(exc), reason='listing_error')
             _add_listing_failure(expanded, child_url, child.get('name', '?'), exc)
+    ctx.progress.discovery(folder_url, 'complete')
 
 
 class _FolderResult:

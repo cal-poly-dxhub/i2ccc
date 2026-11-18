@@ -1,6 +1,6 @@
 """ingest() one item, save_page(), download() one URL, and the FETCHERS registry."""
 import logging
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Callable, Optional, TYPE_CHECKING
 
@@ -27,6 +27,30 @@ log = logging.getLogger('i2cc_scraper.downloader')  # one logger, as before
 
 
 def ingest(entry: 'Source | dict | str', ctx: Context) -> DownloadResult:
+    """Download one item while reporting its attempts and terminal result."""
+    source = Source.of(entry)
+    ctx.progress.discovered(source.url, source.kind, title=source.link_text)
+    for parent in source.found_on:
+        ctx.progress.discovered(source.url, source.kind, parent=parent, title=source.link_text,
+                                context=source.context)
+    ctx.progress.content(source.url, 'checking')
+    previous_url, ctx.current_url = ctx.current_url, source.url
+    try:
+        result = _ingest(source, ctx)
+    except TransientError as exc:
+        ctx.progress.content(source.url, 'retrying', error=str(exc), reason=exc.reason)
+        raise
+    except Exception as exc:
+        ctx.progress.content(source.url, 'failed', error=str(exc), reason='error')
+        raise
+    finally:
+        ctx.current_url = previous_url
+    ctx.progress.content(source.url, 'failed' if result.status == 'failed' else 'stored',
+                         result=asdict(result), error=result.error, reason=result.reason)
+    return result
+
+
+def _ingest(entry: 'Source | dict | str', ctx: Context) -> DownloadResult:
     """Download one asset into ctx.store, unless it's stored and unchanged.
 
     Returns a DownloadResult; a permanent failure is a FAILED result with a Reason. Raises

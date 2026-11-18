@@ -54,6 +54,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f src/backend/requirements.txt ]; then pip install -r src/backend/requirements.txt; fi
           if [ -f src/proxy/requirements.txt ]; then pip install -r src/proxy/requirements.txt; fi
+          pip install -r requirements-dev.txt -e "src/scraper[tui]"
 
       # Step 4: Run flake8 to check code quality
       # This checks for syntax errors, undefined names, and style issues
@@ -64,11 +65,7 @@ jobs:
           # Exit-zero treats all errors as warnings, allowing the workflow to continue
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-      # Step 5: Run tests if a tests directory exists
-      # You can uncomment this when you add tests
-      # - name: Run tests
-      #   run: |
-      #     if [ -d tests ]; then
-      #       pip install pytest
-      #       pytest tests/
-      #     fi
+      # Local tests only. Emulator tests skip without a loopback endpoint;
+      # live AWS/Drive end-to-end tests are deliberately excluded.
+      - name: Run Python tests
+        run: python -m pytest tests/scraper tests/ingest_utils

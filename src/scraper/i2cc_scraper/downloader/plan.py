@@ -1,6 +1,6 @@
 """Planning a run: crawl_into_store(), dedupe(), and the local download_all() loop."""
 import logging
-from dataclasses import dataclass, replace
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any, Callable, Iterable, Optional, TYPE_CHECKING
 
@@ -258,7 +258,9 @@ def crawl_into_store(start_url: str, ctx: Context, max_depth: int = 1, *,
     pages: list[DownloadResult] = []
 
     def on_page(page: CrawlResult) -> None:
+        ctx.progress.discovered(page.url, page.type, title=page.title)
         if page.text:
+            ctx.progress.content(page.url, 'checking')
             try:
                 result = save_page(page, ctx)
             except Exception as exc:
@@ -271,6 +273,10 @@ def crawl_into_store(start_url: str, ctx: Context, max_depth: int = 1, *,
                 result = failed_result(page.url, page.type, error, page.title)
             page.key = result.key
             pages.append(result)
+            ctx.progress.content(page.url, 'failed' if result.status == FAILED else 'stored',
+                                 result=asdict(result), error=result.error, reason=result.reason)
+        else:
+            ctx.progress.content(page.url, 'skipped', reason='no_text')
 
     left = ctx.time_left()
     if left is not None and crawl_options.get('time_limit') is None:
@@ -279,6 +285,7 @@ def crawl_into_store(start_url: str, ctx: Context, max_depth: int = 1, *,
         crawl_options['time_limit'] = min(share, configured) if configured else share
 
     results = crawl_for_ingest(start_url, max_depth, config=ctx.config, on_page=on_page,
+                               progress=ctx.progress,
                                **crawl_options)
     report = CrawlReport(results=results, pages=pages)
     if report.truncated:

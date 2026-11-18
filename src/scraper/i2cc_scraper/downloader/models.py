@@ -17,6 +17,7 @@ from .errors import DeadlineExceeded
 from ..scraper import new_session
 from ..url_classifier import classify_url
 from ..store import Store
+from ..progress import NULL_PROGRESS, Progress
 
 if TYPE_CHECKING:
     from ..drive_api import DriveClient
@@ -135,8 +136,11 @@ class Context:
                  session: Optional[requests.Session] = None,
                  work_dir: Optional[Path | str] = None,
                  on_download: Optional[Callable[[], None]] = None,
-                 budget: Optional[float] = None, reserve: float = 30.0):
+                 budget: Optional[float] = None, reserve: float = 30.0,
+                 progress: Progress = NULL_PROGRESS):
         self.store = store
+        self.progress = progress
+        self.current_url = ''
         self.on_download = on_download
         self.options = options or Options()
         self.config = config or config_module.default()
@@ -173,6 +177,8 @@ class Context:
         """Called just before file bytes are fetched from a source -- not for a metadata check
         or a "not modified" answer, which is how a caller (the TUI) can tell a download from a
         skip. Calls on_download, if set; a failing callback is logged, never fatal."""
+        if self.current_url:
+            self.progress.content(self.current_url, 'downloading')
         if self.on_download is not None:
             try:
                 self.on_download()
