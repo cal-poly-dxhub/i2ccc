@@ -17,6 +17,8 @@ export const STATUS_META: Record<SourceStatus | ChildStatus, { label: string; to
   ingest_started: { label: 'Ingest started', tone: 'warning', active: true },
   ingest_complete: { label: 'Ingest complete', tone: 'success', active: false },
   ingest_failed: { label: 'Ingest failed', tone: 'error', active: false },
+  cleaning_up: { label: 'Removing content', tone: 'warning', active: true },
+  cleanup_failed: { label: 'Removal failed', tone: 'error', active: false },
   pending: { label: 'Not ingested', tone: 'neutral', active: false },
   ingested: { label: 'Ingested', tone: 'success', active: false },
   failed: { label: 'Failed', tone: 'error', active: false },

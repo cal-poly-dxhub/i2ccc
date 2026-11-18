@@ -8,7 +8,21 @@ import { useSources } from './hooks/useSources';
 
 export default function App() {
   const { isAuthenticated, isLoading, authError, user, logout } = useAuth();
-  const { sources, addSource, rerunSource, deleteSource, ingestAll, pendingCount } = useSources();
+  const {
+    sources,
+    pendingCount,
+    loaded,
+    loadError,
+    actionError,
+    page,
+    hasNextPage,
+    goToPage,
+    addSource,
+    rerunSource,
+    deleteSource,
+    ingestAll,
+  } = useSources(isAuthenticated);
+  const [ingesting, setIngesting] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
     localStorage.getItem('i2-theme') === 'dark' ? 'dark' : 'light',
   );
@@ -44,13 +58,41 @@ export default function App() {
       <main className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight">Sources</h1>
-          <button type="button" className="btn-primary" disabled={pendingCount === 0} onClick={ingestAll}>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={pendingCount === 0 || ingesting}
+            onClick={async () => {
+              setIngesting(true);
+              await ingestAll();
+              setIngesting(false);
+            }}
+          >
             <Play size={14} aria-hidden="true" />
             Ingest new documents{pendingCount > 0 ? ` (${pendingCount})` : ''}
           </button>
         </div>
         <AddSourcePanel onAdd={addSource} />
-        <SourcesTable sources={sources} onRerun={rerunSource} onDeleteSource={deleteSource} />
+        {actionError && (
+          <p role="alert" className="text-sm font-medium text-[var(--color-error)]">
+            {actionError}
+          </p>
+        )}
+        {loadError && (
+          <p role="alert" className="text-sm font-medium text-[var(--color-error)]">
+            Could not load sources. Retrying…
+          </p>
+        )}
+        {loaded && (
+          <SourcesTable
+            sources={sources}
+            page={page}
+            hasNextPage={hasNextPage}
+            onPageChange={goToPage}
+            onRerun={rerunSource}
+            onDeleteSource={deleteSource}
+          />
+        )}
       </main>
     </div>
   );

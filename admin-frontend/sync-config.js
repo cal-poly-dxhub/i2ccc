@@ -39,9 +39,14 @@ try {
   const domain = get('CognitoHostedUiDomain');
   const clientId = get('CognitoAppClientId');
   if (!domain || !clientId) throw new Error(`Cognito outputs not found on stack ${stackName}`);
+  // ProxyAPIEndpoint ends at the stage (".../prod/"); the routes live under /api/
+  const proxyApi = get('ProxyAPIEndpoint');
+  if (!proxyApi) throw new Error(`ProxyAPIEndpoint output not found on stack ${stackName}`);
 
   const origin = 'http://localhost:5174';
   const env = [
+    // vite.config.ts proxies /api/ here during pnpm dev
+    `VITE_API_ENDPOINT=${proxyApi.replace(/\/?$/, '/')}api/`,
     `VITE_COGNITO_DOMAIN=${domain}`,
     `VITE_COGNITO_CLIENT_ID=${clientId}`,
     `VITE_COGNITO_REDIRECT_URI=${origin}`,

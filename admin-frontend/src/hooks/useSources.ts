@@ -1,111 +1,131 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { mockSources } from '../data/mockSources';
-import type { Source, SourceChild } from '../types';
-import { detectType, normalizeUrl } from '../utils';
+import * as api from '../services/api';
+import type { SourceStatus, SourcesPage } from '../types';
+import { matchSource } from '../urlPatterns';
 
-export type AddResult = 'added' | 'unsupported' | 'duplicate';
+export type AddResult = 'added' | 'unsupported' | 'duplicate' | 'failed';
 
-/**
- * Mock data layer. Replace the bodies of addSource / rerunSource / deleteSource / ingestAll
- * with the API calls in BACKEND_PLAN.md (POST /api/sources, POST /api/sources/{id}/rerun,
- * DELETE /api/sources/{id}, POST /api/ingest) and poll GET /api/sources for status.
- */
-/** A page source finds subpages and documents. A direct link (video, Drive, PDF) is itself the document, so it has none. */
-function fakeChildren(source: Source): SourceChild[] {
-  if (source.type !== 'page') return [];
-  const base = source.url.replace(/\/$/, '');
-  return [
-    { id: `${source.id}-1`, title: 'Subpage 1', url: `${base}/about`, type: 'page', status: 'pending' },
-    { id: `${source.id}-2`, title: 'Subpage 2', url: `${base}/about/team`, type: 'page', parentId: `${source.id}-1`, status: 'pending' },
-    { id: `${source.id}-3`, parentId: `${source.id}-1`, title: 'slides.pdf', url: `${base}/slides.pdf`, type: 'pdf', status: 'pending' },
-  ];
+export const SOURCES_PER_PAGE = 10;
+// Poll faster while something is crawling, ingesting or being removed
+const ACTIVE_POLL_MS = 5_000;
+const IDLE_POLL_MS = 30_000;
+const BUSY_STATUSES: SourceStatus[] = ['crawling', 'ingest_started', 'cleaning_up'];
+
+const ACTION_ERRORS: Record<string, string> = {
+  crawl_in_progress: 'That source is still crawling. Try again when the crawl finishes.',
+  cleanup_in_progress: 'That source is still being removed. Try again when it finishes.',
+  source_not_found: 'That source no longer exists.',
+};
+
+function actionMessage(error: unknown): string {
+  return (error instanceof api.ApiError && ACTION_ERRORS[error.code]) || 'Something went wrong. Try again.';
 }
 
-export function useSources() {
-  const [sources, setSources] = useState<Source[]>(mockSources);
-  const timers = useRef<number[]>([]);
+/**
+ * One page of sources from GET /api/sources, polled, plus the actions that change them.
+ * Nothing is fetched until enabled is true, so no request goes out before sign-in has a token.
+ */
+export function useSources(enabled: boolean) {
+  // cursors[i] fetches page i; page 0 has none
+  const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
+  const [page, setPage] = useState(0);
+  const [data, setData] = useState<SourcesPage | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const latestRequest = useRef(0);
+
+  const refresh = useCallback(async () => {
+    const requestId = ++latestRequest.current;
+    try {
+      const result = await api.listSources(SOURCES_PER_PAGE, cursors[page]);
+      if (requestId !== latestRequest.current) return; // a newer request superseded this one
+      if (result.sources.length === 0 && page > 0) {
+        // Deletes emptied this page
+        setPage(page - 1);
+        return;
+      }
+      setData(result);
+      setLoadError(false);
+    } catch {
+      if (requestId === latestRequest.current) setLoadError(true);
+    }
+  }, [cursors, page]);
 
   useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(window.clearTimeout);
-  }, []);
+    if (enabled) refresh();
+  }, [refresh, enabled]);
 
-  const later = useCallback((fn: () => void, ms: number) => {
-    timers.current.push(window.setTimeout(fn, ms));
-  }, []);
+  const active = data?.sources.some((s) => BUSY_STATUSES.includes(s.status)) ?? false;
+  useEffect(() => {
+    if (!enabled) return;
+    const id = window.setInterval(refresh, active ? ACTIVE_POLL_MS : IDLE_POLL_MS);
+    return () => window.clearInterval(id);
+  }, [refresh, active, enabled]);
 
-  const update = useCallback((id: string, patch: (s: Source) => Source) => {
-    setSources((prev) => prev.map((s) => (s.id === id ? patch(s) : s)));
-  }, []);
-
-  const crawl = useCallback(
-    (source: Source) => {
-      later(() => update(source.id, (s) => ({ ...s, status: 'crawl_success', children: fakeChildren(s).length ? fakeChildren(s) : undefined })), 3000);
+  const goToPage = useCallback(
+    (next: number) => {
+      if (next > page) {
+        setCursors((prev) => {
+          const copy = prev.slice(0, page + 1);
+          copy[next] = data?.nextCursor;
+          return copy;
+        });
+      }
+      setPage(next);
     },
-    [later, update],
+    [page, data],
   );
 
   const addSource = useCallback(
-    (rawUrl: string): AddResult => {
-      const normalized = normalizeUrl(rawUrl);
-      if (!normalized) return 'unsupported';
-      if (sources.some((s) => normalizeUrl(s.url) === normalized)) return 'duplicate';
-      const url = rawUrl.trim();
-      const source: Source = {
-        id: crypto.randomUUID(),
-        title: url.replace(/^https?:\/\//i, ''),
-        url,
-        type: detectType(url),
-        status: 'crawling',
-        addedAt: new Date().toISOString(),
-      };
-      setSources((prev) => [source, ...prev]);
-      crawl(source);
+    async (rawUrl: string): Promise<AddResult> => {
+      // Same listing as the server (shared/source_urls.yaml), so obvious mistakes skip the round trip
+      if (!matchSource(rawUrl)) return 'unsupported';
+      try {
+        await api.addSource(rawUrl.trim());
+      } catch (error) {
+        if (error instanceof api.ApiError && error.code === 'unsupported_url') return 'unsupported';
+        if (error instanceof api.ApiError && error.code === 'url_already_exists') return 'duplicate';
+        return 'failed';
+      }
+      setActionError(null);
+      // New sources are listed first
+      if (page === 0) await refresh();
+      else setPage(0);
       return 'added';
     },
-    [sources, crawl],
+    [page, refresh],
   );
 
-  const rerunSource = useCallback(
-    (id: string) => {
-      const source = sources.find((s) => s.id === id);
-      if (!source) return;
-      update(id, (s) => ({ ...s, status: 'crawling', error: undefined, children: undefined }));
-      crawl(source);
+  const runAction = useCallback(
+    async (action: () => Promise<unknown>) => {
+      try {
+        await action();
+        setActionError(null);
+      } catch (error) {
+        setActionError(actionMessage(error));
+      }
+      await refresh();
     },
-    [sources, update, crawl],
+    [refresh],
   );
 
-  const deleteSource = useCallback((id: string) => {
-    setSources((prev) => prev.filter((s) => s.id !== id));
-  }, []);
-
+  const rerunSource = useCallback((id: string) => runAction(() => api.rerunSource(id)), [runAction]);
+  const deleteSource = useCallback((id: string) => runAction(() => api.deleteSource(id)), [runAction]);
   /** Ingest every crawled document that is not ingested yet, whichever source it belongs to. */
-  const ingestAll = useCallback(() => {
-    const targets = sources.filter(
-      (s) => s.status === 'crawl_success' || (s.status === 'ingest_started' && s.children?.some((c) => c.status === 'pending')),
-    );
-    targets.forEach((target, i) => {
-      update(target.id, (s) => ({ ...s, status: 'ingest_started' }));
-      later(
-        () =>
-          update(target.id, (s) => ({
-            ...s,
-            status: 'ingest_complete',
-            children: s.children?.map((c) => (c.status === 'pending' ? { ...c, status: 'ingested' } : c)),
-          })),
-        3000 + i * 1500,
-      );
-    });
-  }, [sources, update, later]);
+  const ingestAll = useCallback(() => runAction(api.startIngest), [runAction]);
 
-  // Documents waiting to be ingested. Each source's own document (the page text, or the
-  // file for a direct link) counts too, so it is added on top of the pending children.
-  // The real API returns this total, see BACKEND_PLAN.md.
-  const pendingCount = sources.reduce((n, s) => {
-    if (s.status === 'crawling' || s.status === 'crawl_failed') return n;
-    return n + (s.children?.filter((c) => c.status === 'pending').length ?? 0) + (s.status === 'crawl_success' ? 1 : 0);
-  }, 0);
-
-  return { sources, addSource, rerunSource, deleteSource, ingestAll, pendingCount };
+  return {
+    sources: data?.sources ?? [],
+    pendingCount: data?.pendingCount ?? 0,
+    loaded: data !== null,
+    loadError,
+    actionError,
+    page,
+    hasNextPage: Boolean(data?.nextCursor),
+    goToPage,
+    addSource,
+    rerunSource,
+    deleteSource,
+    ingestAll,
+  };
 }

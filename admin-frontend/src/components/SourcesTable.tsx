@@ -1,55 +1,79 @@
 import { ChevronDown, ChevronRight, RotateCw, Trash2 } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
+import { listDocuments } from '../services/api';
 import type { Source, SourceChild } from '../types';
 import { timeAgo } from '../utils';
 import Pager from './Pager';
 import StatusBadge from './StatusBadge';
 import TypeBadge from './TypeBadge';
 
-const SOURCES_PER_PAGE = 10;
+// Must match the first page of children the API embeds in each source
 const CHILDREN_PER_PAGE = 10;
 
 interface Props {
   sources: Source[];
+  page: number;
+  hasNextPage: boolean;
+  onPageChange: (page: number) => void;
   onRerun: (id: string) => void;
   onDeleteSource: (id: string) => void;
 }
 
+// Rerun and delete wait until the crawl or the previous rerun/delete has finished
+const isBusy = (source: Source) => source.status === 'crawling' || source.status === 'cleaning_up';
+
 function childCountLabel(source: Source): string | null {
   if (source.status === 'crawling') return 'crawling…';
-  const n = source.children?.length;
-  if (n === undefined) return null;
+  const n = source.childCount;
+  if (n === 0) return null;
   return `${n} item${n === 1 ? '' : 's'} found`;
 }
 
-interface TreeRow {
-  child: SourceChild;
-  /** 1 for items found directly on the source, 2 for items found on those pages, and so on. */
-  level: number;
-}
+/**
+ * One page of a source's children. Page 0 comes embedded in the source; later pages are
+ * fetched with the cursor the previous page returned. Refetched whenever the source is
+ * (each poll), so statuses stay current.
+ */
+function useChildrenPage(source: Source) {
+  const [page, setPage] = useState(0);
+  // cursors[i] fetches page i, recorded when the user moves forward
+  const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
+  const [fetched, setFetched] = useState<{ page: number; children: SourceChild[]; nextCursor?: string } | null>(null);
 
-/** Flattens the children into display order: each page followed by everything found on it. */
-function flattenTree(children: SourceChild[]): TreeRow[] {
-  const ids = new Set(children.map((c) => c.id));
-  const byParent = new Map<string | undefined, SourceChild[]>();
-  for (const child of children) {
-    // A missing or unknown parent means it was found on the source itself
-    const key = child.parentId && ids.has(child.parentId) ? child.parentId : undefined;
-    byParent.set(key, [...(byParent.get(key) ?? []), child]);
-  }
+  const pageCount = Math.max(1, Math.ceil(source.childCount / CHILDREN_PER_PAGE));
+  // A rerun can shrink the list under the current page
+  const safePage = page < pageCount ? page : 0;
 
-  const rows: TreeRow[] = [];
-  const seen = new Set<string>();
-  const walk = (parent: string | undefined, level: number) => {
-    for (const child of byParent.get(parent) ?? []) {
-      if (seen.has(child.id)) continue;
-      seen.add(child.id);
-      rows.push({ child, level });
-      walk(child.id, level + 1);
+  useEffect(() => {
+    if (safePage === 0) return;
+    let cancelled = false;
+    listDocuments(source.id, CHILDREN_PER_PAGE, cursors[safePage])
+      .then((result) => {
+        if (!cancelled) setFetched({ page: safePage, children: result.documents, nextCursor: result.nextCursor });
+      })
+      .catch(() => undefined); // keep showing the last page; the next poll retries
+    return () => {
+      cancelled = true;
+    };
+  }, [source, safePage, cursors]);
+
+  const onPage0 = safePage === 0;
+  const current = !onPage0 && fetched?.page === safePage ? fetched : null;
+  const children = onPage0 ? source.children : (current?.children ?? []);
+  const nextCursor = onPage0 ? source.childrenNextCursor : current?.nextCursor;
+
+  const goTo = (next: number) => {
+    if (next > safePage) {
+      setCursors((prev) => {
+        const copy = prev.slice(0, safePage + 1);
+        copy[next] = nextCursor;
+        return copy;
+      });
     }
+    setPage(next);
   };
-  walk(undefined, 1);
-  return rows;
+
+  return { page: safePage, pageCount, children, hasNext: Boolean(nextCursor), goTo };
 }
 
 interface SourceRowsProps {
@@ -61,17 +85,11 @@ interface SourceRowsProps {
 /** One source row plus, when open, all of its levels as a paginated tree. */
 function SourceRows({ source, onRerun, onDelete }: SourceRowsProps) {
   const [open, setOpen] = useState(true);
-  const [page, setPage] = useState(0);
+  const childrenPage = useChildrenPage(source);
 
-  const children = source.children ?? [];
-  const hasChildren = children.length > 0;
+  const hasChildren = source.childCount > 0;
   const count = childCountLabel(source);
-
-  const tree = flattenTree(children);
-  const pageCount = Math.max(1, Math.ceil(tree.length / CHILDREN_PER_PAGE));
-  const safePage = Math.min(page, pageCount - 1);
-  const visible = tree.slice(safePage * CHILDREN_PER_PAGE, (safePage + 1) * CHILDREN_PER_PAGE);
-  const showFooter = open && hasChildren && pageCount > 1;
+  const showFooter = open && hasChildren && childrenPage.pageCount > 1;
 
   return (
     <Fragment>
@@ -107,7 +125,7 @@ function SourceRows({ source, onRerun, onDelete }: SourceRowsProps) {
             <button
               type="button"
               className="icon-btn"
-              disabled={source.status === 'crawling'}
+              disabled={isBusy(source)}
               aria-label={`Rerun ${source.title}`}
               title="Delete old content and recrawl"
               onClick={() => onRerun(source)}
@@ -117,7 +135,7 @@ function SourceRows({ source, onRerun, onDelete }: SourceRowsProps) {
             <button
               type="button"
               className="icon-btn"
-              disabled={source.status === 'crawling'}
+              disabled={isBusy(source)}
               aria-label={`Delete ${source.title}`}
               title="Delete source and its documents"
               onClick={() => onDelete(source)}
@@ -129,15 +147,15 @@ function SourceRows({ source, onRerun, onDelete }: SourceRowsProps) {
       </tr>
 
       {open &&
-        visible.map(({ child, level }) => (
+        childrenPage.children.map((child) => (
           <tr key={child.id} className="border-b border-[var(--color-border-soft)]">
             <td className="py-3 pl-12 pr-5">
               <div
                 className="border-l border-[var(--color-border)] pl-4"
-                style={{ marginLeft: level > 1 ? `${(level - 1) * 1.5}rem` : undefined }}
+                style={{ marginLeft: child.level > 1 ? `${(child.level - 1) * 1.5}rem` : undefined }}
               >
                 {child.title}
-                <span className="ml-2.5 text-xs text-[var(--color-text-muted)]">level {level}</span>
+                <span className="ml-2.5 text-xs text-[var(--color-text-muted)]">level {child.level}</span>
                 <div className="mt-0.5 break-all font-mono text-xs text-[var(--color-text-secondary)]">{child.url}</div>
               </div>
             </td>
@@ -151,7 +169,13 @@ function SourceRows({ source, onRerun, onDelete }: SourceRowsProps) {
       {showFooter && (
         <tr className="border-b border-[var(--color-border-soft)]">
           <td colSpan={5} className="px-5 py-2.5">
-            <Pager page={safePage} pageCount={pageCount} onChange={setPage} label={`${source.title} documents`} />
+            <Pager
+              page={childrenPage.page}
+              pageCount={childrenPage.pageCount}
+              hasNext={childrenPage.hasNext}
+              onChange={childrenPage.goTo}
+              label={`${source.title} documents`}
+            />
           </td>
         </tr>
       )}
@@ -159,13 +183,7 @@ function SourceRows({ source, onRerun, onDelete }: SourceRowsProps) {
   );
 }
 
-export default function SourcesTable({ sources, onRerun, onDeleteSource }: Props) {
-  const [page, setPage] = useState(0);
-
-  const pageCount = Math.max(1, Math.ceil(sources.length / SOURCES_PER_PAGE));
-  const safePage = Math.min(page, pageCount - 1);
-  const visible = sources.slice(safePage * SOURCES_PER_PAGE, (safePage + 1) * SOURCES_PER_PAGE);
-
+export default function SourcesTable({ sources, page, hasNextPage, onPageChange, onRerun, onDeleteSource }: Props) {
   const handleRerun = (source: Source) => {
     const ok = window.confirm(
       `Rerun "${source.title}"?\n\nThis deletes its existing content from storage and search, then crawls the URL again.`,
@@ -180,7 +198,7 @@ export default function SourcesTable({ sources, onRerun, onDeleteSource }: Props
     if (ok) onDeleteSource(source.id);
   };
 
-  if (sources.length === 0) {
+  if (sources.length === 0 && page === 0) {
     return <p className="card p-8 text-center text-sm text-[var(--color-text-secondary)]">No sources yet. Add a URL above.</p>;
   }
 
@@ -198,13 +216,13 @@ export default function SourcesTable({ sources, onRerun, onDeleteSource }: Props
             </tr>
           </thead>
           <tbody>
-            {visible.map((source) => (
+            {sources.map((source) => (
               <SourceRows key={source.id} source={source} onRerun={handleRerun} onDelete={handleDelete} />
             ))}
           </tbody>
         </table>
       </div>
-      <Pager page={safePage} pageCount={pageCount} onChange={setPage} label="Sources" />
+      <Pager page={page} hasNext={hasNextPage} onChange={onPageChange} label="Sources" />
     </div>
   );
 }
