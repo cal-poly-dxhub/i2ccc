@@ -177,6 +177,65 @@ when the admin frontend supplies its IAM role. Deployment still uses `app.py` an
 the normal `cdk deploy` flow in `us-east-1`; no separate app or stack is needed.
 CDK retains the table on stack removal and enables point-in-time recovery.
 
+### Scraper permissions
+
+Each function has its own role. `cdk/scraper.py` grants exact runtime actions rather than
+generic S3 or DynamoDB read/write bundles:
+
+| Function | S3 | Progress database | Other access |
+| --- | --- | --- | --- |
+| Crawl | Content read/write/cleanup; write `crawl.json` | Item reads, queries, transactional puts/checks | Clear scraper-owned processed-file rows; clean vectors in the configured index |
+| Plan | Read `crawl.json`; write `items.json`/`plan.json` | Item reads, queries, transactional puts/checks | Read the configured Google secret |
+| Download | Content/staging read/write/cleanup; write per-item results | Item reads, transactional puts/checks | Read the Google secret; clear scraper-owned processed-file rows and vectors |
+| Report | Read run inputs/results; write `report.json` | Item reads, queries, transactional puts | None |
+| Failure | None | Item reads, queries, transactional puts | None |
+| Starter | None | Item reads and transactional puts | Start this state machine; describe its executions |
+| Reconciler | None | Item reads, queries, transactional puts; query the `sources` index | Start this state machine; describe its executions |
+| Admin frontend | None | `GetItem`/`Query` on this table; `Query` on `sources` | Invoke the starter only |
+
+Content access is confined to the scraper's `pages/`, `files/`, `google_drive/`, `youtube/`,
+and `panopto/` paths. Bucket listing always requires a permitted `s3:prefix`; it cannot list
+unrelated ingestion content. Plan and Report cannot delete objects or change stored content.
+There are no ACL, retention, legal-hold, tagging, or object-version API grants.
+Missing-key reads confirm an ambiguous S3 403 through a list of that exact key prefix; an
+existing denied object or a denied list remains an authorization error.
+
+Progress writes are limited to `TransactWriteItems` and `SOURCE#`/`RUN#` partition families.
+Workers have no `Scan`, `DeleteItem`, or DynamoDB Streams grants on this table. Processed-file
+deletion is restricted by `dynamodb:LeadingKeys` to S3 URIs under the scraper's content paths;
+the `ForAllValues` conditions also require the key to be present with `Null: false`.
+
+The workflow reads only run `items.json` objects and writes only its Map-results path. It can
+invoke scraper workers and operate its own Distributed Map children. Its service trust is
+bound to this account and region. Each Lambda writes only its own pre-created log group;
+the account-wide `AWSLambdaBasicExecutionRole` managed policy is removed from scraper roles.
+Google-secret access is `GetSecretValue` only, on that secret, for Plan and Download.
+
+OpenSearch uses the required collection-scoped `aoss:APIAccessAll` IAM gate plus a separate
+data policy granting just `ReadDocument`/`WriteDocument` on the configured index to Crawl and
+Download. There are no index-management grants. These data permissions are **index-wide**:
+they cannot enforce a `scraper-file-id` filter or distinguish bulk deletion from other document
+writes. The application supplies that filter. Data policies are additive; any other policy
+granting these roles broader access still applies. Strict document isolation would require
+a separate index or a more restricted cleanup service.
+
+The SDK-action baseline can be regenerated locally with IAM Policy Autopilot (no upload flag):
+
+```sh
+DISABLE_IAM_POLICY_AUTOPILOT_TELEMETRY=true uvx iam-policy-autopilot@latest generate-policies \
+  "$PWD/src/scraper/i2cc_scraper/aws/handlers.py" \
+  "$PWD/src/scraper/i2cc_scraper/aws/progress.py" \
+  "$PWD/src/scraper/i2cc_scraper/aws/s3store.py" \
+  "$PWD/src/scraper/i2cc_scraper/aws/invalidate.py" \
+  --region us-east-1 --service-hints s3 dynamodb secretsmanager stepfunctions states --pretty
+```
+
+That generated baseline includes optional SDK features and dynamically resolved resources;
+it is not a deployable least-privilege policy. The CDK construct narrows it to the actual
+handlers, encryption settings, table, prefixes, secret, and state machine. Synthesized-policy
+regression tests check those boundaries; AWS Emulator tests check runtime behavior, **not IAM
+enforcement**. No live permissions are changed by running either test suite.
+
 Locally, against [AWS Emulator](https://github.com/aws/aws-emulator):
 `( . ~/.aws/emulator/9297.env && .venv/bin/python -m pytest )` also runs the S3 store and the
 handlers end to end (`tests/scraper/test_s3store.py`, `tests/scraper/test_handlers.py`), plus

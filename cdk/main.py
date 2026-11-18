@@ -151,6 +151,7 @@ class RagChatbotStack(Stack):
             opensearch_index_name=opensearch_index_name,
             opensearch_collection_arn=ingest_stack.collection_arn,
             google_credentials_secret=content_sync.google_secret,
+            opensearch_collection_name=opensearch_collection_name,
         )
 
         # Weekly Excel export of conversations, emailed as a download link so

@@ -25,6 +25,7 @@ def test_progress_table_workflow_and_frontend_grants_synthesize(tmp_path):
         opensearch_endpoint='https://test.us-east-1.aoss.amazonaws.com',
         opensearch_index_name='test',
         opensearch_collection_arn='arn:aws:aoss:us-east-1:000000000000:collection/test',
+        opensearch_collection_name='test-collection',
         frontend_role=frontend,
     )
     template = Template.from_stack(stack)
@@ -100,8 +101,13 @@ def test_scraper_is_integrated_into_the_existing_stack(tmp_path, monkeypatch):
         'Environment': {'Variables': {
             'SCRAPER_BUCKET': stack.resolve(ingest.input_assets_bucket.bucket_name),
             'PROCESSED_FILES_TABLE': stack.resolve(ingest.processed_files_table.table_name),
-            'GOOGLE_CREDENTIALS_SECRET': stack.resolve(content_sync.google_secret.secret_arn),
             'SCRAPER_PROGRESS_TABLE': stack.resolve(stack.scraper.progress_table.table_name),
+        }},
+    })
+    template.has_resource_properties('AWS::Lambda::Function', {
+        'ImageConfig': {'Command': ['i2cc_scraper.aws.handlers.plan']},
+        'Environment': {'Variables': {
+            'GOOGLE_CREDENTIALS_SECRET': stack.resolve(content_sync.google_secret.secret_arn),
         }},
     })
     resources = template.to_json()['Resources']

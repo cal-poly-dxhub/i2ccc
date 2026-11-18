@@ -124,12 +124,13 @@ class S3Store:
 
     def get(self, key: str) -> Optional[Record]:
         try:
-            response = self.client.get_object(Bucket=self.bucket, Key=self._record_key(key))
+            response = get_object(self.client, self.bucket, self._record_key(key))
         except ClientError as exc:
             if exc.response['Error']['Code'] in ('NoSuchKey', '404'):
                 return None
             raise
-        record = Record.from_json(response['Body'].read().decode('utf-8'))
+        with response['Body'] as body:
+            record = Record.from_json(body.read().decode('utf-8'))
         record.etag = response['ETag']
         return record
 
@@ -317,8 +318,30 @@ class S3Store:
                 log.warning('Could not clear ingestion state for %s: %s', name, exc)
 
 
+def get_object(client, bucket: str, key: str):
+    """Preserve missing-key behavior with prefix-scoped ListBucket permissions.
+
+    S3 may return 403 for a missing object when the caller lacks unrestricted ListBucket.
+    Check only that key's prefix before translating to NoSuchKey; a real denied object or
+    denied listing must remain an authorization error, never a cache miss.
+    """
+    try:
+        return client.get_object(Bucket=bucket, Key=key)
+    except ClientError as exc:
+        if exc.response['Error']['Code'] not in ('AccessDenied', '403'):
+            raise
+        found = client.list_objects_v2(Bucket=bucket, Prefix=key, MaxKeys=1)
+        if any(item['Key'] == key for item in found.get('Contents', [])):
+            raise
+        raise client.exceptions.NoSuchKey({
+            'Error': {'Code': 'NoSuchKey', 'Message': 'The specified key does not exist'},
+            'ResponseMetadata': {'HTTPStatusCode': 404},
+        }, 'GetObject') from exc
+
+
 def read_json(client, bucket: str, key: str):
-    return json.loads(client.get_object(Bucket=bucket, Key=key)['Body'].read())
+    with get_object(client, bucket, key)['Body'] as body:
+        return json.loads(body.read())
 
 
 def write_json(client, bucket: str, key: str, data) -> None:
